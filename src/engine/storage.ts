@@ -1,6 +1,6 @@
 import { CategoryId, GameModeId, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'pulso_v5_state';
+const STORAGE_KEY = 'pulso_v5_editorial_state';
 
 export function createDefaultProfile(): PlayerProfile {
   const prefersReduced =
@@ -35,9 +35,6 @@ export function createDefaultProfile(): PlayerProfile {
   };
 }
 
-/**
- * Sanitiza dados do localStorage contra corrupção ou estruturas antigas
- */
 export function sanitizeProfile(raw: unknown): PlayerProfile {
   const def = createDefaultProfile();
   if (!raw || typeof raw !== 'object') return def;
@@ -105,7 +102,7 @@ export function saveProfile(profile: PlayerProfile): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   } catch {
-    // Tolera navegador em modo privado ou quota cheia
+    // Ignore storage quota issues
   }
 }
 

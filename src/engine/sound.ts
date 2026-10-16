@@ -12,7 +12,7 @@ class WebAudioSynthesizer {
     }
   }
 
-  private playTone(freq: number, type: OscillatorType, durationMs: number, gainVal = 0.07, delayMs = 0): void {
+  private playTone(freq: number, type: OscillatorType, durationMs: number, gainVal = 0.065, delayMs = 0): void {
     if (!this.enabled) return;
     try {
       this.init();
@@ -29,38 +29,38 @@ class WebAudioSynthesizer {
       osc.start(start);
       osc.stop(start + durationMs / 1000);
     } catch {
-      // Ignora caso o navegador bloqueie áudio antes de clique
+      // Ignore autoplay lock
     }
   }
 
   public keyClick(): void {
-    this.playTone(620, 'sine', 22, 0.02, 0);
+    this.playTone(580, 'sine', 20, 0.018, 0);
   }
 
   public hit(streak: number): void {
-    const base = 420 + Math.min(streak, 6) * 48;
-    this.playTone(base, 'triangle', 100, 0.08, 0);
-    this.playTone(base * 1.25, 'sine', 150, 0.07, 45);
+    const base = 420 + Math.min(streak, 6) * 45;
+    this.playTone(base, 'triangle', 95, 0.075, 0);
+    this.playTone(base * 1.25, 'sine', 145, 0.065, 45);
   }
 
   public bank(): void {
-    this.playTone(523.25, 'sine', 95, 0.09, 0);
-    this.playTone(659.25, 'sine', 115, 0.09, 55);
-    this.playTone(783.99, 'triangle', 200, 0.1, 110);
+    this.playTone(523.25, 'sine', 90, 0.085, 0);
+    this.playTone(659.25, 'sine', 110, 0.085, 55);
+    this.playTone(783.99, 'triangle', 190, 0.095, 110);
   }
 
   public error(): void {
-    this.playTone(195, 'sawtooth', 160, 0.075, 0);
-    this.playTone(145, 'sawtooth', 230, 0.075, 75);
+    this.playTone(190, 'sawtooth', 150, 0.07, 0);
+    this.playTone(142, 'sawtooth', 220, 0.07, 70);
   }
 
   public tickUrgent(): void {
-    this.playTone(840, 'sine', 35, 0.025, 0);
+    this.playTone(820, 'sine', 32, 0.022, 0);
   }
 
   public finish(): void {
-    this.playTone(523.25, 'triangle', 130, 0.08, 0);
-    this.playTone(783.99, 'triangle', 260, 0.09, 95);
+    this.playTone(523.25, 'triangle', 130, 0.075, 0);
+    this.playTone(783.99, 'triangle', 250, 0.085, 95);
   }
 }
 

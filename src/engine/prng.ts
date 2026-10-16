@@ -1,8 +1,5 @@
 import { QuestionItem } from '../types/game';
 
-/**
- * Hash FNV-1a de 32 bits determinístico
- */
 export function hashSeed(str: string): number {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
@@ -12,9 +9,6 @@ export function hashSeed(str: string): number {
   return h >>> 0;
 }
 
-/**
- * Gerador pseudoaleatório Mulberry32 determinístico
- */
 export function createPRNG(seed: number): () => number {
   let a = seed >>> 0;
   return function () {
@@ -25,9 +19,6 @@ export function createPRNG(seed: number): () => number {
   };
 }
 
-/**
- * Retorna a chave de data YYYY-MM-DD estritamente no fuso horário de Brasília (America/Sao_Paulo)
- */
 export function getBrasiliaDateKey(referenceDate: Date = new Date()): string {
   try {
     const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -42,26 +33,20 @@ export function getBrasiliaDateKey(referenceDate: Date = new Date()): string {
     const d = parts.find(p => p.type === 'day')?.value;
     if (y && m && d) return `${y}-${m}-${d}`;
   } catch {
-    // Fallback UTC-3 manual caso Intl falhe em ambiente restrito
+    // Fallback UTC-3
   }
   const utcMs = referenceDate.getTime() + referenceDate.getTimezoneOffset() * 60000;
   const brtDate = new Date(utcMs - 3 * 3600000);
-  const y = brtDate.getFullYear();
-  const m = String(brtDate.getMonth() + 1).padStart(2, '0');
-  const d = String(brtDate.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return `${brtDate.getFullYear()}-${String(brtDate.getMonth() + 1).padStart(2, '0')}-${String(brtDate.getDate()).padStart(2, '0')}`;
 }
 
 export function formatDatePtBr(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number);
-  const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const months = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
   if (!y || !m || !d) return dateKey;
   return `${d} de ${months[(m - 1) % 12]} de ${y}`;
 }
 
-/**
- * Normaliza palavra removendo acentos, espaços e símbolos para comparação justa
- */
 export function normalizeWord(raw: string): string {
   return (raw || '')
     .trim()
@@ -98,7 +83,7 @@ export function validateWordSubmission(
 
   for (const root of PROFANITY_ROOTS) {
     if (word.includes(root)) {
-      return { valid: false, normalized: word, reason: 'Palavra bloqueada pelo filtro do jogo.' };
+      return { valid: false, normalized: word, reason: 'Palavra bloqueada pelo filtro de segurança.' };
     }
   }
 
@@ -121,9 +106,6 @@ export function validateWordSubmission(
   return { valid: true, normalized: word };
 }
 
-/**
- * Embaralha as 4 alternativas de forma determinística preservando a referência correta
- */
 export function shuffleQuestionOptions(q: QuestionItem, rng: () => number): QuestionItem {
   const indices: [number, number, number, number] = [0, 1, 2, 3];
   for (let i = 3; i > 0; i--) {
@@ -132,23 +114,18 @@ export function shuffleQuestionOptions(q: QuestionItem, rng: () => number): Ques
     indices[i] = indices[j];
     indices[j] = temp;
   }
-  const newOptions: [string, string, string, string] = [
-    q.options[indices[0]],
-    q.options[indices[1]],
-    q.options[indices[2]],
-    q.options[indices[3]],
-  ];
-  const newCorrect = indices.indexOf(q.correctIndex) as 0 | 1 | 2 | 3;
   return {
     ...q,
-    options: newOptions,
-    correctIndex: newCorrect,
+    options: [
+      q.options[indices[0]],
+      q.options[indices[1]],
+      q.options[indices[2]],
+      q.options[indices[3]],
+    ],
+    correctIndex: indices.indexOf(q.correctIndex) as 0 | 1 | 2 | 3,
   };
 }
 
-/**
- * Gerador procedural determinístico de matemática quando o banco estático da sessão foi todo respondido
- */
 export function generateProceduralMathQuestion(
   rng: () => number,
   difficulty: 1 | 2 | 3,
@@ -189,14 +166,16 @@ export function generateProceduralMathQuestion(
     wrongs.add(String(answer + wrongs.size + 1));
   }
   const arr = Array.from(wrongs);
-  const rawQ: QuestionItem = {
-    id: `proc_math_${serial}`,
-    category: 'math',
-    difficulty,
-    prompt,
-    options: [String(answer), arr[0], arr[1], arr[2]],
-    correctIndex: 0,
-    explanation,
-  };
-  return shuffleQuestionOptions(rawQ, rng);
+  return shuffleQuestionOptions(
+    {
+      id: `proc_math_${serial}`,
+      category: 'math',
+      difficulty,
+      prompt,
+      options: [String(answer), arr[0], arr[1], arr[2]],
+      correctIndex: 0,
+      explanation,
+    },
+    rng
+  );
 }

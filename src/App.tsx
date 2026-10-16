@@ -30,7 +30,7 @@ const MODE_DETAILS: Record<
 > = {
   daily: {
     name: 'Desafio Diário',
-    badge: 'Sequência única do dia',
+    badge: 'Sequência oficial do dia',
     summary: 'Todos os jogadores enfrentam exatamente a mesma sequência hoje (60 segundos).',
     rules: '60s • Todas as categorias • Semente determinística pela data de Brasília',
     hasMatchClock: true,
@@ -92,7 +92,6 @@ export default function App() {
   const [profile, setProfile] = useState(() => loadProfile());
   const [activeView, setActiveView] = useState<AppViewId>('home');
 
-  // Estados visuais da partida
   const [inMatch, setInMatch] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [matchClock, setMatchClock] = useState(60.0);
@@ -120,11 +119,9 @@ export default function App() {
   const [lastReport, setLastReport] = useState<PostMatchReport | null>(null);
   const [copiedBanner, setCopiedBanner] = useState(false);
 
-  // Estado da aba Explorar Dicionário / Questões
   const [wordCheckInput, setWordCheckInput] = useState('');
   const [libraryCatFilter, setLibraryCatFilter] = useState<CategoryId>('mixed');
 
-  // Referências para controle estrito de sessão (impede timers duplicados ou vazamento de estado)
   const sessionIdRef = useRef(0);
   const transitionTimerRef = useRef<number | null>(null);
   const rngRef = useRef<() => number>(Math.random);
@@ -333,7 +330,6 @@ export default function App() {
     setIsPaused(false);
     SoundEngine.finish();
 
-    // Se o tempo geral acabou e havia pontos em risco não protegidos, 50% são salvos
     const salvagedScore = Math.round(st.riskScore * 0.5);
     const dissipated = st.riskScore - salvagedScore;
     const totalLostRisk = st.lostRiskScore + dissipated;
@@ -607,7 +603,6 @@ export default function App() {
     });
   };
 
-  // Loop único de cronômetro de alta precisão (congela durante pausa e durante feedback)
   useEffect(() => {
     if (!inMatch) return;
     let lastTime = performance.now();
@@ -702,7 +697,6 @@ export default function App() {
     return () => cancelAnimationFrame(rafId);
   }, [inMatch]);
 
-  // Atalhos de Teclado Acessíveis
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!matchRef.current.active) return;
@@ -769,7 +763,6 @@ export default function App() {
 
   return (
     <div className="pulso-shell">
-      {/* CABEÇALHO CONSISTENTE E LIMPO */}
       <header className="pulso-header">
         <div className="pulso-header-inner">
           <button
@@ -782,11 +775,11 @@ export default function App() {
             }}
           >
             <div className="brand-mark" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M2 12H6L9 5L14 19L17 10L19 12H22"
                   stroke="currentColor"
-                  strokeWidth="2.6"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -794,11 +787,11 @@ export default function App() {
             </div>
             <div>
               <span className="brand-name">Pulso</span>
-              <span className="brand-tagline">Pense rápido. Decida a hora de parar.</span>
+              <span className="brand-tagline">Pense rápido. Vá mais longe.</span>
             </div>
           </button>
 
-          <nav className="header-nav" aria-label="Menu principal">
+          <nav className="header-nav" aria-label="Navegação principal">
             <button
               type="button"
               className={`nav-btn ${activeView === 'home' && !inMatch ? 'active' : ''}`}
@@ -856,16 +849,14 @@ export default function App() {
       </header>
 
       <main className="pulso-main">
-        {/* 1. SE ESTIVER EM PARTIDA ATIVA */}
         {inMatch ? (
           <div className="match-container" aria-live="polite">
-            {/* BARRA SUPERIOR DA PARTIDA */}
             <div className="match-hud-bar">
               <div>
                 <div className="eyebrow-badge">{MODE_DETAILS[matchRef.current.mode].name}</div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   {matchRef.current.mode === 'elevator'
-                    ? `Andar #${floor} • Dificuldade crescente`
+                    ? `Andar #${floor} • Dificuldade progressiva`
                     : `Questão #${matchRef.current.totalCount + 1}`}
                 </div>
               </div>
@@ -873,7 +864,7 @@ export default function App() {
               <div className="hud-clock-box">
                 {MODE_DETAILS[matchRef.current.mode].initialLives > 0 && (
                   <div
-                    style={{ marginRight: '14px', fontWeight: 800, color: 'var(--state-error)' }}
+                    style={{ marginRight: '14px', fontWeight: 700, color: 'var(--state-error)' }}
                     aria-label={`${lives} vidas restantes`}
                   >
                     Vidas: {'♥ '.repeat(lives) || '0'}
@@ -893,7 +884,7 @@ export default function App() {
                 <button
                   type="button"
                   className="btn-secondary"
-                  style={{ minHeight: '42px', padding: '6px 14px' }}
+                  style={{ minHeight: '40px', padding: '6px 14px' }}
                   onClick={() => {
                     matchRef.current.paused = !matchRef.current.paused;
                     setIsPaused(matchRef.current.paused);
@@ -904,7 +895,7 @@ export default function App() {
                 <button
                   type="button"
                   className="btn-secondary"
-                  style={{ minHeight: '42px', padding: '6px 14px' }}
+                  style={{ minHeight: '40px', padding: '6px 14px' }}
                   onClick={abortMatchToHome}
                 >
                   Sair
@@ -912,7 +903,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* SISTEMA DE COFRE SEGURO vs PONTOS EM RISCO */}
             <div className="vaults-bar">
               <div className="vault-box safe">
                 <div className="vault-label">
@@ -928,10 +918,10 @@ export default function App() {
                 disabled={riskScore <= 0 || isPaused}
                 onClick={handleProtectPulse}
               >
-                <span>PROTEGER PONTOS AGORA</span>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                <span>Proteger Pontos Agora</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 500 }}>
                   {riskScore > 0
-                    ? `Salvar +${riskScore} pts no cofre [Espaço / Tab]`
+                    ? `Guardar +${riskScore} pts no cofre [Espaço / Tab]`
                     : 'Acerte para acumular pontos em risco'}
                 </span>
               </button>
@@ -945,7 +935,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* PALCO DO DESAFIO OU TELA DE PAUSA */}
             {isPaused ? (
               <div className="surface-card" style={{ textAlign: 'center', padding: '40px 24px' }}>
                 <h2 className="hero-title">Partida Pausada</h2>
@@ -964,7 +953,7 @@ export default function App() {
                     Continuar Partida
                   </button>
                   <button type="button" className="btn-secondary" onClick={() => startNewMatch()}>
-                    Reiniciar do Zero
+                    Reiniciar Partida
                   </button>
                 </div>
               </div>
@@ -981,8 +970,8 @@ export default function App() {
                   <div className="challenge-meta">
                     <span>
                       {matchRef.current.mode === 'wordbomb'
-                        ? 'BOMBA DE SÍLABAS • DICIONÁRIO OFICIAL'
-                        : `${CATEGORY_LABELS[currentQuestion?.category || 'mixed']} • NÍVEL ${
+                        ? 'Bomba de Sílabas • Dicionário Oficial'
+                        : `${CATEGORY_LABELS[currentQuestion?.category || 'mixed']} • Nível ${
                             currentQuestion?.difficulty || 1
                           }`}
                     </span>
@@ -993,11 +982,11 @@ export default function App() {
 
                   {matchRef.current.mode === 'wordbomb' ? (
                     <>
-                      <p style={{ textAlign: 'center', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                      <p style={{ textAlign: 'center', fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: 'var(--text-secondary)' }}>
                         Digite uma palavra em português que contenha a sílaba:
                       </p>
                       <div className="syllable-badge-large">{currentSyllable.syl}</div>
-                      <p style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                      <p style={{ textAlign: 'center', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
                         {currentSyllable.hint}
                       </p>
 
@@ -1077,7 +1066,6 @@ export default function App() {
             )}
           </div>
         ) : lastReport ? (
-          /* 2. TELA DE RESULTADO PÓS-PARTIDA */
           <div className="match-container">
             <section className="surface-card hero-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
@@ -1087,20 +1075,20 @@ export default function App() {
                     className="eyebrow-badge"
                     style={{ backgroundColor: 'var(--state-positive-soft)', color: 'var(--state-positive)' }}
                   >
-                    ★ Novo Recorde Pessoal!
+                    ★ Novo Recorde Pessoal
                   </span>
                 )}
               </div>
 
               <div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                  PONTUAÇÃO FINAL
+                <div style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Pontuação Final
                 </div>
                 <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '3.2rem',
-                    fontWeight: 800,
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '3.4rem',
+                    fontWeight: 700,
                     color: 'var(--brand-terracotta-text)',
                     lineHeight: 1.05,
                   }}
@@ -1142,7 +1130,7 @@ export default function App() {
                   backgroundColor: 'var(--bg-main)',
                   border: '1px solid var(--border-color)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '14px',
+                  padding: '16px',
                 }}
               >
                 <div
@@ -1155,11 +1143,11 @@ export default function App() {
                     marginBottom: '8px',
                   }}
                 >
-                  <strong style={{ fontSize: '0.94rem' }}>Compartilhar Resultado</strong>
+                  <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem' }}>Compartilhar Resultado</strong>
                   <button
                     type="button"
                     className="btn-secondary"
-                    style={{ minHeight: '40px', padding: '6px 14px' }}
+                    style={{ minHeight: '38px', padding: '6px 14px' }}
                     onClick={() => copyText(lastReport.shareText)}
                   >
                     {copiedBanner ? '✓ Copiado!' : 'Copiar Resumo'}
@@ -1168,7 +1156,7 @@ export default function App() {
                 <pre
                   style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '0.86rem',
+                    fontSize: '0.84rem',
                     whiteSpace: 'pre-wrap',
                     color: 'var(--text-primary)',
                   }}
@@ -1198,7 +1186,6 @@ export default function App() {
               </div>
             </section>
 
-            {/* REVISÃO EDUCATIVA DAS RESPOSTAS DA PARTIDA */}
             <section className="surface-card">
               <h3 className="section-heading">Revisão das Questões ({lastReport.history.length})</h3>
               {lastReport.history.length === 0 ? (
@@ -1235,16 +1222,14 @@ export default function App() {
             </section>
           </div>
         ) : activeView === 'home' ? (
-          /* 3. PÁGINA INICIAL (HIERARQUIA CLARA, MOBILE-FIRST, PROPORCIONAL EM DESKTOP) */
           <div className="home-grid">
-            {/* COLUNA PRINCIPAL: AÇÃO RECOMENDADA E SELEÇÃO DE MODOS */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <section className="surface-card hero-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                   <span className="eyebrow-badge">
                     {MODE_DETAILS[profile.selectedMode].badge}
                   </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
                     {formatDatePtBr(todayKey)}
                   </span>
                 </div>
@@ -1258,7 +1243,7 @@ export default function App() {
 
                 {profile.selectedMode === 'classic' && (
                   <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '6px' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-secondary)' }}>
                       Escolha a categoria da partida:
                     </div>
                     <div className="category-chips" role="group" aria-label="Categorias">
@@ -1292,7 +1277,7 @@ export default function App() {
                       onClick={() => copyText(todayDailyRecord.shareText)}
                     >
                       {copiedBanner
-                        ? '✓ Resultado de hoje copiado!'
+                        ? '✓ Resultado copiado!'
                         : `Compartilhar hoje (${todayDailyRecord.score} pts)`}
                     </button>
                   )}
@@ -1301,9 +1286,9 @@ export default function App() {
 
               <section>
                 <div className="section-heading">
-                  <span>Selecione o Modo de Jogo</span>
-                  <span style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                    4 modos disponíveis
+                  <span>Modos de Jogo</span>
+                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.84rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                    4 experiências disponíveis
                   </span>
                 </div>
 
@@ -1325,7 +1310,7 @@ export default function App() {
                           <span className="mode-card-record">Recorde: {best} pts</span>
                         </div>
                         <p className="mode-card-desc">{info.summary}</p>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                           {info.rules}
                         </div>
                       </button>
@@ -1335,35 +1320,34 @@ export default function App() {
               </section>
             </div>
 
-            {/* COLUNA SECUNDÁRIA: COMO FUNCIONA O RISCO E SEUS RECORDES REAIS */}
             <aside style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <section className="surface-card">
-                <h2 className="section-heading">Como Funciona o Pulso</h2>
+                <h2 className="section-heading">Dinâmica do Pulso</h2>
                 <div className="steps-list">
                   <div className="step-row">
                     <div className="step-num">1</div>
                     <div>
-                      <strong>Responda antes do pavio acabar</strong>
-                      <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
-                        Cada acerto soma pontos em risco e eleva seu multiplicador de combo (até <strong>3.0x</strong>).
+                      <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem' }}>Responda sob pressão</strong>
+                      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Cada acerto acumula pontos provisórios e eleva seu multiplicador de combo até <strong>3.0x</strong>.
                       </p>
                     </div>
                   </div>
                   <div className="step-row">
                     <div className="step-num">2</div>
                     <div>
-                      <strong>Decida quando proteger seus pontos</strong>
-                      <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
-                        Toque em <strong>Proteger Pontos</strong> (ou pressione <code>Espaço</code> / <code>Tab</code>) para guardar 100% dos pontos no cofre seguro.
+                      <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem' }}>Proteja no momento certo</strong>
+                      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Acione <strong>Proteger Pontos</strong> (ou <code>Espaço</code> / <code>Tab</code>) para transferir 100% dos pontos em risco para o cofre seguro.
                       </p>
                     </div>
                   </div>
                   <div className="step-row">
                     <div className="step-num">3</div>
                     <div>
-                      <strong>Cuidado com a sobrecarga</strong>
-                      <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
-                        Errar ou deixar o tempo da questão zerar apaga os pontos que ainda não foram protegidos no cofre.
+                      <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.05rem' }}>Evite a sobrecarga</strong>
+                      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Errar uma questão ou deixar o tempo esgotar zera os pontos ainda não protegidos.
                       </p>
                     </div>
                   </div>
@@ -1371,7 +1355,7 @@ export default function App() {
               </section>
 
               <section className="surface-card">
-                <h2 className="section-heading">Seu Desempenho Local</h2>
+                <h2 className="section-heading">Resumo Pessoal</h2>
                 <div className="stats-summary-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
                   <div className="stat-metric-card">
                     <span className="stat-metric-val">
@@ -1396,54 +1380,52 @@ export default function App() {
             </aside>
           </div>
         ) : activeView === 'rules' ? (
-          /* 4. ABA COMO JOGAR (REGRAS TRANSPARENTES) */
-          <section className="surface-card" style={{ maxWidth: '760px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <section className="surface-card" style={{ maxWidth: '740px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <h1 className="hero-title">Regras e Sistema de Pontuação</h1>
             <p className="hero-description">
-              O Pulso combina velocidade de raciocínio com gestão de risco. Entenda exatamente como cada ponto é calculado:
+              O Pulso combina velocidade de raciocínio com tomada de decisão estratégica. Veja como cada ação afeta o seu placar:
             </p>
             <div className="steps-list">
               <div className="step-row">
                 <div className="step-num">1</div>
                 <div>
-                  <strong>Pontuação Base e Bônus de Velocidade</strong>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                    Questões de Nível 1 valem 100 pts, Nível 2 valem 150 pts e Nível 3 valem 220 pts, acrescidos de até +50 pts conforme a rapidez da sua resposta.
+                  <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.08rem' }}>Pontuação Base e Velocidade</strong>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem' }}>
+                    Desafios de Nível 1 valem 100 pts, Nível 2 valem 150 pts e Nível 3 valem 220 pts, acrescidos de até +50 pts conforme o tempo restante da questão.
                   </p>
                 </div>
               </div>
               <div className="step-row">
                 <div className="step-num">2</div>
                 <div>
-                  <strong>Escada de Multiplicadores (1.0x a 3.0x)</strong>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                    Acertos consecutivos sobem o multiplicador: 1.0x → 1.2x → 1.5x → 2.0x → 2.5x → 3.0x.
+                  <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.08rem' }}>Escada de Multiplicadores (1.0x a 3.0x)</strong>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem' }}>
+                    Respostas corretas consecutivas elevam o multiplicador: 1.0x → 1.2x → 1.5x → 2.0x → 2.5x → 3.0x.
                   </p>
                 </div>
               </div>
               <div className="step-row">
                 <div className="step-num">3</div>
                 <div>
-                  <strong>Proteger Pontos e Bônus de Tempo (+1,5s)</strong>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                    Ao proteger seus pontos em risco, 100% deles vão para o Cofre Seguro e o multiplicador volta a 1.0x. Se você proteger uma sequência de 4 ou mais acertos seguidos, ganha +1,5 segundo extra no relógio!
+                  <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.08rem' }}>Proteger Pontos e Bônus de Tempo (+1,5s)</strong>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem' }}>
+                    Ao proteger seus pontos em risco, 100% deles vão para o Cofre Seguro e o multiplicador reinicia em 1.0x. Proteger uma sequência de 4 ou mais acertos concede +1,5 segundo extra no relógio.
                   </p>
                 </div>
               </div>
               <div className="step-row">
                 <div className="step-num">4</div>
                 <div>
-                  <strong>Fim de Tempo da Partida (Salvamento de 50%)</strong>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                    Quando os 60 segundos chegam ao fim, 50% dos pontos que ainda estavam em risco são salvos automaticamente.
+                  <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.08rem' }}>Fim de Tempo da Partida (Salvamento de 50%)</strong>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.94rem' }}>
+                    Quando os 60 segundos terminam, metade (50%) dos pontos que ficaram em risco é salva automaticamente.
                   </p>
                 </div>
               </div>
             </div>
           </section>
         ) : activeView === 'stats' ? (
-          /* 5. ABA RECORDES E PREFERÊNCIAS LOCAIS */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '860px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '840px', margin: '0 auto' }}>
             <section className="surface-card">
               <h1 className="section-heading">Recordes por Modo de Jogo</h1>
               <div className="stats-summary-grid">
@@ -1485,14 +1467,13 @@ export default function App() {
             </section>
           </div>
         ) : (
-          /* 6. ABA CONTEÚDO (VERIFICADOR DE PALAVRAS E BANCO DE QUESTÕES) */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section className="surface-card">
               <h1 className="section-heading">
-                Verificador do Dicionário ({PORTUGUESE_WORD_SET.size} palavras válidas)
+                Verificador do Dicionário ({PORTUGUESE_WORD_SET.size} vocábulos validados)
               </h1>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                Consulte se uma palavra (com ou sem acento) é aceita no modo Bomba de Sílabas:
+                Consulte se uma palavra (com ou sem acentuação) é aceita no modo Bomba de Sílabas:
               </p>
               <div className="word-input-row">
                 <input
@@ -1504,7 +1485,7 @@ export default function App() {
                 />
               </div>
               {wordCheckInput.trim().length >= 2 && (
-                <div style={{ marginTop: '12px', fontWeight: 700 }}>
+                <div style={{ marginTop: '12px', fontWeight: 600 }}>
                   {PORTUGUESE_WORD_SET.has(
                     wordCheckInput
                       .trim()
@@ -1526,7 +1507,7 @@ export default function App() {
 
             <section className="surface-card">
               <div className="section-heading">
-                <span>Banco de Questões Verificadas ({QUESTION_BANK.length})</span>
+                <span>Biblioteca de Questões ({QUESTION_BANK.length})</span>
               </div>
               <div className="category-chips" style={{ marginBottom: '16px' }}>
                 {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
@@ -1548,7 +1529,7 @@ export default function App() {
                     <div className="feedback-title">
                       [{CATEGORY_LABELS[q.category]} • Nível {q.difficulty}] {q.prompt}
                     </div>
-                    <div style={{ fontSize: '0.92rem', color: 'var(--state-positive)', fontWeight: 700 }}>
+                    <div style={{ fontSize: '0.92rem', color: 'var(--state-positive)', fontWeight: 600 }}>
                       Resposta: {q.options[q.correctIndex]}
                     </div>
                     <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{q.explanation}</div>
