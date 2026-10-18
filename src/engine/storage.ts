@@ -1,23 +1,20 @@
-import { AvatarId, CategoryId, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
+import { CategoryId, DiceBearStyle, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'the_pulse_game_v7_profile';
+const STORAGE_KEY = 'the_pulse_game_v8_profile';
 
 export function createDefaultProfile(): PlayerProfile {
   return {
-    version: 7,
+    version: 8,
     username: 'PulsePlayer',
-    titleBadge: 'Challenger',
-    avatarId: 'cybercat',
+    avatarStyle: 'adventurer',
+    avatarSeed: 'Felix',
+    avatarBg: '1e293b',
     language: 'pt',
     reducedMotion: false,
-    highContrastGlow: true,
     sfxVolume: 85,
-    coins: 250,
+    coins: 300,
     keys: 3,
-    careerXP: 420,
-    unlockedAvatars: ['cybercat', 'shiba', 'kitsune', 'astro'],
-    unlockedRings: ['indigo', 'cyan'],
-    equippedRing: 'indigo',
+    careerXP: 450,
     selectedMode: 'wordbomb',
     selectedCategory: 'mixed',
     matchesPlayed: 0,
@@ -49,7 +46,7 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
   const validModes: GameModeId[] = ['wordbomb', 'daily', 'elevator', 'classic'];
   const validCats: CategoryId[] = ['mixed', 'math', 'logic', 'words', 'general'];
   const validLangs: LanguageCode[] = ['pt', 'en', 'es'];
-  const validAvatars: AvatarId[] = ['cybercat', 'shiba', 'kitsune', 'astro', 'ghosty', 'owl', 'dragon', 'witch'];
+  const validStyles: DiceBearStyle[] = ['adventurer', 'bottts', 'lorelei', 'avataaars', 'pixel-art', 'fun-emoji'];
 
   const safeNum = (val: unknown, fallback = 0): number =>
     typeof val === 'number' && Number.isFinite(val) && val >= 0 ? Math.floor(val) : fallback;
@@ -60,20 +57,17 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
     : {}) as Record<string, unknown>;
 
   return {
-    version: 7,
+    version: 8,
     username: typeof obj.username === 'string' && obj.username.trim().length > 0 ? obj.username.slice(0, 18) : def.username,
-    titleBadge: typeof obj.titleBadge === 'string' ? obj.titleBadge : def.titleBadge,
-    avatarId: validAvatars.includes(obj.avatarId as AvatarId) ? (obj.avatarId as AvatarId) : def.avatarId,
+    avatarStyle: validStyles.includes(obj.avatarStyle as DiceBearStyle) ? (obj.avatarStyle as DiceBearStyle) : def.avatarStyle,
+    avatarSeed: typeof obj.avatarSeed === 'string' && obj.avatarSeed.trim().length > 0 ? obj.avatarSeed.slice(0, 24) : def.avatarSeed,
+    avatarBg: typeof obj.avatarBg === 'string' && obj.avatarBg.length === 6 ? obj.avatarBg : def.avatarBg,
     language: validLangs.includes(obj.language as LanguageCode) ? (obj.language as LanguageCode) : def.language,
     reducedMotion: typeof obj.reducedMotion === 'boolean' ? obj.reducedMotion : def.reducedMotion,
-    highContrastGlow: typeof obj.highContrastGlow === 'boolean' ? obj.highContrastGlow : def.highContrastGlow,
     sfxVolume: safeNum(obj.sfxVolume, 85),
-    coins: safeNum(obj.coins, 250),
+    coins: safeNum(obj.coins, 300),
     keys: safeNum(obj.keys, 3),
-    careerXP: safeNum(obj.careerXP, 420),
-    unlockedAvatars: Array.isArray(obj.unlockedAvatars) ? (obj.unlockedAvatars as AvatarId[]) : def.unlockedAvatars,
-    unlockedRings: Array.isArray(obj.unlockedRings) ? (obj.unlockedRings as string[]) : def.unlockedRings,
-    equippedRing: typeof obj.equippedRing === 'string' ? obj.equippedRing : def.equippedRing,
+    careerXP: safeNum(obj.careerXP, 450),
     selectedMode: validModes.includes(obj.selectedMode as GameModeId)
       ? (obj.selectedMode as GameModeId)
       : def.selectedMode,
@@ -134,10 +128,10 @@ export function clearProfileStorage(): PlayerProfile {
   return createDefaultProfile();
 }
 
-export function getSeasonRankInfo(xp: number): { season: string; division: string; code: string; nextXp: number } {
-  if (xp >= 10000) return { season: 'SEASON 12', division: 'GRANDMASTER', code: 'GM', nextXp: 25000 };
-  if (xp >= 5000) return { season: 'SEASON 12', division: 'DIAMOND I', code: 'D1', nextXp: 10000 };
-  if (xp >= 2200) return { season: 'SEASON 12', division: 'GOLD I', code: 'G1', nextXp: 5000 };
-  if (xp >= 900) return { season: 'SEASON 12', division: 'SILVER I', code: 'S1', nextXp: 2200 };
-  return { season: 'SEASON 12', division: 'BRONZE I', code: 'B1', nextXp: 900 };
+export function getPlayerLeague(xp: number): { division: string; tierCode: string; nextXp: number; progressPct: number } {
+  if (xp >= 10000) return { division: 'Liga Ametista', tierCode: 'AM', nextXp: 25000, progressPct: 100 };
+  if (xp >= 5000) return { division: 'Liga Diamante', tierCode: 'DM', nextXp: 10000, progressPct: Math.round(((xp - 5000) / 5000) * 100) };
+  if (xp >= 2200) return { division: 'Liga Ouro', tierCode: 'AU', nextXp: 5000, progressPct: Math.round(((xp - 2200) / 2800) * 100) };
+  if (xp >= 900) return { division: 'Liga Prata', tierCode: 'AG', nextXp: 2200, progressPct: Math.round(((xp - 900) / 1300) * 100) };
+  return { division: 'Liga Bronze', tierCode: 'BR', nextXp: 900, progressPct: Math.round((xp / 900) * 100) };
 }

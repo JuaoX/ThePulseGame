@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   AnswerHistoryItem,
-  AvatarId,
   CategoryId,
   GameModeId,
   LanguageCode,
@@ -11,7 +10,14 @@ import {
 } from './types/game';
 import { QUESTION_BANK } from './data/questions';
 import { PORTUGUESE_WORD_SET, WORDBOMB_SYLLABLES } from './data/syllables';
-import { AVATAR_CATALOG, I18N_STRINGS } from './data/avatars';
+import {
+  buildDiceBearUrl,
+  CURATED_COMMUNITY_AVATARS,
+  DICEBEAR_STYLE_LIST,
+  I18N_STRINGS,
+  LANGUAGE_OPTIONS,
+  PulseBrandLogo,
+} from './data/avatars';
 import {
   createPRNG,
   generateProceduralMathQuestion,
@@ -21,97 +27,73 @@ import {
   validateWordSubmission,
 } from './engine/prng';
 import { SoundEngine } from './engine/sound';
-import { clearProfileStorage, getSeasonRankInfo, loadProfile, saveProfile } from './engine/storage';
+import { clearProfileStorage, getPlayerLeague, loadProfile, saveProfile } from './engine/storage';
 import { ArenaCanvasFX, ArenaCanvasFXHandle } from './components/ArenaCanvasFX';
 
 const COMBO_STEPS = [1.0, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0];
 const BASE_POINTS = { 1: 100, 2: 150, 3: 220 } as const;
 
-interface RoomEntry {
-  id: string;
-  hostName: string;
-  avatarId: AvatarId;
-  mode: GameModeId;
-  category: CategoryId;
-  modeLabel: string;
-  playersRatio: string;
-  wppBadge?: string;
-}
-
-const FEATURED_ROOMS: RoomEntry[] = [
+const ARENA_MODES: {
+  id: GameModeId;
+  code: string;
+  title: string;
+  subtitle: string;
+  tag: string;
+  accent: string;
+  bgTint: string;
+}[] = [
   {
-    id: 'r1',
-    hostName: 'Bomba de Sílabas — Oficial',
-    avatarId: 'shiba',
-    mode: 'wordbomb',
-    category: 'words',
-    modeLabel: 'Original',
-    playersRatio: '18/32',
-    wppBadge: '< 500 WPP',
+    id: 'wordbomb',
+    code: 'SYL',
+    title: 'Bomba Léxica de Sílabas',
+    subtitle: 'O núcleo sorteia uma sílaba em tempo real. Digite vocábulos válidos antes que o pavio zere.',
+    tag: '3 Vidas • Dicionário Oficial',
+    accent: '#22D3EE',
+    bgTint: 'rgba(34, 211, 238, 0.14)',
   },
   {
-    id: 'r2',
-    hostName: 'Desafio Diário Global',
-    avatarId: 'cybercat',
-    mode: 'daily',
-    category: 'mixed',
-    modeLabel: 'Chain Word',
-    playersRatio: '24/32',
+    id: 'daily',
+    code: '24H',
+    title: 'Pulso Diário Oficial',
+    subtitle: 'Sequência determinística única gerada pela data de Brasília. Mesma prova para todos hoje.',
+    tag: '60 Segundos • Semente Global',
+    accent: '#10B981',
+    bgTint: 'rgba(16, 185, 129, 0.14)',
   },
   {
-    id: 'r3',
-    hostName: 'Torre do Elevador (3 Vidas)',
-    avatarId: 'kitsune',
-    mode: 'elevator',
-    category: 'mixed',
-    modeLabel: 'Dungeon',
-    playersRatio: '12/32',
+    id: 'elevator',
+    code: 'ELV',
+    title: 'Torre de Sobrevivência',
+    subtitle: 'Suba andares infinitos com 3 vidas. A cada andar superado o reator reduz o tempo de resposta.',
+    tag: 'Sem Relógio Geral • Ritmo Crescente',
+    accent: '#F43F5E',
+    bgTint: 'rgba(244, 63, 94, 0.14)',
   },
   {
-    id: 'r4',
-    hostName: 'Arena Trivia — Pulso Misto',
-    avatarId: 'owl',
-    mode: 'classic',
-    category: 'mixed',
-    modeLabel: 'Trivia',
-    playersRatio: '9/32',
-  },
-  {
-    id: 'r5',
-    hostName: 'Cálculo Rápido & Lógica',
-    avatarId: 'astro',
-    mode: 'classic',
-    category: 'math',
-    modeLabel: 'Original',
-    playersRatio: '14/32',
-    wppBadge: ' Rápido',
-  },
-  {
-    id: 'r6',
-    hostName: 'Mestres do Vocabulário',
-    avatarId: 'dragon',
-    mode: 'classic',
-    category: 'words',
-    modeLabel: 'Chain Word',
-    playersRatio: '7/32',
-  },
-  {
-    id: 'r7',
-    hostName: 'Conhecimentos Gerais Turbo',
-    avatarId: 'witch',
-    mode: 'classic',
-    category: 'general',
-    modeLabel: 'Trivia',
-    playersRatio: '11/32',
+    id: 'classic',
+    code: '60S',
+    title: 'Velocidade Clássica 60s',
+    subtitle: 'Acumule combos até 3.0x nas áreas de Matemática, Lógica, Linguagem ou Gerais e blinde seu cofre.',
+    tag: '60 Segundos • Multi-Categoria',
+    accent: '#818CF8',
+    bgTint: 'rgba(129, 140, 248, 0.16)',
   },
 ];
 
+const CATEGORY_LABELS: Record<CategoryId, string> = {
+  mixed: 'Pulso Misto (Todas)',
+  math: 'Matemática Mental',
+  logic: 'Lógica & Padrões',
+  words: 'Palavras & Idioma',
+  general: 'Conhecimentos Gerais',
+};
+
 export default function App() {
   const [profile, setProfile] = useState(() => loadProfile());
-  const [activeTab, setActiveTab] = useState<NavTabId>('rooms');
+  const [activeTab, setActiveTab] = useState<NavTabId>('play');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
   // Estado da partida ativa
   const [inMatch, setInMatch] = useState(false);
@@ -149,6 +131,7 @@ export default function App() {
 
   const [wordSearchQuery, setWordSearchQuery] = useState('');
 
+  const langMenuRef = useRef<HTMLDivElement | null>(null);
   const fxRef = useRef<ArenaCanvasFXHandle | null>(null);
   const sessionIdRef = useRef(0);
   const transitionTimerRef = useRef<number | null>(null);
@@ -188,9 +171,21 @@ export default function App() {
     saveProfile(profile);
   }, [profile]);
 
+  // Fecha o dropdown vertical de idioma ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const t = I18N_STRINGS[profile.language] || I18N_STRINGS.pt;
-  const currentAvatar = AVATAR_CATALOG.find(a => a.id === profile.avatarId) || AVATAR_CATALOG[0];
-  const rankInfo = getSeasonRankInfo(profile.careerXP);
+  const activeLangMeta = LANGUAGE_OPTIONS.find(l => l.code === profile.language) || LANGUAGE_OPTIONS[0];
+  const playerAvatarUrl = buildDiceBearUrl(profile.avatarStyle, profile.avatarSeed, profile.avatarBg);
+  const leagueInfo = getPlayerLeague(profile.careerXP);
 
   const clearPendingTransition = () => {
     if (transitionTimerRef.current !== null) {
@@ -417,7 +412,7 @@ export default function App() {
     setStreak(0);
     setCombo(1.0);
     SoundEngine.bank();
-    fxRef.current?.spawnBurst('#22C55E', 24);
+    fxRef.current?.spawnBurst('#10B981', 24);
 
     setFeedback({
       visible: true,
@@ -457,7 +452,7 @@ export default function App() {
       setCombo(st.combo);
       setRiskScore(st.riskScore);
       SoundEngine.hit(st.streak);
-      fxRef.current?.spawnShockwave('#38BDF8');
+      fxRef.current?.spawnShockwave('#22D3EE');
 
       setFeedback({
         visible: true,
@@ -546,7 +541,7 @@ export default function App() {
     setCombo(st.combo);
     setRiskScore(st.riskScore);
     SoundEngine.hit(st.streak);
-    fxRef.current?.spawnShockwave('#38BDF8');
+    fxRef.current?.spawnShockwave('#22D3EE');
 
     loadStepChallenge(currentSessionId);
     setFeedback({
@@ -673,75 +668,57 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   });
 
-  const cycleLanguage = () => {
-    const order: LanguageCode[] = ['pt', 'en', 'es'];
-    const nextIdx = (order.indexOf(profile.language) + 1) % order.length;
-    setProfile(p => ({ ...p, language: order[nextIdx] }));
-  };
-
   const fuseRatio = Math.max(0, Math.min(1, fuseClock / fuseTotal));
   const dialDashOffset = 502 * (1 - fuseRatio);
+  const selectedArenaMeta = ARENA_MODES.find(m => m.id === profile.selectedMode) || ARENA_MODES[0];
 
   return (
-    <div className="wb-app-shell">
+    <div className="pg-shell">
       {/* =========================================================
-          1. BARRA SUPERIOR IDÊNTICA AO WORDBOMB.IO (ZERO BOTÃO DE MUTE)
+          1. BARRA SUPERIOR DE ESTÚDIO (SEM BOTÃO DUPLICADO E COM DROPDOWN DE IDIOMA)
          ========================================================= */}
-      <header className="wb-navbar">
-        <div className="wb-nav-left">
+      <header className="pg-navbar">
+        <div className="pg-nav-left">
           <button
             type="button"
-            className="wb-hamburger-btn"
+            className="pg-icon-btn"
             onClick={() => setSettingsOpen(true)}
             title={t.settingsTitle}
             aria-label={t.settingsTitle}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <line x1="4" y1="6" x2="20" y2="6" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <line x1="4" y1="7" x2="20" y2="7" />
               <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="18" x2="20" y2="18" />
+              <line x1="4" y1="17" x2="14" y2="17" />
             </svg>
           </button>
 
           <button
             type="button"
-            className="wb-brand-logo"
+            className="pg-brand-trigger"
             onClick={() => {
               if (inMatch) abortMatchToHome();
-              setActiveTab('rooms');
+              setActiveTab('play');
             }}
-            title="The Pulse Game"
           >
-            <svg width="42" height="42" viewBox="0 0 64 64">
-              <rect width="64" height="64" rx="15" fill="#151922" stroke="#5865F2" strokeWidth="3" />
-              <circle cx="32" cy="34" r="17" fill="#0B0D12" stroke="#38BDF8" strokeWidth="2" />
-              <path
-                d="M14 34H23L27 21L33 47L38 28L42 34H50"
-                fill="none"
-                stroke="#38BDF8"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="45" cy="15" r="4.5" fill="#F43F5E" />
-            </svg>
+            <PulseBrandLogo size={40} />
+            <span className="pg-brand-text">THE PULSE</span>
           </button>
 
-          <nav className="wb-tabs-row" aria-label="Navegação Principal">
+          <nav className="pg-nav-links" aria-label="Navegação Principal">
             {(
               [
-                ['rooms', t.rooms],
-                ['ranked', t.ranked],
-                ['shop', t.shop],
-                ['inventory', t.inventory],
-                ['words', t.words],
-                ['syllables', t.syllables],
+                ['play', t.navPlay],
+                ['ranked', t.navRanked],
+                ['Customize', t.navCustomize],
+                ['lexicon', t.navLexicon],
+                ['syllables', t.navSyllables],
               ] as [NavTabId, string][]
             ).map(([tabKey, label]) => (
               <button
                 key={tabKey}
                 type="button"
-                className={`wb-tab-btn ${activeTab === tabKey && !inMatch ? 'active' : ''}`}
+                className={`pg-nav-tab ${activeTab === tabKey && !inMatch ? 'active' : ''}`}
                 onClick={() => {
                   if (inMatch) abortMatchToHome();
                   setActiveTab(tabKey);
@@ -753,86 +730,84 @@ export default function App() {
           </nav>
         </div>
 
-        <div className="wb-nav-right">
-          {/* Contador de Moedas Douradas */}
-          <div className="wb-currency-pill" title="Moedas">
-            <svg width="20" height="20" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" fill="#FBBF24" stroke="#D97706" strokeWidth="2" />
-              <circle cx="12" cy="12" r="6" fill="none" stroke="#FEF3C7" strokeWidth="1.5" />
+        <div className="pg-nav-right">
+          {/* Moedas */}
+          <div className="pg-stat-pill" title="Moedas Acumuladas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B">
+              <circle cx="12" cy="12" r="10" />
             </svg>
             <span>{profile.coins}</span>
           </div>
 
-          {/* Contador de Chaves + Botão + */}
-          <div className="wb-currency-pill" title="Chaves de Cofre">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2.4">
-              <circle cx="7.5" cy="15.5" r="4.5" />
-              <path d="M10.7 12.3L20 3" />
-              <path d="M16 7l3 3" />
-            </svg>
-            <span>{profile.keys}</span>
-            <button
-              type="button"
-              className="wb-plus-mini"
-              onClick={() => {
-                if (inMatch) abortMatchToHome();
-                setActiveTab('shop');
-              }}
-              title="Obter mais chaves"
-            >
-              +
-            </button>
+          {/* XP / Liga */}
+          <div className="pg-stat-pill" title="Experiência de Carreira">
+            <span style={{ color: 'var(--pg-cyan-bright)' }}>⚡</span>
+            <span>{profile.careerXP} XP</span>
           </div>
 
-          {/* Botão Perfil Iluminado */}
+          {/* Botão Único Unificado de Perfil (Foto DiceBear + Nome) */}
           <button
             type="button"
-            className="wb-illuminated-btn"
+            className="pg-profile-unified-btn"
             onClick={() => setProfileModalOpen(true)}
+            title={t.profileTitle}
           >
-            {profile.username}
+            <div className="pg-avatar-circle">
+              <img src={playerAvatarUrl} alt={profile.username} />
+            </div>
+            <span className="pg-profile-name">{profile.username}</span>
           </button>
 
-          {/* Sino de Notificações */}
-          <button
-            type="button"
-            className="wb-bell-btn"
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            title="Novidades e Atualizações"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-            </svg>
-            <span className="wb-bell-dot" />
-          </button>
+          {/* Seletor de Idioma com Lista Vertical Suspensa (Dropdown) */}
+          <div className="pg-lang-dropdown-wrap" ref={langMenuRef}>
+            <button
+              type="button"
+              className="pg-lang-btn"
+              onClick={() => setLangDropdownOpen(prev => !prev)}
+              aria-expanded={langDropdownOpen}
+              aria-haspopup="listbox"
+            >
+              <img src={activeLangMeta.flagUrl} alt={activeLangMeta.short} className="pg-flag-img" />
+              <span>{activeLangMeta.short}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
 
-          {/* Foto de Perfil Redonda Bonitinha */}
-          <button
-            type="button"
-            className="wb-avatar-trigger"
-            onClick={() => setProfileModalOpen(true)}
-            title="Trocar Foto de Perfil"
-          >
-            {currentAvatar.renderSvg()}
-          </button>
-
-          {/* Seletor de Idioma com Bandeira */}
-          <button
-            type="button"
-            className="wb-lang-trigger"
-            onClick={cycleLanguage}
-            title="Mudar Idioma / Change Language"
-          >
-            <span>{t.flag}</span>
-            <span>{t.label}</span>
-          </button>
+            {langDropdownOpen && (
+              <div className="pg-lang-menu" role="listbox">
+                {LANGUAGE_OPTIONS.map(opt => {
+                  const isSelected = profile.language === opt.code;
+                  return (
+                    <button
+                      key={opt.code}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      className={`pg-lang-option ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        setProfile(p => ({ ...p, language: opt.code as LanguageCode }));
+                        setLangDropdownOpen(false);
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src={opt.flagUrl} alt={opt.name} className="pg-flag-img" />
+                        <span>{opt.name}</span>
+                      </div>
+                      {isSelected && <span style={{ color: 'var(--pg-cyan-bright)' }}>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
       {/* =========================================================
-          2. CONTEÚDO CENTRAL
+          2. PALCO CENTRAL DE JOGO
          ========================================================= */}
-      <main className="wb-center-column">
+      <main className="pg-main-container">
         {inMatch ? (
           <div className="arena-stage-wrap">
             <ArenaCanvasFX ref={fxRef} reducedMotion={profile.reducedMotion} />
@@ -840,19 +815,13 @@ export default function App() {
             <div className="arena-hud-bar">
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 900 }}>
-                  {matchRef.current.mode === 'wordbomb'
-                    ? 'Bomba de Sílabas'
-                    : matchRef.current.mode === 'daily'
-                    ? 'Desafio Diário Oficial'
-                    : matchRef.current.mode === 'elevator'
-                    ? `O Elevador • Andar #${floor}`
-                    : 'Arena Clássica 60s'}
+                  {selectedArenaMeta.title}
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
                 {(matchRef.current.mode === 'wordbomb' || matchRef.current.mode === 'elevator') && (
-                  <div style={{ fontSize: '1.35rem', color: 'var(--wb-coral)', fontWeight: 900 }}>
+                  <div style={{ fontSize: '1.35rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
                     {[0, 1, 2].map(i => (
                       <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '4px' }}>
                         ♥
@@ -867,14 +836,14 @@ export default function App() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: '2rem',
                       fontWeight: 800,
-                      color: matchClock <= 10 ? 'var(--wb-coral)' : 'var(--wb-text-bright)',
+                      color: matchClock <= 10 ? 'var(--pg-coral)' : 'var(--pg-text-bright)',
                     }}
                   >
                     {matchClock.toFixed(1)}s
                   </div>
                 )}
 
-                <button type="button" className="wb-lang-trigger" onClick={abortMatchToHome}>
+                <button type="button" className="pg-secondary-btn" onClick={abortMatchToHome}>
                   ✕ Sair
                 </button>
               </div>
@@ -886,15 +855,15 @@ export default function App() {
                   <span>🛡️ Cofre Seguro</span>
                   <span>100% Garantido</span>
                 </div>
-                <div className="vault-value" style={{ color: 'var(--wb-emerald)' }}>
+                <div className="vault-value" style={{ color: 'var(--pg-emerald)' }}>
                   {safeScore}
                 </div>
               </div>
 
               <button
                 type="button"
-                className="wb-illuminated-btn"
-                style={{ height: '100%', minHeight: '64px', fontSize: '1.08rem', gridColumn: 'span 1' }}
+                className="pg-illuminated-cta"
+                style={{ height: '100%', minHeight: '64px', fontSize: '1.08rem' }}
                 disabled={riskScore <= 0}
                 onClick={handleProtectPulse}
               >
@@ -906,7 +875,7 @@ export default function App() {
                   <span>⚡ Em Risco</span>
                   <span>Combo {combo.toFixed(1)}x</span>
                 </div>
-                <div className="vault-value" style={{ color: 'var(--wb-gold)' }}>
+                <div className="vault-value" style={{ color: 'var(--pg-gold)' }}>
                   {riskScore}
                 </div>
               </div>
@@ -915,13 +884,13 @@ export default function App() {
             <section className="arena-core-box">
               <div className="bomb-dial">
                 <svg className="bomb-svg" viewBox="0 0 180 180">
-                  <circle cx="90" cy="90" r="80" fill="#0B0D12" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                  <circle cx="90" cy="90" r="80" fill="#090B10" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
                   <circle
                     cx="90"
                     cy="90"
                     r="80"
                     fill="none"
-                    stroke={fuseRatio < 0.3 ? '#F43F5E' : '#38BDF8'}
+                    stroke={fuseRatio < 0.3 ? '#F43F5E' : '#22D3EE'}
                     strokeWidth="8"
                     strokeLinecap="round"
                     strokeDasharray="502"
@@ -929,7 +898,7 @@ export default function App() {
                   />
                 </svg>
                 <div className="bomb-core-circle">
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--wb-text-muted)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--pg-text-muted)' }}>
                     {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
                   </span>
                   <div
@@ -937,12 +906,12 @@ export default function App() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: '2.4rem',
                       fontWeight: 800,
-                      color: 'var(--wb-cyan)',
+                      color: 'var(--pg-cyan-bright)',
                     }}
                   >
                     {matchRef.current.mode === 'wordbomb' ? currentSyllable.syl : `${combo.toFixed(1)}x`}
                   </div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--wb-gold)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--pg-gold)' }}>
                     {fuseClock.toFixed(1)}s
                   </span>
                 </div>
@@ -951,9 +920,10 @@ export default function App() {
               {matchRef.current.mode === 'wordbomb' ? (
                 <>
                   <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
-                    Digite uma palavra que contenha <span style={{ color: 'var(--wb-cyan)' }}>{currentSyllable.syl}</span>
+                    Digite uma palavra que contenha{' '}
+                    <span style={{ color: 'var(--pg-cyan-bright)' }}>{currentSyllable.syl}</span>
                   </h2>
-                  <p style={{ color: 'var(--wb-text-muted)', fontSize: '1rem' }}>{currentSyllable.hint}</p>
+                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '1rem' }}>{currentSyllable.hint}</p>
 
                   <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '520px' }}>
                     <input
@@ -973,8 +943,8 @@ export default function App() {
                       style={{
                         flex: 1,
                         height: '54px',
-                        backgroundColor: 'var(--wb-bg)',
-                        border: '2px solid var(--wb-indigo-light)',
+                        backgroundColor: 'var(--pg-bg)',
+                        border: '2px solid var(--pg-indigo-light)',
                         borderRadius: '12px',
                         padding: '0 18px',
                         fontFamily: 'var(--font-mono)',
@@ -986,11 +956,11 @@ export default function App() {
                     />
                     <button
                       type="button"
-                      className="wb-illuminated-btn"
-                      style={{ height: '54px', padding: '0 24px', fontSize: '1.05rem' }}
+                      className="pg-illuminated-cta"
+                      style={{ minHeight: '54px', padding: '0 24px', fontSize: '1.05rem' }}
                       onClick={handleWordBombSubmit}
                     >
-                      Enviar
+                      Detonar
                     </button>
                   </div>
                 </>
@@ -1019,12 +989,12 @@ export default function App() {
                               width: '32px',
                               height: '32px',
                               borderRadius: '8px',
-                              backgroundColor: 'var(--wb-bg)',
+                              backgroundColor: 'var(--pg-bg)',
                               display: 'inline-flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontFamily: 'var(--font-mono)',
-                              color: 'var(--wb-cyan)',
+                              color: 'var(--pg-cyan-bright)',
                             }}
                           >
                             {idx + 1}
@@ -1044,277 +1014,229 @@ export default function App() {
                     padding: '14px 18px',
                     borderRadius: '12px',
                     backgroundColor:
-                      feedback.tone === 'positive' ? 'rgba(34, 197, 94, 0.16)' : 'rgba(244, 63, 94, 0.16)',
-                    border: `1px solid ${feedback.tone === 'positive' ? '#22C55E' : '#F43F5E'}`,
+                      feedback.tone === 'positive' ? 'rgba(16, 185, 129, 0.16)' : 'rgba(244, 63, 94, 0.16)',
+                    border: `1px solid ${feedback.tone === 'positive' ? '#10B981' : '#F43F5E'}`,
                   }}
                 >
                   <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>{feedback.title}</div>
-                  <div style={{ color: 'var(--wb-text-body)', fontSize: '0.96rem', marginTop: '2px' }}>
+                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.96rem', marginTop: '2px' }}>
                     {feedback.detail}
                   </div>
                 </div>
               )}
             </section>
           </div>
-        ) : activeTab === 'rooms' ? (
+        ) : activeTab === 'play' ? (
           <>
-            {/* 4 MINI-WIDGETS NO TOPO FIÉIS À CAPTURA DO WORDBOMB.IO */}
-            <div className="wb-top-widgets">
-              <button
-                type="button"
-                className={`wb-widget-card ${profile.selectedMode === 'daily' ? 'active' : ''}`}
-                onClick={() => startNewMatch('daily')}
-              >
-                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #143321 0%, #151922 100%)' }}>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <span style={{ background: '#22C55E', color: '#052E16', padding: '3px 7px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>R</span>
-                    <span style={{ background: '#EAB308', color: '#422006', padding: '3px 7px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>A</span>
-                  </div>
+            {/* CONSOLE HERO DE LANÇAMENTO — IDENTIDADE PRÓPRIA */}
+            <section className="pg-hero-console">
+              <div className="pg-hero-top">
+                <span className="pg-pill-tag">
+                  ⚡ {selectedArenaMeta.tag}
+                </span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.92rem', color: 'var(--pg-text-muted)' }}>
+                  {t.dailySeedLabel}: #{getBrasiliaDateKey()}
+                </span>
+              </div>
+
+              <div>
+                <h1 className="pg-hero-title">{selectedArenaMeta.title}</h1>
+                <p className="pg-hero-desc" style={{ marginTop: '6px' }}>
+                  {selectedArenaMeta.subtitle}
+                </p>
+              </div>
+
+              {profile.selectedMode === 'classic' && (
+                <div className="pg-cat-row">
+                  {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`pg-cat-chip ${profile.selectedCategory === cat ? 'active' : ''}`}
+                      onClick={() => setProfile(p => ({ ...p, selectedCategory: cat }))}
+                    >
+                      {CATEGORY_LABELS[cat]}
+                    </button>
+                  ))}
                 </div>
-                <div className="wb-widget-footer">DAILY</div>
-              </button>
+              )}
 
-              <button
-                type="button"
-                className={`wb-widget-card ${profile.selectedMode === 'elevator' ? 'active' : ''}`}
-                onClick={() => startNewMatch('elevator')}
-              >
-                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #3B1826 0%, #151922 100%)' }}>
-                  <span style={{ background: '#F43F5E', color: '#FFF', padding: '3px 10px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>▲▲</span>
-                </div>
-                <div className="wb-widget-footer">ELEVATOR</div>
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="pg-illuminated-cta"
+                  onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
+                >
+                  ▶ {t.launchSelected}
+                </button>
+                <button
+                  type="button"
+                  className="pg-secondary-btn"
+                  onClick={() => setActiveTab('ranked')}
+                >
+                  🏆 {leagueInfo.division} ({profile.careerXP} XP)
+                </button>
+              </div>
+            </section>
 
-              <button
-                type="button"
-                className={`wb-widget-card ${profile.selectedMode === 'wordbomb' ? 'active' : ''}`}
-                onClick={() => startNewMatch('wordbomb')}
-              >
-                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #1D1B4B 0%, #151922 100%)' }}>
-                  <span style={{ background: '#6366F1', color: '#FFF', padding: '3px 9px', borderRadius: '999px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>SYL</span>
-                </div>
-                <div className="wb-widget-footer">SCAPES</div>
-              </button>
-
-              <button
-                type="button"
-                className="wb-widget-card"
-                onClick={() => setSettingsOpen(true)}
-              >
-                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #3740A6 0%, #242B70 100%)' }}>
-                  <span style={{ fontSize: '1.35rem' }}>⚙️</span>
-                </div>
-                <div className="wb-widget-footer">OPÇÕES</div>
-              </button>
-            </div>
-
-            {/* DUPLA DE BOTÕES PRINCIPAIS: CREATE ROOM + SEASON 12 RANKED */}
-            <div className="wb-hero-buttons">
-              <button
-                type="button"
-                className="wb-illuminated-btn wb-create-room-btn"
-                onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
-              >
-                {t.createRoom}
-              </button>
-
-              <button
-                type="button"
-                className="wb-season-ranked-btn"
-                onClick={() => setActiveTab('ranked')}
-              >
-                <div className="wb-season-tv-icon">^_^</div>
-                <div className="wb-season-labels">
-                  <span className="wb-season-top">{rankInfo.season}</span>
-                  <span className="wb-season-main">RANKED</span>
-                </div>
-              </button>
-            </div>
-
-            {/* LISTA DE SALAS FIEL AO WORDBOMB.IO */}
-            <div className="wb-room-stack">
-              {FEATURED_ROOMS.map(room => {
-                const av = AVATAR_CATALOG.find(a => a.id === room.avatarId) || AVATAR_CATALOG[0];
+            {/* BENTO GRID 2x2 DAS ARENAS ORIGINAIS DO THE PULSE GAME */}
+            <section className="pg-bento-grid" aria-label="Arenas de Jogo">
+              {ARENA_MODES.map(arena => {
+                const isSelected = profile.selectedMode === arena.id;
+                const best = profile.bestScores[arena.id] || 0;
                 return (
-                  <div key={room.id} className="wb-room-item">
-                    <div className="wb-room-left">
-                      <div className="wb-room-thumb">{av.renderSvg()}</div>
-                      <div className="wb-room-details">
-                        <div className="wb-room-name">{room.hostName}</div>
-                        <div className="wb-room-meta">
-                          <span className="wb-mode-tag">
-                            <span style={{ color: 'var(--wb-cyan)' }}>◈</span> {room.modeLabel}
-                          </span>
-                          <span>• 👥 {room.playersRatio}</span>
-                          {room.wppBadge && <span>• {room.wppBadge}</span>}
-                          <span className="wb-status-started">• {t.started}</span>
-                          <span>• 🌐 {t.multiLang}</span>
+                  <div
+                    key={arena.id}
+                    className={`pg-bento-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setProfile(p => ({ ...p, selectedMode: arena.id }))}
+                  >
+                    <div>
+                      <div className="pg-bento-header">
+                        <div
+                          className="pg-mode-icon-box"
+                          style={{ backgroundColor: arena.bgTint, color: arena.accent }}
+                        >
+                          {arena.code}
                         </div>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
+                          {arena.tag}
+                        </span>
                       </div>
+                      <h2 className="pg-bento-title" style={{ marginTop: '14px' }}>
+                        {arena.title}
+                      </h2>
+                      <p className="pg-bento-desc">{arena.subtitle}</p>
                     </div>
 
-                    <div className="wb-room-right">
-                      <span className="wb-eye-icon" title="Inspecionar Regras">
-                        👁
+                    <div className="pg-bento-footer">
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-gold)' }}>
+                        ★ {t.bestScore}: {best} pts
                       </span>
                       <button
                         type="button"
-                        className="wb-illuminated-btn wb-join-button"
-                        onClick={() => startNewMatch(room.mode, room.category)}
+                        className="pg-illuminated-cta"
+                        style={{ minHeight: '38px', padding: '0 18px', fontSize: '0.92rem' }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          startNewMatch(arena.id, profile.selectedCategory);
+                        }}
                       >
-                        {t.joinBtn}
+                        {t.playNow} →
                       </button>
                     </div>
                   </div>
                 );
               })}
-            </div>
+            </section>
           </>
         ) : activeTab === 'ranked' ? (
-          <div className="wb-room-stack">
-            <div className="wb-room-item" style={{ padding: '26px', flexDirection: 'column', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '64px', height: '64px', borderRadius: '16px', overflow: 'hidden' }}>
-                  {currentAvatar.renderSvg()}
-                </div>
-                <div>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-emerald)', fontWeight: 800 }}>
-                    {rankInfo.season} • {rankInfo.division}
-                  </span>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>
-                    {profile.username} — {profile.careerXP} XP
-                  </h2>
-                  <p style={{ color: 'var(--wb-text-muted)' }}>
-                    Próxima promoção em {rankInfo.nextXp} XP • Recorde Bomba de Sílabas: {profile.bestScores.wordbomb} pts
-                  </p>
-                </div>
+          <section className="pg-hero-console">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+              <div style={{ width: '76px', height: '76px', borderRadius: '20px', overflow: 'hidden', border: '2px solid var(--pg-indigo-light)' }}>
+                <img src={playerAvatarUrl} alt={profile.username} style={{ width: '100%', height: '100%' }} />
               </div>
-              <button
-                type="button"
-                className="wb-illuminated-btn"
-                style={{ height: '48px', padding: '0 28px', fontSize: '1.05rem' }}
-                onClick={() => startNewMatch('wordbomb')}
-              >
-                Iniciar Partida Ranqueada
-              </button>
-            </div>
-          </div>
-        ) : activeTab === 'shop' || activeTab === 'inventory' ? (
-          <div className="wb-room-stack">
-            <div className="wb-room-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '16px', padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
-                  Coleção de Avatares &amp; Fotos de Perfil
+              <div style={{ flex: 1 }}>
+                <span className="pg-pill-tag">{leagueInfo.division}</span>
+                <h2 className="pg-hero-title" style={{ marginTop: '6px' }}>
+                  {profile.username} — {profile.careerXP} XP
                 </h2>
-                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-gold)', fontWeight: 800 }}>
-                  Saldo: {profile.coins} Moedas
-                </span>
-              </div>
-              <div className="avatar-picker-grid">
-                {AVATAR_CATALOG.map(av => {
-                  const unlocked = profile.unlockedAvatars.includes(av.id) || av.priceCoins === 0;
-                  const equipped = profile.avatarId === av.id;
-                  return (
-                    <button
-                      key={av.id}
-                      type="button"
-                      className={`avatar-choice-card ${equipped ? 'selected' : ''}`}
-                      onClick={() => {
-                        if (unlocked) {
-                          setProfile(p => ({ ...p, avatarId: av.id }));
-                        } else if (profile.coins >= av.priceCoins) {
-                          setProfile(p => ({
-                            ...p,
-                            coins: p.coins - av.priceCoins,
-                            unlockedAvatars: [...p.unlockedAvatars, av.id],
-                            avatarId: av.id,
-                          }));
-                        }
-                      }}
-                    >
-                      <div style={{ width: '64px', height: '64px', borderRadius: '14px', overflow: 'hidden' }}>
-                        {av.renderSvg()}
-                      </div>
-                      <strong style={{ fontSize: '0.96rem' }}>{av.name}</strong>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: equipped ? 'var(--wb-emerald)' : 'var(--wb-gold)' }}>
-                        {equipped ? '✓ Equipado' : unlocked ? 'Desbloqueado' : `🪙 ${av.priceCoins}`}
-                      </span>
-                    </button>
-                  );
-                })}
+                <p style={{ color: 'var(--pg-text-muted)', marginTop: '4px' }}>
+                  Próximo marco em {leagueInfo.nextXp} XP • {profile.matchesPlayed} partidas disputadas • Combo máximo: {profile.highestComboEver.toFixed(1)}x
+                </p>
               </div>
             </div>
-          </div>
-        ) : activeTab === 'words' ? (
-          <div className="wb-room-stack">
-            <div className="wb-room-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '14px', padding: '24px' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
-                Verificador Oficial de Palavras ({PORTUGUESE_WORD_SET.size} vocábulos)
-              </h2>
-              <input
-                type="text"
-                value={wordSearchQuery}
-                onChange={e => setWordSearchQuery(e.target.value)}
-                placeholder="Digite uma palavra para verificar no dicionário..."
-                style={{
-                  height: '52px',
-                  backgroundColor: 'var(--wb-bg)',
-                  border: '2px solid var(--wb-border-strong)',
-                  borderRadius: '12px',
-                  padding: '0 16px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '1.15rem',
-                  textTransform: 'uppercase',
-                }}
-              />
-              {wordSearchQuery.trim().length >= 2 && (
-                <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>
-                  {PORTUGUESE_WORD_SET.has(
-                    wordSearchQuery
-                      .trim()
-                      .toUpperCase()
-                      .normalize('NFD')
-                      .replace(/[\u0300-\u036f]/g, '')
-                  ) ? (
-                    <span style={{ color: 'var(--wb-emerald)' }}>✓ Palavra aceita e validada no dicionário!</span>
-                  ) : (
-                    <span style={{ color: 'var(--wb-coral)' }}>✕ Palavra não encontrada ou bloqueada.</span>
-                  )}
-                </div>
-              )}
+          </section>
+        ) : activeTab === 'Customize' ? (
+          <section className="pg-hero-console">
+            <h2 className="pg-hero-title">Galeria Oficial de Avatares (DiceBear Open-Source)</h2>
+            <p className="pg-hero-desc">
+              Selecione qualquer personagem ilustrado pela comunidade ou personalize sua própria semente no perfil:
+            </p>
+            <div className="avatar-picker-grid">
+              {CURATED_COMMUNITY_AVATARS.map(preset => {
+                const url = buildDiceBearUrl(preset.style, preset.seed, preset.bg);
+                const isCurrent = profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={`avatar-choice-card ${isCurrent ? 'selected' : ''}`}
+                    onClick={() =>
+                      setProfile(p => ({
+                        ...p,
+                        avatarStyle: preset.style,
+                        avatarSeed: preset.seed,
+                        avatarBg: preset.bg,
+                      }))
+                    }
+                  >
+                    <img
+                      src={url}
+                      alt={preset.label}
+                      style={{ width: '68px', height: '68px', borderRadius: '16px' }}
+                    />
+                    <strong style={{ fontSize: '0.96rem' }}>{preset.label}</strong>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--pg-cyan-bright)' }}>
+                      {preset.style}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          </section>
+        ) : activeTab === 'lexicon' ? (
+          <section className="pg-hero-console">
+            <h2 className="pg-hero-title">
+              Verificador Léxico ({PORTUGUESE_WORD_SET.size} palavras higienizadas)
+            </h2>
+            <input
+              type="text"
+              value={wordSearchQuery}
+              onChange={e => setWordSearchQuery(e.target.value)}
+              placeholder="Digite uma palavra para verificar no dicionário..."
+              style={{
+                height: '54px',
+                backgroundColor: 'var(--pg-bg)',
+                border: '2px solid var(--pg-border-strong)',
+                borderRadius: '14px',
+                padding: '0 18px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '1.15rem',
+                textTransform: 'uppercase',
+              }}
+            />
+            {wordSearchQuery.trim().length >= 2 && (
+              <div style={{ fontWeight: 800, fontSize: '1.08rem' }}>
+                {PORTUGUESE_WORD_SET.has(
+                  wordSearchQuery
+                    .trim()
+                    .toUpperCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                ) ? (
+                  <span style={{ color: 'var(--pg-emerald)' }}>✓ Palavra aceita e validada no dicionário!</span>
+                ) : (
+                  <span style={{ color: 'var(--pg-coral)' }}>✕ Palavra não encontrada ou bloqueada.</span>
+                )}
+              </div>
+            )}
+          </section>
         ) : (
-          <div className="wb-room-stack">
+          <div className="pg-bento-grid">
             {WORDBOMB_SYLLABLES.map(item => (
-              <div key={item.syl} className="wb-room-item">
-                <div className="wb-room-left">
+              <div key={item.syl} className="pg-bento-card" onClick={() => startNewMatch('wordbomb')}>
+                <div className="pg-bento-header">
                   <div
-                    className="wb-room-thumb"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'var(--wb-bg)',
-                      fontFamily: 'var(--font-mono)',
-                      fontWeight: 900,
-                      color: 'var(--wb-cyan)',
-                    }}
+                    className="pg-mode-icon-box"
+                    style={{ backgroundColor: 'rgba(6, 182, 212, 0.14)', color: 'var(--pg-cyan-bright)' }}
                   >
                     {item.syl}
                   </div>
-                  <div className="wb-room-details">
-                    <div className="wb-room-name">Sílaba "{item.syl}"</div>
-                    <div className="wb-room-meta">{item.hint}</div>
-                  </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
+                    Nível {item.difficulty}
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  className="wb-illuminated-btn wb-join-button"
-                  onClick={() => startNewMatch('wordbomb')}
-                >
-                  Treinar
-                </button>
+                <div className="pg-bento-desc">{item.hint}</div>
               </div>
             ))}
           </div>
@@ -1322,33 +1244,25 @@ export default function App() {
       </main>
 
       {/* =========================================================
-          3. MODAL DE CONFIGURAÇÕES COMPLETO (HAMBURGER MENU)
+          3. MODAL DE CONFIGURAÇÕES COMPLETO
          ========================================================= */}
       {settingsOpen && (
-        <div className="wb-modal-backdrop" onClick={() => setSettingsOpen(false)}>
-          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+        <div className="pg-modal-backdrop" onClick={() => setSettingsOpen(false)}>
+          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>{t.settingsTitle}</h2>
-              <button type="button" className="wb-lang-trigger" onClick={() => setSettingsOpen(false)}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>{t.settingsTitle}</h2>
+              <button type="button" className="pg-secondary-btn" onClick={() => setSettingsOpen(false)}>
                 ✕ Fechar
               </button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div className="wb-room-item">
+              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div className="wb-room-name">Idioma da Interface</div>
-                  <div className="wb-room-meta">Português (BR), English (US), Español</div>
-                </div>
-                <button type="button" className="wb-illuminated-btn" onClick={cycleLanguage}>
-                  {t.flag} {t.label}
-                </button>
-              </div>
-
-              <div className="wb-room-item">
-                <div>
-                  <div className="wb-room-name">Intensidade dos Efeitos Sonoros</div>
-                  <div className="wb-room-meta">Volume atual do sintetizador: {profile.sfxVolume}%</div>
+                  <strong style={{ fontSize: '1.05rem' }}>Volume dos Efeitos Sonoros</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
+                    Intensidade atual: {profile.sfxVolume}%
+                  </div>
                 </div>
                 <input
                   type="range"
@@ -1359,29 +1273,33 @@ export default function App() {
                 />
               </div>
 
-              <div className="wb-room-item">
+              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div className="wb-room-name">Partículas e Ondas de Choque (60 FPS)</div>
-                  <div className="wb-room-meta">Ativar explosões luminosas no Canvas da Arena</div>
+                  <strong style={{ fontSize: '1.05rem' }}>Partículas e Ondas de Choque (60 FPS)</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
+                    Explosões luminosas no Canvas da Arena
+                  </div>
                 </div>
                 <button
                   type="button"
-                  className="wb-lang-trigger"
+                  className="pg-secondary-btn"
                   onClick={() => setProfile(p => ({ ...p, reducedMotion: !p.reducedMotion }))}
                 >
-                  {profile.reducedMotion ? 'Reduzido' : 'Ultra 60 FPS'}
+                  {profile.reducedMotion ? 'Reduzido' : 'Máximo (60 FPS)'}
                 </button>
               </div>
 
-              <div className="wb-room-item">
+              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div className="wb-room-name">Redefinir Dados Locais</div>
-                  <div className="wb-room-meta">Restaurar estatísticas e recordes para o padrão</div>
+                  <strong style={{ fontSize: '1.05rem' }}>Redefinir Dados Locais</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
+                    Zera recordes e restaura o perfil inicial
+                  </div>
                 </div>
                 <button
                   type="button"
-                  className="wb-lang-trigger"
-                  style={{ color: 'var(--wb-coral)', borderColor: 'var(--wb-coral)' }}
+                  className="pg-secondary-btn"
+                  style={{ color: 'var(--pg-coral)', borderColor: 'var(--pg-coral)' }}
                   onClick={() => {
                     setProfile(clearProfileStorage());
                     setSettingsOpen(false);
@@ -1396,59 +1314,111 @@ export default function App() {
       )}
 
       {/* =========================================================
-          4. MODAL DE PERFIL & ESCOLHA DE FOTOS DE PERFIL BONITINHAS
+          4. MODAL DE PERFIL & ESTÚDIO DE AVATARES DICEBEAR
          ========================================================= */}
       {profileModalOpen && (
-        <div className="wb-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
-          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+        <div className="pg-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
+          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>
-                Seu Perfil &amp; Avatares
-              </h2>
-              <button type="button" className="wb-lang-trigger" onClick={() => setProfileModalOpen(false)}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>{t.profileTitle}</h2>
+              <button type="button" className="pg-illuminated-cta" style={{ minHeight: '42px', padding: '0 18px', fontSize: '0.95rem' }} onClick={() => setProfileModalOpen(false)}>
                 ✓ Salvar
               </button>
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <img
+                src={playerAvatarUrl}
+                alt={profile.username}
+                style={{ width: '76px', height: '76px', borderRadius: '18px', border: '2px solid var(--pg-indigo-light)' }}
+              />
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px' }}>
+                  Nome de Exibição:
+                </label>
+                <input
+                  type="text"
+                  value={profile.username}
+                  maxLength={18}
+                  onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}
+                  style={{
+                    width: '100%',
+                    height: '44px',
+                    backgroundColor: 'var(--pg-bg)',
+                    border: '1px solid var(--pg-border-strong)',
+                    borderRadius: '10px',
+                    padding: '0 14px',
+                    fontWeight: 700,
+                  }}
+                />
+              </div>
+            </div>
+
             <div>
-              <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px' }}>
-                Nome de Exibição:
-              </label>
+              <div style={{ fontWeight: 700, marginBottom: '8px' }}>
+                Gerador Customizado DiceBear (Escolha o Estilo + Semente):
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                {DICEBEAR_STYLE_LIST.map(st => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    className={`pg-cat-chip ${profile.avatarStyle === st.id ? 'active' : ''}`}
+                    style={{ height: '36px', fontSize: '0.88rem' }}
+                    onClick={() => setProfile(p => ({ ...p, avatarStyle: st.id }))}
+                  >
+                    {st.name}
+                  </button>
+                ))}
+              </div>
               <input
                 type="text"
-                value={profile.username}
-                maxLength={18}
-                onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}
+                value={profile.avatarSeed}
+                onChange={e => setProfile(p => ({ ...p, avatarSeed: e.target.value }))}
+                placeholder="Digite qualquer nome/semente para gerar um avatar único..."
                 style={{
                   width: '100%',
-                  height: '46px',
-                  backgroundColor: 'var(--wb-bg)',
-                  border: '1px solid var(--wb-border-strong)',
+                  height: '42px',
+                  backgroundColor: 'var(--pg-bg)',
+                  border: '1px solid var(--pg-border-strong)',
                   borderRadius: '10px',
                   padding: '0 14px',
-                  fontWeight: 700,
                 }}
               />
             </div>
 
             <div>
               <div style={{ fontWeight: 700, marginBottom: '10px' }}>
-                Escolha sua Foto de Perfil:
+                Ou escolha um Avatar Curado da Comunidade:
               </div>
               <div className="avatar-picker-grid">
-                {AVATAR_CATALOG.map(av => (
-                  <button
-                    key={av.id}
-                    type="button"
-                    className={`avatar-choice-card ${profile.avatarId === av.id ? 'selected' : ''}`}
-                    onClick={() => setProfile(p => ({ ...p, avatarId: av.id }))}
-                  >
-                    <div style={{ width: '56px', height: '56px', borderRadius: '14px', overflow: 'hidden' }}>
-                      {av.renderSvg()}
-                    </div>
-                    <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>{av.name}</span>
-                  </button>
-                ))}
+                {CURATED_COMMUNITY_AVATARS.map(preset => {
+                  const url = buildDiceBearUrl(preset.style, preset.seed, preset.bg);
+                  const isSelected =
+                    profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      className={`avatar-choice-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() =>
+                        setProfile(p => ({
+                          ...p,
+                          avatarStyle: preset.style,
+                          avatarSeed: preset.seed,
+                          avatarBg: preset.bg,
+                        }))
+                      }
+                    >
+                      <img
+                        src={url}
+                        alt={preset.label}
+                        style={{ width: '58px', height: '58px', borderRadius: '14px' }}
+                      />
+                      <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>{preset.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1459,20 +1429,20 @@ export default function App() {
           5. MODAL PÓS-PARTIDA
          ========================================================= */}
       {postMatchModal && (
-        <div className="wb-modal-backdrop" onClick={() => setPostMatchModal(null)}>
-          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+        <div className="pg-modal-backdrop" onClick={() => setPostMatchModal(null)}>
+          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-cyan)', fontWeight: 800 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-cyan-bright)', fontWeight: 800 }}>
                   FIM DE PARTIDA • +{postMatchModal.coinsEarned} MOEDAS
                 </span>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.9rem' }}>
                   {postMatchModal.finalScore} Pontos
                 </h2>
               </div>
               <button
                 type="button"
-                className="wb-illuminated-btn"
+                className="pg-illuminated-cta"
                 onClick={() => {
                   const m = profile.selectedMode;
                   setPostMatchModal(null);
@@ -1484,11 +1454,11 @@ export default function App() {
             </div>
             <pre
               style={{
-                backgroundColor: 'var(--wb-bg)',
-                padding: '14px',
-                borderRadius: '10px',
+                backgroundColor: 'var(--pg-bg)',
+                padding: '16px',
+                borderRadius: '12px',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.92rem',
+                fontSize: '0.94rem',
                 whiteSpace: 'pre-wrap',
               }}
             >
@@ -1497,24 +1467,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* =========================================================
-          6. RODAPÉ PROFISSIONAL CORPORATIVO (SEM ATALHOS DE TECLADO)
-         ========================================================= */}
-      <footer className="wb-pro-footer">
-        <div className="wb-pro-footer-inner">
-          <div>{t.footerRights}</div>
-          <div className="wb-footer-links">
-            <button type="button" className="wb-footer-link" onClick={() => setSettingsOpen(true)}>
-              {t.terms}
-            </button>
-            <button type="button" className="wb-footer-link" onClick={() => setSettingsOpen(true)}>
-              {t.privacy}
-            </button>
-            <span style={{ color: 'var(--wb-emerald)', fontWeight: 700 }}>● {t.status}</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
