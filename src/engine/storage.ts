@@ -1,6 +1,6 @@
 import { CategoryId, GameModeId, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'pulso_v5_editorial_state';
+const STORAGE_KEY = 'the_pulse_game_v6_state';
 
 export function createDefaultProfile(): PlayerProfile {
   const prefersReduced =
@@ -9,20 +9,20 @@ export function createDefaultProfile(): PlayerProfile {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   return {
-    version: 5,
+    version: 6,
     soundEnabled: true,
     reducedMotion: Boolean(prefersReduced),
-    selectedMode: 'daily',
+    selectedMode: 'wordbomb',
     selectedCategory: 'mixed',
     matchesPlayed: 0,
     totalQuestionsAnswered: 0,
     totalQuestionsCorrect: 0,
     highestComboEver: 1.0,
     bestScores: {
-      daily: 0,
-      classic: 0,
       wordbomb: 0,
+      daily: 0,
       elevator: 0,
+      classic: 0,
     },
     bestCategoryScores: {
       mixed: 0,
@@ -40,7 +40,7 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
   if (!raw || typeof raw !== 'object') return def;
   const obj = raw as Record<string, unknown>;
 
-  const validModes: GameModeId[] = ['daily', 'classic', 'wordbomb', 'elevator'];
+  const validModes: GameModeId[] = ['wordbomb', 'daily', 'elevator', 'classic'];
   const validCats: CategoryId[] = ['mixed', 'math', 'logic', 'words', 'general'];
 
   const safeNum = (val: unknown, fallback = 0): number =>
@@ -52,7 +52,7 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
     : {}) as Record<string, unknown>;
 
   return {
-    version: 5,
+    version: 6,
     soundEnabled: typeof obj.soundEnabled === 'boolean' ? obj.soundEnabled : def.soundEnabled,
     reducedMotion: typeof obj.reducedMotion === 'boolean' ? obj.reducedMotion : def.reducedMotion,
     selectedMode: validModes.includes(obj.selectedMode as GameModeId)
@@ -69,10 +69,10 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
         ? obj.highestComboEver
         : 1.0,
     bestScores: {
-      daily: safeNum(rawBest.daily, 0),
-      classic: safeNum(rawBest.classic, 0),
       wordbomb: safeNum(rawBest.wordbomb, 0),
+      daily: safeNum(rawBest.daily, 0),
       elevator: safeNum(rawBest.elevator, 0),
+      classic: safeNum(rawBest.classic, 0),
     },
     bestCategoryScores: {
       mixed: safeNum(rawCatBest.mixed, 0),

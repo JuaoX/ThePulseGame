@@ -42,9 +42,9 @@ export function getBrasiliaDateKey(referenceDate: Date = new Date()): string {
 
 export function formatDatePtBr(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number);
-  const months = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+  const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
   if (!y || !m || !d) return dateKey;
-  return `${d} de ${months[(m - 1) % 12]} de ${y}`;
+  return `${d} ${months[(m - 1) % 12]} ${y}`;
 }
 
 export function normalizeWord(raw: string): string {
@@ -83,24 +83,24 @@ export function validateWordSubmission(
 
   for (const root of PROFANITY_ROOTS) {
     if (word.includes(root)) {
-      return { valid: false, normalized: word, reason: 'Palavra bloqueada pelo filtro de segurança.' };
+      return { valid: false, normalized: word, reason: 'Termo bloqueado pelo filtro de segurança.' };
     }
   }
 
   if (/(.)\1\1/.test(word) || /[BCDFGHJKLMNPQRSTVWXYZ]{5,}/.test(word)) {
-    return { valid: false, normalized: word, reason: 'Sequência de letras inválida.' };
+    return { valid: false, normalized: word, reason: 'Sequência de caracteres inválida.' };
   }
 
   if (!word.includes(syl)) {
-    return { valid: false, normalized: word, reason: `A palavra deve conter a sílaba "${syl}".` };
+    return { valid: false, normalized: word, reason: `A palavra precisa conter a sílaba "${syl}".` };
   }
 
   if (usedWords.has(word)) {
-    return { valid: false, normalized: word, reason: `"${word}" já foi utilizada nesta partida.` };
+    return { valid: false, normalized: word, reason: `A palavra "${word}" já foi usada nesta partida!` };
   }
 
   if (!dictionary.has(word)) {
-    return { valid: false, normalized: word, reason: `"${word}" não consta no dicionário do Pulso.` };
+    return { valid: false, normalized: word, reason: `"${word}" não consta no dicionário oficial.` };
   }
 
   return { valid: true, normalized: word };
@@ -145,7 +145,7 @@ export function generateProceduralMathQuestion(
     explanation = `Multiplicamos primeiro: ${b} × 2 = ${b * 2}. Somando ${a}, temos ${answer}.`;
   } else if (difficulty === 2) {
     answer = a * b - c;
-    prompt = `Calcule o resultado de ${a} × ${b} - ${c}:`;
+    prompt = `Calcule rápido: ${a} × ${b} - ${c}`;
     explanation = `${a} × ${b} = ${a * b}. Subtraindo ${c}, o resultado é ${answer}.`;
   } else {
     answer = (a + b) * c;

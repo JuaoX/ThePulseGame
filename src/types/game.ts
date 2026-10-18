@@ -1,4 +1,4 @@
-export type GameModeId = 'daily' | 'classic' | 'wordbomb' | 'elevator';
+export type GameModeId = 'wordbomb' | 'daily' | 'elevator' | 'classic';
 export type CategoryId = 'mixed' | 'math' | 'logic' | 'words' | 'general';
 export type AppViewId = 'home' | 'rules' | 'stats' | 'library';
 

@@ -12,7 +12,7 @@ class WebAudioSynthesizer {
     }
   }
 
-  private playTone(freq: number, type: OscillatorType, durationMs: number, gainVal = 0.065, delayMs = 0): void {
+  private playTone(freq: number, type: OscillatorType, durationMs: number, gainVal = 0.08, delayMs = 0): void {
     if (!this.enabled) return;
     try {
       this.init();
@@ -34,33 +34,33 @@ class WebAudioSynthesizer {
   }
 
   public keyClick(): void {
-    this.playTone(580, 'sine', 20, 0.018, 0);
+    this.playTone(680, 'sine', 24, 0.025, 0);
   }
 
   public hit(streak: number): void {
-    const base = 420 + Math.min(streak, 6) * 45;
-    this.playTone(base, 'triangle', 95, 0.075, 0);
-    this.playTone(base * 1.25, 'sine', 145, 0.065, 45);
+    const base = 440 + Math.min(streak, 6) * 55;
+    this.playTone(base, 'triangle', 105, 0.09, 0);
+    this.playTone(base * 1.25, 'sine', 155, 0.08, 48);
   }
 
   public bank(): void {
-    this.playTone(523.25, 'sine', 90, 0.085, 0);
-    this.playTone(659.25, 'sine', 110, 0.085, 55);
-    this.playTone(783.99, 'triangle', 190, 0.095, 110);
+    this.playTone(523.25, 'sine', 95, 0.1, 0);
+    this.playTone(659.25, 'sine', 115, 0.1, 58);
+    this.playTone(783.99, 'triangle', 210, 0.11, 115);
   }
 
   public error(): void {
-    this.playTone(190, 'sawtooth', 150, 0.07, 0);
-    this.playTone(142, 'sawtooth', 220, 0.07, 70);
+    this.playTone(185, 'sawtooth', 170, 0.085, 0);
+    this.playTone(138, 'sawtooth', 240, 0.085, 75);
   }
 
   public tickUrgent(): void {
-    this.playTone(820, 'sine', 32, 0.022, 0);
+    this.playTone(900, 'sine', 38, 0.03, 0);
   }
 
   public finish(): void {
-    this.playTone(523.25, 'triangle', 130, 0.075, 0);
-    this.playTone(783.99, 'triangle', 250, 0.085, 95);
+    this.playTone(587.33, 'triangle', 140, 0.09, 0);
+    this.playTone(880, 'triangle', 290, 0.1, 105);
   }
 }
 
