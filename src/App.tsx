@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   AnswerHistoryItem,
-  AppViewId,
+  AvatarId,
   CategoryId,
   GameModeId,
+  LanguageCode,
+  NavTabId,
   QuestionItem,
   SyllableChallenge,
 } from './types/game';
 import { QUESTION_BANK } from './data/questions';
 import { PORTUGUESE_WORD_SET, WORDBOMB_SYLLABLES } from './data/syllables';
+import { AVATAR_CATALOG, I18N_STRINGS } from './data/avatars';
 import {
   createPRNG,
-  formatDatePtBr,
   generateProceduralMathQuestion,
   getBrasiliaDateKey,
   hashSeed,
@@ -19,97 +21,99 @@ import {
   validateWordSubmission,
 } from './engine/prng';
 import { SoundEngine } from './engine/sound';
-import { clearProfileStorage, loadProfile, saveProfile } from './engine/storage';
+import { clearProfileStorage, getSeasonRankInfo, loadProfile, saveProfile } from './engine/storage';
 import { ArenaCanvasFX, ArenaCanvasFXHandle } from './components/ArenaCanvasFX';
 
 const COMBO_STEPS = [1.0, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0];
 const BASE_POINTS = { 1: 100, 2: 150, 3: 220 } as const;
 
-const MODE_DETAILS: Record<
-  GameModeId,
-  {
-    code: string;
-    name: string;
-    badge: string;
-    summary: string;
-    rules: string;
-    color: string;
-    hasMatchClock: boolean;
-    initialLives: number;
-  }
-> = {
-  wordbomb: {
-    code: 'SYL',
-    name: 'Bomba de Sílabas',
-    badge: 'MODO ESTRELA • DIGITAÇÃO RÁPIDA',
-    summary: 'O reator sorteia uma sílaba e o pavio começa a queimar! Digite qualquer palavra válida antes que exploda.',
-    rules: '60 Segundos • 3 Vidas • Dicionário Oficial de 17.600+ palavras',
-    color: '#22D3EE',
-    hasMatchClock: true,
-    initialLives: 3,
-  },
-  daily: {
-    code: '24H',
-    name: 'Desafio Diário',
-    badge: 'SEMENTE OFICIAL DO DIA',
-    summary: 'Todos os jogadores enfrentam exatamente a mesma sequência hoje. Dispute a maior pontuação e compartilhe!',
-    rules: '60 Segundos • Todas as Áreas • Virada à meia-noite (Brasília)',
-    color: '#10B981',
-    hasMatchClock: true,
-    initialLives: 0,
-  },
-  elevator: {
-    code: 'ELV',
-    name: 'O Elevador',
-    badge: 'TORRE DE SOBREVIVÊNCIA',
-    summary: 'Suba andares infinitos com 3 vidas. A cada andar vencido o reator acelera a velocidade do pavio!',
-    rules: 'Sem Relógio Geral • 3 Vidas • Velocidade Progressiva',
-    color: '#F43F5E',
-    hasMatchClock: false,
-    initialLives: 3,
-  },
-  classic: {
-    code: '60S',
-    name: 'Arena Turbo 60s',
-    badge: 'VELOCIDADE & COMBO 3.0X',
-    summary: 'Bateria eletrizante de desafios rápidos. Suba seu multiplicador até 3.0x e decida a hora exata de blindar o cofre!',
-    rules: '60 Segundos • Escolha Modo Misto ou sua categoria favorita',
-    color: '#FACC15',
-    hasMatchClock: true,
-    initialLives: 0,
-  },
-};
-
-const CATEGORY_LABELS: Record<CategoryId, string> = {
-  mixed: 'Pulso Misto (Todas)',
-  math: 'Matemática Mental',
-  logic: 'Lógica & Padrões',
-  words: 'Palavras & Idioma',
-  general: 'Conhecimentos Gerais',
-};
-
-interface PostMatchReport {
+interface RoomEntry {
+  id: string;
+  hostName: string;
+  avatarId: AvatarId;
   mode: GameModeId;
   category: CategoryId;
-  dateKey: string;
-  finalScore: number;
-  safeScore: number;
-  salvagedScore: number;
-  lostRiskScore: number;
-  correctCount: number;
-  totalCount: number;
-  peakCombo: number;
-  banksCount: number;
-  isNewRecord: boolean;
-  timeline: string;
-  shareText: string;
-  history: AnswerHistoryItem[];
+  modeLabel: string;
+  playersRatio: string;
+  wppBadge?: string;
 }
+
+const FEATURED_ROOMS: RoomEntry[] = [
+  {
+    id: 'r1',
+    hostName: 'Bomba de Sílabas — Oficial',
+    avatarId: 'shiba',
+    mode: 'wordbomb',
+    category: 'words',
+    modeLabel: 'Original',
+    playersRatio: '18/32',
+    wppBadge: '< 500 WPP',
+  },
+  {
+    id: 'r2',
+    hostName: 'Desafio Diário Global',
+    avatarId: 'cybercat',
+    mode: 'daily',
+    category: 'mixed',
+    modeLabel: 'Chain Word',
+    playersRatio: '24/32',
+  },
+  {
+    id: 'r3',
+    hostName: 'Torre do Elevador (3 Vidas)',
+    avatarId: 'kitsune',
+    mode: 'elevator',
+    category: 'mixed',
+    modeLabel: 'Dungeon',
+    playersRatio: '12/32',
+  },
+  {
+    id: 'r4',
+    hostName: 'Arena Trivia — Pulso Misto',
+    avatarId: 'owl',
+    mode: 'classic',
+    category: 'mixed',
+    modeLabel: 'Trivia',
+    playersRatio: '9/32',
+  },
+  {
+    id: 'r5',
+    hostName: 'Cálculo Rápido & Lógica',
+    avatarId: 'astro',
+    mode: 'classic',
+    category: 'math',
+    modeLabel: 'Original',
+    playersRatio: '14/32',
+    wppBadge: ' Rápido',
+  },
+  {
+    id: 'r6',
+    hostName: 'Mestres do Vocabulário',
+    avatarId: 'dragon',
+    mode: 'classic',
+    category: 'words',
+    modeLabel: 'Chain Word',
+    playersRatio: '7/32',
+  },
+  {
+    id: 'r7',
+    hostName: 'Conhecimentos Gerais Turbo',
+    avatarId: 'witch',
+    mode: 'classic',
+    category: 'general',
+    modeLabel: 'Trivia',
+    playersRatio: '11/32',
+  },
+];
 
 export default function App() {
   const [profile, setProfile] = useState(() => loadProfile());
-  const [activeView, setActiveView] = useState<AppViewId>('home');
+  const [activeTab, setActiveTab] = useState<NavTabId>('rooms');
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
+  // Estado da partida ativa
   const [inMatch, setInMatch] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [matchClock, setMatchClock] = useState(60.0);
@@ -134,11 +138,16 @@ export default function App() {
     detail: string;
   } | null>(null);
 
-  const [lastReport, setLastReport] = useState<PostMatchReport | null>(null);
-  const [copiedBanner, setCopiedBanner] = useState(false);
+  const [postMatchModal, setPostMatchModal] = useState<{
+    finalScore: number;
+    safeScore: number;
+    salvagedScore: number;
+    coinsEarned: number;
+    peakCombo: number;
+    shareText: string;
+  } | null>(null);
 
-  const [wordCheckInput, setWordCheckInput] = useState('');
-  const [libraryCatFilter, setLibraryCatFilter] = useState<CategoryId>('mixed');
+  const [wordSearchQuery, setWordSearchQuery] = useState('');
 
   const fxRef = useRef<ArenaCanvasFXHandle | null>(null);
   const sessionIdRef = useRef(0);
@@ -164,11 +173,9 @@ export default function App() {
     floor: 1,
     safeScore: 0,
     riskScore: 0,
-    lostRiskScore: 0,
     streak: 0,
     combo: 1.0,
     peakCombo: 1.0,
-    banksCount: 0,
     correctCount: 0,
     totalCount: 0,
     currentQuestion: null as QuestionItem | null,
@@ -176,10 +183,14 @@ export default function App() {
   });
 
   useEffect(() => {
-    SoundEngine.enabled = profile.soundEnabled;
+    SoundEngine.volume = profile.sfxVolume / 100;
     document.body.classList.toggle('reduced-motion', profile.reducedMotion);
     saveProfile(profile);
   }, [profile]);
+
+  const t = I18N_STRINGS[profile.language] || I18N_STRINGS.pt;
+  const currentAvatar = AVATAR_CATALOG.find(a => a.id === profile.avatarId) || AVATAR_CATALOG[0];
+  const rankInfo = getSeasonRankInfo(profile.careerXP);
 
   const clearPendingTransition = () => {
     if (transitionTimerRef.current !== null) {
@@ -287,7 +298,7 @@ export default function App() {
     historyRef.current = [];
     timelineMarksRef.current = [];
 
-    const initialLives = MODE_DETAILS[mode].initialLives;
+    const initialLives = mode === 'wordbomb' || mode === 'elevator' ? 3 : 0;
 
     matchRef.current = {
       active: true,
@@ -303,11 +314,9 @@ export default function App() {
       floor: 1,
       safeScore: 0,
       riskScore: 0,
-      lostRiskScore: 0,
       streak: 0,
       combo: 1.0,
       peakCombo: 1.0,
-      banksCount: 0,
       correctCount: 0,
       totalCount: 0,
       currentQuestion: null,
@@ -315,7 +324,7 @@ export default function App() {
     };
 
     setProfile(prev => ({ ...prev, selectedMode: mode, selectedCategory: category }));
-    setLastReport(null);
+    setPostMatchModal(null);
     setIsPaused(false);
     setMatchClock(60.0);
     setLives(initialLives);
@@ -350,81 +359,38 @@ export default function App() {
     SoundEngine.finish();
 
     const salvagedScore = Math.round(st.riskScore * 0.5);
-    const dissipated = st.riskScore - salvagedScore;
-    const totalLostRisk = st.lostRiskScore + dissipated;
     const finalScore = st.safeScore + salvagedScore;
-
-    const prevModeBest = profile.bestScores[st.mode] || 0;
-    const isNewRecord = finalScore > prevModeBest && finalScore > 0;
+    const coinsEarned = Math.max(10, Math.round(finalScore / 20));
     const timelineStr = timelineMarksRef.current.length > 0 ? timelineMarksRef.current.join('') : '—';
 
-    const modeTitle =
-      st.mode === 'daily'
-        ? `Desafio Diário (${st.dateKey})`
-        : st.mode === 'classic'
-        ? `${MODE_DETAILS.classic.name} - ${CATEGORY_LABELS[st.category]}`
-        : MODE_DETAILS[st.mode].name;
-
     const shareText = [
-      `⚡ The Pulse Game — ${modeTitle}`,
-      `🏆 Pontos: ${finalScore} (🛡️ Cofre: ${st.safeScore} | ⚡ Bônus Final: +${salvagedScore})`,
-      `🔥 Combo Máx: ${st.peakCombo.toFixed(1)}x • 🎯 Acertos: ${st.correctCount}/${st.totalCount}`,
-      `📊 Mapa: ${timelineStr}`,
+      `⚡ The Pulse Game — ${st.mode.toUpperCase()} (${st.dateKey})`,
+      `🏆 ${finalScore} pts (🛡️ Cofre: ${st.safeScore} | ⚡ Bônus: +${salvagedScore})`,
+      `🔥 Combo Máx: ${st.peakCombo.toFixed(1)}x • 🎯 ${st.correctCount}/${st.totalCount}`,
+      `📊 ${timelineStr}`,
     ].join('\n');
 
-    setProfile(prev => {
-      const updatedDaily = { ...prev.dailyHistory };
-      if (st.mode === 'daily' && !updatedDaily[st.dateKey]) {
-        updatedDaily[st.dateKey] = {
-          dateKey: st.dateKey,
-          score: finalScore,
-          safeScore: st.safeScore,
-          salvagedScore,
-          correctCount: st.correctCount,
-          totalCount: st.totalCount,
-          peakCombo: st.peakCombo,
-          timeline: timelineStr,
-          shareText,
-        };
-      }
+    setProfile(prev => ({
+      ...prev,
+      coins: prev.coins + coinsEarned,
+      careerXP: prev.careerXP + finalScore,
+      matchesPlayed: prev.matchesPlayed + 1,
+      totalQuestionsAnswered: prev.totalQuestionsAnswered + st.totalCount,
+      totalQuestionsCorrect: prev.totalQuestionsCorrect + st.correctCount,
+      highestComboEver: Math.max(prev.highestComboEver, st.peakCombo),
+      bestScores: {
+        ...prev.bestScores,
+        [st.mode]: Math.max(prev.bestScores[st.mode] || 0, finalScore),
+      },
+    }));
 
-      return {
-        ...prev,
-        matchesPlayed: prev.matchesPlayed + 1,
-        totalQuestionsAnswered: prev.totalQuestionsAnswered + st.totalCount,
-        totalQuestionsCorrect: prev.totalQuestionsCorrect + st.correctCount,
-        highestComboEver: Math.max(prev.highestComboEver, st.peakCombo),
-        bestScores: {
-          ...prev.bestScores,
-          [st.mode]: Math.max(prev.bestScores[st.mode] || 0, finalScore),
-        },
-        bestCategoryScores:
-          st.mode === 'classic'
-            ? {
-                ...prev.bestCategoryScores,
-                [st.category]: Math.max(prev.bestCategoryScores[st.category] || 0, finalScore),
-              }
-            : prev.bestCategoryScores,
-        dailyHistory: updatedDaily,
-      };
-    });
-
-    setLastReport({
-      mode: st.mode,
-      category: st.category,
-      dateKey: st.dateKey,
+    setPostMatchModal({
       finalScore,
       safeScore: st.safeScore,
       salvagedScore,
-      lostRiskScore: totalLostRisk,
-      correctCount: st.correctCount,
-      totalCount: st.totalCount,
+      coinsEarned,
       peakCombo: st.peakCombo,
-      banksCount: st.banksCount,
-      isNewRecord,
-      timeline: timelineStr,
       shareText,
-      history: [...historyRef.current],
     });
   };
 
@@ -433,13 +399,12 @@ export default function App() {
     if (!st.active || st.paused || st.riskScore <= 0) return;
 
     const amount = st.riskScore;
-    const hadHighStreak = st.streak >= 4 && MODE_DETAILS[st.mode].hasMatchClock;
+    const hadHighStreak = st.streak >= 4 && st.mode !== 'elevator';
 
     st.safeScore += amount;
     st.riskScore = 0;
     st.streak = 0;
     st.combo = 1.0;
-    st.banksCount += 1;
     timelineMarksRef.current.push('🛡️');
 
     if (hadHighStreak) {
@@ -452,13 +417,13 @@ export default function App() {
     setStreak(0);
     setCombo(1.0);
     SoundEngine.bank();
-    fxRef.current?.spawnBurst('#10B981', 24);
+    fxRef.current?.spawnBurst('#22C55E', 24);
 
     setFeedback({
       visible: true,
       tone: 'positive',
-      title: `🛡️ +${amount} PONTOS BLINDADOS NO COFRE!${hadHighStreak ? ' (+1,5s DE TEMPO EXTRA!)' : ''}`,
-      detail: 'Seus pontos estão 100% garantidos. O multiplicador voltou para 1.0x.',
+      title: `🛡️ +${amount} PTS BLINDADOS NO COFRE!${hadHighStreak ? ' (+1,5s EXTRA)' : ''}`,
+      detail: 'Seus pontos estão 100% seguros.',
     });
   };
 
@@ -492,37 +457,26 @@ export default function App() {
       setCombo(st.combo);
       setRiskScore(st.riskScore);
       SoundEngine.hit(st.streak);
-      fxRef.current?.spawnShockwave('#22D3EE');
-
-      historyRef.current.push({
-        step: st.totalCount,
-        prompt: q.prompt,
-        userAnswer: q.options[optionIdx],
-        correctAnswer: q.options[q.correctIndex],
-        isCorrect: true,
-        pointsDelta: earned,
-        explanation: q.explanation,
-      });
+      fxRef.current?.spawnShockwave('#38BDF8');
 
       setFeedback({
         visible: true,
         tone: 'positive',
-        title: `✓ ACERTOU! +${earned} PTS EM RISCO (COMBO ${st.combo.toFixed(1)}X)`,
+        title: `✓ +${earned} PTS EM RISCO (${st.combo.toFixed(1)}X)`,
         detail: q.explanation,
       });
 
       transitionTimerRef.current = window.setTimeout(() => {
         loadStepChallenge(currentSessionId);
-      }, 950);
+      }, 900);
     } else {
       const lost = st.riskScore;
-      st.lostRiskScore += lost;
       st.riskScore = 0;
       st.streak = 0;
       st.combo = 1.0;
       timelineMarksRef.current.push('🔴');
 
-      if (MODE_DETAILS[st.mode].initialLives > 0) {
+      if (st.mode === 'elevator' || st.mode === 'wordbomb') {
         st.lives = Math.max(0, st.lives - 1);
         setLives(st.lives);
       }
@@ -533,35 +487,21 @@ export default function App() {
       SoundEngine.error();
       fxRef.current?.spawnBurst('#F43F5E', 24);
 
-      const userChoiceLabel = optionIdx >= 0 ? q.options[optionIdx] : 'Tempo esgotado';
-      historyRef.current.push({
-        step: st.totalCount,
-        prompt: q.prompt,
-        userAnswer: userChoiceLabel,
-        correctAnswer: q.options[q.correctIndex],
-        isCorrect: false,
-        pointsDelta: -lost,
-        explanation: q.explanation,
-      });
-
       setFeedback({
         visible: true,
         tone: 'error',
-        title:
-          optionIdx === -1
-            ? `💥 PAVIO ESGOTADO! ${lost > 0 ? `-${lost} PTS EM RISCO PERDIDOS!` : ''}`
-            : `✕ SOBRECARGA! ${lost > 0 ? `-${lost} PTS EM RISCO PERDIDOS!` : 'COMBO REINICIADO!'}`,
+        title: `✕ SOBRECARGA! ${lost > 0 ? `-${lost} PTS PERDIDOS` : ''}`,
         detail: `Correta: ${q.options[q.correctIndex]} — ${q.explanation}`,
       });
 
-      if (MODE_DETAILS[st.mode].initialLives > 0 && st.lives <= 0) {
+      if ((st.mode === 'elevator' || st.mode === 'wordbomb') && st.lives <= 0) {
         transitionTimerRef.current = window.setTimeout(() => {
           if (sessionIdRef.current === currentSessionId) concludeMatch();
-        }, 1250);
+        }, 1200);
       } else {
         transitionTimerRef.current = window.setTimeout(() => {
           loadStepChallenge(currentSessionId);
-        }, 1450);
+        }, 1400);
       }
     }
   };
@@ -583,8 +523,8 @@ export default function App() {
       setFeedback({
         visible: true,
         tone: 'error',
-        title: '✕ PALAVRA RECUSADA PELO REATOR',
-        detail: validation.reason || 'Digite uma palavra válida da língua portuguesa.',
+        title: '✕ PALAVRA RECUSADA',
+        detail: validation.reason || 'Digite uma palavra válida.',
       });
       return;
     }
@@ -602,28 +542,18 @@ export default function App() {
     st.riskScore += earned;
     timelineMarksRef.current.push('🟢');
 
-    historyRef.current.push({
-      step: st.totalCount,
-      prompt: `Sílaba [${st.currentSyllable.syl}]`,
-      userAnswer: validation.normalized,
-      correctAnswer: st.currentSyllable.samples.slice(0, 3).join(', '),
-      isCorrect: true,
-      pointsDelta: earned,
-      explanation: `Palavra aceita (${validation.normalized.length} letras).`,
-    });
-
     setStreak(st.streak);
     setCombo(st.combo);
     setRiskScore(st.riskScore);
     SoundEngine.hit(st.streak);
-    fxRef.current?.spawnShockwave('#22D3EE');
+    fxRef.current?.spawnShockwave('#38BDF8');
 
     loadStepChallenge(currentSessionId);
     setFeedback({
       visible: true,
       tone: 'positive',
-      title: `✓ "${validation.normalized}" DETONOU A BOMBA! +${earned} PTS (${st.combo.toFixed(1)}X)`,
-      detail: 'Pressione TAB a qualquer momento para blindar seus pontos em risco no Cofre Seguro!',
+      title: `✓ "${validation.normalized}" ACEITA! +${earned} PTS (${st.combo.toFixed(1)}X)`,
+      detail: 'Aperte TAB para blindar seus pontos no Cofre Seguro!',
     });
   };
 
@@ -641,7 +571,7 @@ export default function App() {
       lastTime = now;
 
       if (!st.paused && !st.inFeedback) {
-        if (MODE_DETAILS[st.mode].hasMatchClock) {
+        if (st.mode !== 'elevator') {
           st.matchClock = Math.max(0, st.matchClock - dt);
           setMatchClock(st.matchClock);
 
@@ -667,8 +597,6 @@ export default function App() {
             const currentSessionId = sessionIdRef.current;
             st.inFeedback = true;
             st.totalCount += 1;
-            const lost = st.riskScore;
-            st.lostRiskScore += lost;
             st.riskScore = 0;
             st.streak = 0;
             st.combo = 1.0;
@@ -682,21 +610,11 @@ export default function App() {
             SoundEngine.error();
             fxRef.current?.spawnBurst('#F43F5E', 26);
 
-            historyRef.current.push({
-              step: st.totalCount,
-              prompt: `Sílaba [${st.currentSyllable.syl}]`,
-              userAnswer: 'Pavio explodiu',
-              correctAnswer: st.currentSyllable.samples.slice(0, 4).join(', '),
-              isCorrect: false,
-              pointsDelta: -lost,
-              explanation: `Exemplos possíveis: ${st.currentSyllable.samples.slice(0, 4).join(', ')}.`,
-            });
-
             setFeedback({
               visible: true,
               tone: 'error',
-              title: `💥 A BOMBA EXPLODIU! -1 VIDA ${lost > 0 ? `E -${lost} PTS PERDIDOS!` : ''}`,
-              detail: `Você podia digitar: ${st.currentSyllable.samples.slice(0, 4).join(', ')}.`,
+              title: '💥 A BOMBA EXPLODIU! -1 VIDA',
+              detail: `Exemplos possíveis: ${st.currentSyllable.samples.slice(0, 4).join(', ')}.`,
             });
 
             if (st.lives <= 0) {
@@ -739,31 +657,15 @@ export default function App() {
         e.preventDefault();
         if (matchRef.current.riskScore > 0) {
           handleProtectPulse();
-        } else if (matchRef.current.inFeedback) {
-          loadStepChallenge(sessionIdRef.current);
         }
         return;
       }
 
       if (matchRef.current.mode !== 'wordbomb') {
-        if (matchRef.current.inFeedback && e.key === 'Enter') {
-          e.preventDefault();
-          loadStepChallenge(sessionIdRef.current);
-          return;
-        }
-        if (e.key === '1' || e.key.toUpperCase() === 'A') {
-          e.preventDefault();
-          handleAnswerOption(0);
-        } else if (e.key === '2' || e.key.toUpperCase() === 'B') {
-          e.preventDefault();
-          handleAnswerOption(1);
-        } else if (e.key === '3' || e.key.toUpperCase() === 'C') {
-          e.preventDefault();
-          handleAnswerOption(2);
-        } else if (e.key === '4' || e.key.toUpperCase() === 'D') {
-          e.preventDefault();
-          handleAnswerOption(3);
-        }
+        if (e.key === '1' || e.key.toUpperCase() === 'A') handleAnswerOption(0);
+        else if (e.key === '2' || e.key.toUpperCase() === 'B') handleAnswerOption(1);
+        else if (e.key === '3' || e.key.toUpperCase() === 'C') handleAnswerOption(2);
+        else if (e.key === '4' || e.key.toUpperCase() === 'D') handleAnswerOption(3);
       }
     };
 
@@ -771,131 +673,186 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   });
 
-  const todayKey = getBrasiliaDateKey();
-  const todayDailyRecord = profile.dailyHistory[todayKey];
-  const overallAccuracy =
-    profile.totalQuestionsAnswered > 0
-      ? Math.round((profile.totalQuestionsCorrect / profile.totalQuestionsAnswered) * 100)
-      : 0;
-
-  const fuseRatio = Math.max(0, Math.min(1, fuseClock / fuseTotal));
-  const fusePercent = fuseRatio * 100;
-  const dialDashOffset = 502 * (1 - fuseRatio);
-
-  const copyText = (text: string) => {
-    navigator.clipboard?.writeText(text).catch(() => {});
-    setCopiedBanner(true);
-    setTimeout(() => setCopiedBanner(false), 2000);
+  const cycleLanguage = () => {
+    const order: LanguageCode[] = ['pt', 'en', 'es'];
+    const nextIdx = (order.indexOf(profile.language) + 1) % order.length;
+    setProfile(p => ({ ...p, language: order[nextIdx] }));
   };
 
+  const fuseRatio = Math.max(0, Math.min(1, fuseClock / fuseTotal));
+  const dialDashOffset = 502 * (1 - fuseRatio);
+
   return (
-    <div className="game-shell">
-      {/* BARRA SUPERIOR DE ENTRETENIMENTO */}
-      <header className="game-topbar">
-        <div className="game-topbar-inner">
+    <div className="wb-app-shell">
+      {/* =========================================================
+          1. BARRA SUPERIOR IDÊNTICA AO WORDBOMB.IO (ZERO BOTÃO DE MUTE)
+         ========================================================= */}
+      <header className="wb-navbar">
+        <div className="wb-nav-left">
           <button
             type="button"
-            className="logo-lockup-btn"
+            className="wb-hamburger-btn"
+            onClick={() => setSettingsOpen(true)}
+            title={t.settingsTitle}
+            aria-label={t.settingsTitle}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className="wb-brand-logo"
             onClick={() => {
               if (inMatch) abortMatchToHome();
-              setLastReport(null);
-              setActiveView('home');
+              setActiveTab('rooms');
             }}
+            title="The Pulse Game"
           >
-            <svg width="42" height="42" viewBox="0 0 64 64" aria-hidden="true">
-              <rect width="64" height="64" rx="16" fill="#161B26" stroke="#6366F1" strokeWidth="3.5" />
-              <circle cx="32" cy="32" r="20" fill="none" stroke="#22D3EE" strokeWidth="2" strokeDasharray="5 4" />
+            <svg width="42" height="42" viewBox="0 0 64 64">
+              <rect width="64" height="64" rx="15" fill="#151922" stroke="#5865F2" strokeWidth="3" />
+              <circle cx="32" cy="34" r="17" fill="#0B0D12" stroke="#38BDF8" strokeWidth="2" />
               <path
-                d="M11 32H21L26 16L33 48L39 24L43 32H53"
+                d="M14 34H23L27 21L33 47L38 28L42 34H50"
                 fill="none"
-                stroke="#22D3EE"
-                strokeWidth="4.5"
+                stroke="#38BDF8"
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <circle cx="32" cy="32" r="4" fill="#F43F5E" />
+              <circle cx="45" cy="15" r="4.5" fill="#F43F5E" />
             </svg>
-            <span className="logo-title">THE PULSE GAME</span>
           </button>
 
-          <nav className="topbar-nav" aria-label="Menu do jogo">
-            <button
-              type="button"
-              className={`nav-pill-btn ${activeView === 'home' && !inMatch ? 'active' : ''}`}
-              onClick={() => {
-                if (inMatch) abortMatchToHome();
-                setLastReport(null);
-                setActiveView('home');
-              }}
-            >
-              Modos
-            </button>
-            <button
-              type="button"
-              className={`nav-pill-btn ${activeView === 'rules' && !inMatch ? 'active' : ''}`}
-              onClick={() => {
-                if (inMatch) abortMatchToHome();
-                setLastReport(null);
-                setActiveView('rules');
-              }}
-            >
-              Como Jogar
-            </button>
-            <button
-              type="button"
-              className={`nav-pill-btn ${activeView === 'stats' && !inMatch ? 'active' : ''}`}
-              onClick={() => {
-                if (inMatch) abortMatchToHome();
-                setLastReport(null);
-                setActiveView('stats');
-              }}
-            >
-              Recordes
-            </button>
-            <button
-              type="button"
-              className={`nav-pill-btn ${activeView === 'library' && !inMatch ? 'active' : ''}`}
-              onClick={() => {
-                if (inMatch) abortMatchToHome();
-                setLastReport(null);
-                setActiveView('library');
-              }}
-            >
-              Dicionário
-            </button>
-            <button
-              type="button"
-              className="sound-toggle-btn"
-              onClick={() => setProfile(p => ({ ...p, soundEnabled: !p.soundEnabled }))}
-            >
-              {profile.soundEnabled ? '🔊 Som ON' : '🔇 Mudo'}
-            </button>
+          <nav className="wb-tabs-row" aria-label="Navegação Principal">
+            {(
+              [
+                ['rooms', t.rooms],
+                ['ranked', t.ranked],
+                ['shop', t.shop],
+                ['inventory', t.inventory],
+                ['words', t.words],
+                ['syllables', t.syllables],
+              ] as [NavTabId, string][]
+            ).map(([tabKey, label]) => (
+              <button
+                key={tabKey}
+                type="button"
+                className={`wb-tab-btn ${activeTab === tabKey && !inMatch ? 'active' : ''}`}
+                onClick={() => {
+                  if (inMatch) abortMatchToHome();
+                  setActiveTab(tabKey);
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </nav>
+        </div>
+
+        <div className="wb-nav-right">
+          {/* Contador de Moedas Douradas */}
+          <div className="wb-currency-pill" title="Moedas">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" fill="#FBBF24" stroke="#D97706" strokeWidth="2" />
+              <circle cx="12" cy="12" r="6" fill="none" stroke="#FEF3C7" strokeWidth="1.5" />
+            </svg>
+            <span>{profile.coins}</span>
+          </div>
+
+          {/* Contador de Chaves + Botão + */}
+          <div className="wb-currency-pill" title="Chaves de Cofre">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2.4">
+              <circle cx="7.5" cy="15.5" r="4.5" />
+              <path d="M10.7 12.3L20 3" />
+              <path d="M16 7l3 3" />
+            </svg>
+            <span>{profile.keys}</span>
+            <button
+              type="button"
+              className="wb-plus-mini"
+              onClick={() => {
+                if (inMatch) abortMatchToHome();
+                setActiveTab('shop');
+              }}
+              title="Obter mais chaves"
+            >
+              +
+            </button>
+          </div>
+
+          {/* Botão Perfil Iluminado */}
+          <button
+            type="button"
+            className="wb-illuminated-btn"
+            onClick={() => setProfileModalOpen(true)}
+          >
+            {profile.username}
+          </button>
+
+          {/* Sino de Notificações */}
+          <button
+            type="button"
+            className="wb-bell-btn"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            title="Novidades e Atualizações"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+            </svg>
+            <span className="wb-bell-dot" />
+          </button>
+
+          {/* Foto de Perfil Redonda Bonitinha */}
+          <button
+            type="button"
+            className="wb-avatar-trigger"
+            onClick={() => setProfileModalOpen(true)}
+            title="Trocar Foto de Perfil"
+          >
+            {currentAvatar.renderSvg()}
+          </button>
+
+          {/* Seletor de Idioma com Bandeira */}
+          <button
+            type="button"
+            className="wb-lang-trigger"
+            onClick={cycleLanguage}
+            title="Mudar Idioma / Change Language"
+          >
+            <span>{t.flag}</span>
+            <span>{t.label}</span>
+          </button>
         </div>
       </header>
 
-      <main className="game-main">
+      {/* =========================================================
+          2. CONTEÚDO CENTRAL
+         ========================================================= */}
+      <main className="wb-center-column">
         {inMatch ? (
-          /* =========================================================
-             ARENA DE JOGO ATIVA (COM CANVAS FX E REATOR CENTRAL)
-             ========================================================= */
-          <div className="arena-stage-wrap" aria-live="polite">
+          <div className="arena-stage-wrap">
             <ArenaCanvasFX ref={fxRef} reducedMotion={profile.reducedMotion} />
 
-            {/* HUD SUPERIOR DA ARENA */}
-            <div className="arena-hud-top">
+            <div className="arena-hud-bar">
               <div>
-                <div className="stage-badge">{MODE_DETAILS[matchRef.current.mode].name}</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-body)', marginTop: '6px' }}>
-                  {matchRef.current.mode === 'elevator'
-                    ? `Andar #${floor} • Velocidade Progressiva`
-                    : `Rodada #${matchRef.current.totalCount + 1}`}
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 900 }}>
+                  {matchRef.current.mode === 'wordbomb'
+                    ? 'Bomba de Sílabas'
+                    : matchRef.current.mode === 'daily'
+                    ? 'Desafio Diário Oficial'
+                    : matchRef.current.mode === 'elevator'
+                    ? `O Elevador • Andar #${floor}`
+                    : 'Arena Clássica 60s'}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                {MODE_DETAILS[matchRef.current.mode].initialLives > 0 && (
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--arcade-coral)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                {(matchRef.current.mode === 'wordbomb' || matchRef.current.mode === 'elevator') && (
+                  <div style={{ fontSize: '1.35rem', color: 'var(--wb-coral)', fontWeight: 900 }}>
                     {[0, 1, 2].map(i => (
                       <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '4px' }}>
                         ♥
@@ -904,571 +861,659 @@ export default function App() {
                   </div>
                 )}
 
-                {MODE_DETAILS[matchRef.current.mode].hasMatchClock && (
-                  <div className={`arena-timer-big ${matchClock <= 10 ? 'danger' : ''}`}>
+                {matchRef.current.mode !== 'elevator' && (
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '2rem',
+                      fontWeight: 800,
+                      color: matchClock <= 10 ? 'var(--wb-coral)' : 'var(--wb-text-bright)',
+                    }}
+                  >
                     {matchClock.toFixed(1)}s
                   </div>
                 )}
-              </div>
 
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button
-                  type="button"
-                  className="btn-arcade-secondary"
-                  onClick={() => {
-                    matchRef.current.paused = !matchRef.current.paused;
-                    setIsPaused(matchRef.current.paused);
-                  }}
-                >
-                  {isPaused ? '▶ Retomar' : '⏸ Pausar'}
-                </button>
-                <button type="button" className="btn-arcade-secondary" onClick={abortMatchToHome}>
+                <button type="button" className="wb-lang-trigger" onClick={abortMatchToHome}>
                   ✕ Sair
                 </button>
               </div>
             </div>
 
-            {/* PAINEL DE COFRE SEGURO VS RISCO + BOTÃO TÁTIL DE BLINDAGEM */}
-            <div className="arena-vaults-grid">
-              <div className="vault-panel safe-vault">
-                <div className="vault-head">
+            <div className="arena-vaults-row">
+              <div className="vault-card safe">
+                <div className="vault-title">
                   <span>🛡️ Cofre Seguro</span>
-                  <span>Garantido</span>
+                  <span>100% Garantido</span>
                 </div>
-                <div className="vault-digits">{safeScore}</div>
+                <div className="vault-value" style={{ color: 'var(--wb-emerald)' }}>
+                  {safeScore}
+                </div>
               </div>
 
               <button
                 type="button"
-                className={`btn-bank-reactor ${riskScore > 0 ? 'armed' : ''}`}
-                disabled={riskScore <= 0 || isPaused}
+                className="wb-illuminated-btn"
+                style={{ height: '100%', minHeight: '64px', fontSize: '1.08rem', gridColumn: 'span 1' }}
+                disabled={riskScore <= 0}
                 onClick={handleProtectPulse}
               >
-                <span style={{ fontSize: '1.15rem', fontWeight: 900 }}>
-                  🛡️ BLINDAR PONTOS AGORA
-                </span>
-                <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>
-                  {riskScore > 0
-                    ? `Salvar +${riskScore} pts [ESPAÇO / TAB]`
-                    : 'Acumule acertos para blindar'}
-                </span>
+                🛡️ Blindar +{riskScore} pts [TAB]
               </button>
 
-              <div className="vault-panel risk-vault">
-                <div className="vault-head">
+              <div className="vault-card risk">
+                <div className="vault-title">
                   <span>⚡ Em Risco</span>
                   <span>Combo {combo.toFixed(1)}x</span>
                 </div>
-                <div className="vault-digits">{riskScore}</div>
+                <div className="vault-value" style={{ color: 'var(--wb-gold)' }}>
+                  {riskScore}
+                </div>
               </div>
             </div>
 
-            {/* PALCO DO REATOR OU PAUSA */}
-            {isPaused ? (
-              <div className="Selected-mode-stage" style={{ textAlign: 'center', alignItems: 'center' }}>
-                <h2 className="stage-big-title">Jogo Pausado</h2>
-                <p className="stage-desc">O tempo está congelado. Pronto para voltar à arena?</p>
-                <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <button
-                    type="button"
-                    className="btn-arcade-play"
-                    onClick={() => {
-                      matchRef.current.paused = false;
-                      setIsPaused(false);
+            <section className="arena-core-box">
+              <div className="bomb-dial">
+                <svg className="bomb-svg" viewBox="0 0 180 180">
+                  <circle cx="90" cy="90" r="80" fill="#0B0D12" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                  <circle
+                    cx="90"
+                    cy="90"
+                    r="80"
+                    fill="none"
+                    stroke={fuseRatio < 0.3 ? '#F43F5E' : '#38BDF8'}
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray="502"
+                    style={{ strokeDashoffset: dialDashOffset }}
+                  />
+                </svg>
+                <div className="bomb-core-circle">
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--wb-text-muted)' }}>
+                    {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
+                  </span>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '2.4rem',
+                      fontWeight: 800,
+                      color: 'var(--wb-cyan)',
                     }}
                   >
-                    ▶ Continuar Jogo
-                  </button>
-                  <button type="button" className="btn-arcade-secondary" onClick={() => startNewMatch()}>
-                    ↻ Reiniciar Partida
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <section className="reactor-stage-card">
-                <div className="fuse-bar-track">
-                  <div
-                    className={`fuse-bar-fill ${fusePercent < 30 ? 'danger' : ''}`}
-                    style={{ width: `${fusePercent}%` }}
-                  />
-                </div>
-
-                <div className="reactor-body">
-                  {/* NÚCLEO CIRCULAR ESTILO WORDBOMB */}
-                  <div className="bomb-dial-wrap">
-                    <svg className="bomb-dial-svg" viewBox="0 0 180 180">
-                      <circle className="bomb-dial-bg" cx="90" cy="90" r="80" />
-                      <circle
-                        className={`bomb-dial-fg ${fuseRatio < 0.3 ? 'danger' : ''}`}
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        style={{ strokeDashoffset: dialDashOffset }}
-                      />
-                    </svg>
-                    <div className="bomb-dial-core">
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-body)' }}>
-                        {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
-                      </span>
-                      <div className="bomb-core-syl">
-                        {matchRef.current.mode === 'wordbomb' ? currentSyllable.syl : `${combo.toFixed(1)}x`}
-                      </div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.98rem', fontWeight: 800, color: 'var(--arcade-gold)' }}>
-                        {fuseClock.toFixed(1)}s
-                      </span>
-                    </div>
+                    {matchRef.current.mode === 'wordbomb' ? currentSyllable.syl : `${combo.toFixed(1)}x`}
                   </div>
-
-                  {matchRef.current.mode === 'wordbomb' ? (
-                    <>
-                      <h2 className="arena-question-title">
-                        Digite uma palavra contendo <span style={{ color: 'var(--arcade-cyan)' }}>{currentSyllable.syl}</span>
-                      </h2>
-                      <p style={{ fontSize: '1.02rem', color: 'var(--text-body)', textAlign: 'center' }}>
-                        {currentSyllable.hint}
-                      </p>
-
-                      <div className="wordbomb-input-bar">
-                        <input
-                          type="text"
-                          className="wordbomb-field"
-                          placeholder="DIGITE AQUI..."
-                          value={typedWord}
-                          onChange={e => {
-                            SoundEngine.keyClick();
-                            setTypedWord(e.target.value);
-                          }}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleWordBombSubmit();
-                            }
-                          }}
-                          autoFocus
-                        />
-                        <button type="button" className="btn-arcade-play" onClick={handleWordBombSubmit}>
-                          Detonar [Enter]
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <h2 className="arena-question-title">{currentQuestion?.prompt}</h2>
-
-                      <div className="arcade-options-grid">
-                        {currentQuestion?.options.map((optText, idx) => {
-                          const isAnswered = selectedOption !== null;
-                          const isCorrect = isAnswered && idx === currentQuestion.correctIndex;
-                          const isWrong = isAnswered && selectedOption === idx && idx !== currentQuestion.correctIndex;
-
-                          return (
-                            <button
-                              key={idx}
-                              type="button"
-                              className={`arcade-opt-btn ${isCorrect ? 'correct' : ''} ${
-                                isWrong ? 'wrong' : ''
-                              }`}
-                              disabled={isAnswered}
-                              onClick={() => handleAnswerOption(idx)}
-                            >
-                              <span className="arcade-opt-key">{idx + 1}</span>
-                              <span>{optText}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-
-                  {feedback?.visible && (
-                    <div className={`arena-toast ${feedback.tone}`} role="status">
-                      <div className="arena-toast-title">{feedback.title}</div>
-                      <div style={{ fontSize: '1.02rem', color: 'var(--text-bright)' }}>{feedback.detail}</div>
-                      {matchRef.current.inFeedback && matchRef.current.mode !== 'wordbomb' && (
-                        <div style={{ marginTop: '8px' }}>
-                          <button
-                            type="button"
-                            className="btn-arcade-secondary"
-                            onClick={() => loadStepChallenge(sessionIdRef.current)}
-                          >
-                            Próximo Desafio [Enter] →
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </section>
-            )}
-          </div>
-        ) : lastReport ? (
-          /* =========================================================
-             RELATÓRIO DE FIM DE PARTIDA (VIBRANTE E CLARO)
-             ========================================================= */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <section className="Selected-mode-stage">
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                <span className="stage-badge">{MODE_DETAILS[lastReport.mode].name}</span>
-                {lastReport.isNewRecord && (
-                  <span className="stage-badge" style={{ color: 'var(--arcade-gold)', borderColor: 'var(--arcade-gold)' }}>
-                    🏆 NOVO RECORDE PESSOAL!
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--wb-gold)' }}>
+                    {fuseClock.toFixed(1)}s
                   </span>
-                )}
+                </div>
               </div>
 
-              <div>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-body)' }}>
-                  PONTUAÇÃO FINAL CONQUISTADA
-                </div>
+              {matchRef.current.mode === 'wordbomb' ? (
+                <>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+                    Digite uma palavra que contenha <span style={{ color: 'var(--wb-cyan)' }}>{currentSyllable.syl}</span>
+                  </h2>
+                  <p style={{ color: 'var(--wb-text-muted)', fontSize: '1rem' }}>{currentSyllable.hint}</p>
+
+                  <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '520px' }}>
+                    <input
+                      type="text"
+                      value={typedWord}
+                      onChange={e => {
+                        SoundEngine.keyClick();
+                        setTypedWord(e.target.value);
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleWordBombSubmit();
+                        }
+                      }}
+                      placeholder="DIGITE A PALAVRA..."
+                      style={{
+                        flex: 1,
+                        height: '54px',
+                        backgroundColor: 'var(--wb-bg)',
+                        border: '2px solid var(--wb-indigo-light)',
+                        borderRadius: '12px',
+                        padding: '0 18px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '1.35rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      className="wb-illuminated-btn"
+                      style={{ height: '54px', padding: '0 24px', fontSize: '1.05rem' }}
+                      onClick={handleWordBombSubmit}
+                    >
+                      Enviar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+                    {currentQuestion?.prompt}
+                  </h2>
+
+                  <div className="options-2col">
+                    {currentQuestion?.options.map((optText, idx) => {
+                      const isAnswered = selectedOption !== null;
+                      const isCorrect = isAnswered && idx === currentQuestion.correctIndex;
+                      const isWrong = isAnswered && selectedOption === idx && idx !== currentQuestion.correctIndex;
+
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          className={`opt-push-btn ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
+                          disabled={isAnswered}
+                          onClick={() => handleAnswerOption(idx)}
+                        >
+                          <span
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '8px',
+                              backgroundColor: 'var(--wb-bg)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontFamily: 'var(--font-mono)',
+                              color: 'var(--wb-cyan)',
+                            }}
+                          >
+                            {idx + 1}
+                          </span>
+                          <span>{optText}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {feedback?.visible && (
                 <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '3.6rem',
-                    fontWeight: 800,
-                    color: 'var(--arcade-cyan)',
-                    lineHeight: 1.05,
+                    width: '100%',
+                    padding: '14px 18px',
+                    borderRadius: '12px',
+                    backgroundColor:
+                      feedback.tone === 'positive' ? 'rgba(34, 197, 94, 0.16)' : 'rgba(244, 63, 94, 0.16)',
+                    border: `1px solid ${feedback.tone === 'positive' ? '#22C55E' : '#F43F5E'}`,
                   }}
                 >
-                  {lastReport.finalScore} PTS
-                </div>
-                <p style={{ fontSize: '1.05rem', color: 'var(--text-body)', marginTop: '8px' }}>
-                  🛡️ Cofre Seguro: <strong>{lastReport.safeScore} pts</strong> • ⚡ Salvos no fim (50%):{' '}
-                  <strong>+{lastReport.salvagedScore} pts</strong>
-                </p>
-              </div>
-
-              <div className="stats-cards-grid">
-                <div className="stat-card-box">
-                  <span className="stat-card-num">
-                    {lastReport.correctCount}/{lastReport.totalCount}
-                  </span>
-                  <span className="stat-card-label">Acertos</span>
-                </div>
-                <div className="stat-card-box">
-                  <span className="stat-card-num">{lastReport.peakCombo.toFixed(1)}x</span>
-                  <span className="stat-card-label">Combo Máximo</span>
-                </div>
-                <div className="stat-card-box">
-                  <span className="stat-card-num">{lastReport.banksCount}</span>
-                  <span className="stat-card-label">Blindagens</span>
-                </div>
-                <div className="stat-card-box">
-                  <span className="stat-card-num" style={{ fontSize: '1.35rem' }}>
-                    {lastReport.timeline}
-                  </span>
-                  <span className="stat-card-label">Mapa da Partida</span>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  backgroundColor: 'var(--bg-stage)',
-                  border: '2px solid var(--border-subtle)',
-                  borderRadius: '16px',
-                  padding: '18px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '10px' }}>
-                  <strong style={{ fontSize: '1.05rem' }}>Compartilhar com Amigos</strong>
-                  <button
-                    type="button"
-                    className="btn-arcade-secondary"
-                    onClick={() => copyText(lastReport.shareText)}
-                  >
-                    {copiedBanner ? '✓ Copiado!' : '📋 Copiar Placar'}
-                  </button>
-                </div>
-                <pre style={{ fontFamily: 'var(--font-mono)', fontSize: '0.96rem', whiteSpace: 'pre-wrap' }}>
-                  {lastReport.shareText}
-                </pre>
-              </div>
-
-              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className="btn-arcade-play"
-                  onClick={() => startNewMatch(lastReport.mode, lastReport.category)}
-                >
-                  ↻ Jogar Novamente
-                </button>
-                <button
-                  type="button"
-                  className="btn-arcade-secondary"
-                  onClick={() => {
-                    setLastReport(null);
-                    setActiveView('home');
-                  }}
-                >
-                  Trocar de Modo
-                </button>
-              </div>
-            </section>
-          </div>
-        ) : activeView === 'home' ? (
-          /* =========================================================
-             LOBBY CENTRAL DE ENTRETENIMENTO (ESTILO WORDBOMB.IO)
-             ========================================================= */
-          <>
-            {/* 4 CARDS VISUAIS DE MODO NO TOPO */}
-            <section className="mode-tiles-grid" aria-label="Seleção rápida de modo">
-              {(Object.keys(MODE_DETAILS) as GameModeId[]).map(mKey => {
-                const info = MODE_DETAILS[mKey];
-                const isSelected = profile.selectedMode === mKey;
-                return (
-                  <button
-                    key={mKey}
-                    type="button"
-                    className={`mode-tile-btn ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setProfile(p => ({ ...p, selectedMode: mKey }))}
-                  >
-                    <span className="mode-tile-icon" style={{ color: info.color }}>
-                      {info.code}
-                    </span>
-                    <span className="mode-tile-name">{info.name}</span>
-                    <span className="mode-tile-best">★ {profile.bestScores[mKey] || 0} pts</span>
-                  </button>
-                );
-              })}
-            </section>
-
-            {/* PALCO DE LANÇAMENTO DO MODO SELECIONADO */}
-            <section className="Selected-mode-stage">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <span className="stage-badge">{MODE_DETAILS[profile.selectedMode].badge}</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-body)' }}>
-                  {formatDatePtBr(todayKey)}
-                </span>
-              </div>
-
-              <div>
-                <h1 className="stage-big-title">{MODE_DETAILS[profile.selectedMode].name}</h1>
-                <p className="stage-desc" style={{ marginTop: '8px' }}>
-                  {MODE_DETAILS[profile.selectedMode].summary}
-                </p>
-              </div>
-
-              {profile.selectedMode === 'classic' && (
-                <div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '10px', color: 'var(--text-body)' }}>
-                    Escolha o tema da partida:
-                  </div>
-                  <div className="cat-pills-row">
-                    {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
-                      <button
-                        key={cat}
-                        type="button"
-                        className={`cat-pill ${profile.selectedCategory === cat ? 'active' : ''}`}
-                        onClick={() => setProfile(p => ({ ...p, selectedCategory: cat }))}
-                      >
-                        {CATEGORY_LABELS[cat]}
-                      </button>
-                    ))}
+                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>{feedback.title}</div>
+                  <div style={{ color: 'var(--wb-text-body)', fontSize: '0.96rem', marginTop: '2px' }}>
+                    {feedback.detail}
                   </div>
                 </div>
               )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className="btn-arcade-play"
-                  onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
-                >
-                  ▶ JOGAR {MODE_DETAILS[profile.selectedMode].name.toUpperCase()}
-                </button>
-
-                {profile.selectedMode === 'daily' && todayDailyRecord && (
-                  <button
-                    type="button"
-                    className="btn-arcade-secondary"
-                    onClick={() => copyText(todayDailyRecord.shareText)}
-                  >
-                    {copiedBanner ? '✓ Copiado!' : `📋 Compartilhar Hoje (${todayDailyRecord.score} pts)`}
-                  </button>
-                )}
-              </div>
             </section>
+          </div>
+        ) : activeTab === 'rooms' ? (
+          <>
+            {/* 4 MINI-WIDGETS NO TOPO FIÉIS À CAPTURA DO WORDBOMB.IO */}
+            <div className="wb-top-widgets">
+              <button
+                type="button"
+                className={`wb-widget-card ${profile.selectedMode === 'daily' ? 'active' : ''}`}
+                onClick={() => startNewMatch('daily')}
+              >
+                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #143321 0%, #151922 100%)' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <span style={{ background: '#22C55E', color: '#052E16', padding: '3px 7px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>R</span>
+                    <span style={{ background: '#EAB308', color: '#422006', padding: '3px 7px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>A</span>
+                  </div>
+                </div>
+                <div className="wb-widget-footer">DAILY</div>
+              </button>
 
-            {/* LISTA DE ARENAS PRONTAS ESTILO WORDBOMB ROOMS */}
-            <section className="quick-rooms-list" aria-label="Arenas disponíveis">
-              {(Object.keys(MODE_DETAILS) as GameModeId[]).map(mKey => {
-                const info = MODE_DETAILS[mKey];
+              <button
+                type="button"
+                className={`wb-widget-card ${profile.selectedMode === 'elevator' ? 'active' : ''}`}
+                onClick={() => startNewMatch('elevator')}
+              >
+                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #3B1826 0%, #151922 100%)' }}>
+                  <span style={{ background: '#F43F5E', color: '#FFF', padding: '3px 10px', borderRadius: '5px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>▲▲</span>
+                </div>
+                <div className="wb-widget-footer">ELEVATOR</div>
+              </button>
+
+              <button
+                type="button"
+                className={`wb-widget-card ${profile.selectedMode === 'wordbomb' ? 'active' : ''}`}
+                onClick={() => startNewMatch('wordbomb')}
+              >
+                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #1D1B4B 0%, #151922 100%)' }}>
+                  <span style={{ background: '#6366F1', color: '#FFF', padding: '3px 9px', borderRadius: '999px', fontFamily: 'var(--font-mono)', fontWeight: 900 }}>SYL</span>
+                </div>
+                <div className="wb-widget-footer">SCAPES</div>
+              </button>
+
+              <button
+                type="button"
+                className="wb-widget-card"
+                onClick={() => setSettingsOpen(true)}
+              >
+                <div className="wb-widget-art" style={{ background: 'linear-gradient(180deg, #3740A6 0%, #242B70 100%)' }}>
+                  <span style={{ fontSize: '1.35rem' }}>⚙️</span>
+                </div>
+                <div className="wb-widget-footer">OPÇÕES</div>
+              </button>
+            </div>
+
+            {/* DUPLA DE BOTÕES PRINCIPAIS: CREATE ROOM + SEASON 12 RANKED */}
+            <div className="wb-hero-buttons">
+              <button
+                type="button"
+                className="wb-illuminated-btn wb-create-room-btn"
+                onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
+              >
+                {t.createRoom}
+              </button>
+
+              <button
+                type="button"
+                className="wb-season-ranked-btn"
+                onClick={() => setActiveTab('ranked')}
+              >
+                <div className="wb-season-tv-icon">^_^</div>
+                <div className="wb-season-labels">
+                  <span className="wb-season-top">{rankInfo.season}</span>
+                  <span className="wb-season-main">RANKED</span>
+                </div>
+              </button>
+            </div>
+
+            {/* LISTA DE SALAS FIEL AO WORDBOMB.IO */}
+            <div className="wb-room-stack">
+              {FEATURED_ROOMS.map(room => {
+                const av = AVATAR_CATALOG.find(a => a.id === room.avatarId) || AVATAR_CATALOG[0];
                 return (
-                  <div key={mKey} className="quick-room-card">
-                    <div className="quick-room-left">
-                      <div
-                        className="quick-room-badge"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: info.color }}
-                      >
-                        {info.code}
-                      </div>
-                      <div>
-                        <div className="quick-room-title">{info.name}</div>
-                        <div className="quick-room-sub">{info.rules}</div>
+                  <div key={room.id} className="wb-room-item">
+                    <div className="wb-room-left">
+                      <div className="wb-room-thumb">{av.renderSvg()}</div>
+                      <div className="wb-room-details">
+                        <div className="wb-room-name">{room.hostName}</div>
+                        <div className="wb-room-meta">
+                          <span className="wb-mode-tag">
+                            <span style={{ color: 'var(--wb-cyan)' }}>◈</span> {room.modeLabel}
+                          </span>
+                          <span>• 👥 {room.playersRatio}</span>
+                          {room.wppBadge && <span>• {room.wppBadge}</span>}
+                          <span className="wb-status-started">• {t.started}</span>
+                          <span>• 🌐 {t.multiLang}</span>
+                        </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className="btn-arcade-secondary"
-                      onClick={() => startNewMatch(mKey, profile.selectedCategory)}
-                    >
-                      Entrar →
-                    </button>
+
+                    <div className="wb-room-right">
+                      <span className="wb-eye-icon" title="Inspecionar Regras">
+                        👁
+                      </span>
+                      <button
+                        type="button"
+                        className="wb-illuminated-btn wb-join-button"
+                        onClick={() => startNewMatch(room.mode, room.category)}
+                      >
+                        {t.joinBtn}
+                      </button>
+                    </div>
                   </div>
                 );
               })}
-            </section>
+            </div>
           </>
-        ) : activeView === 'rules' ? (
-          <section className="Selected-mode-stage">
-            <h1 className="stage-big-title">Como Dominar a Arena</h1>
-            <p className="stage-desc">
-              Em <strong>The Pulse Game</strong>, saber a resposta é só metade do jogo — a outra metade é decidir a hora exata de blindar seus pontos antes que o reator exploda!
-            </p>
-            <div className="quick-rooms-list">
-              <div className="quick-room-card">
+        ) : activeTab === 'ranked' ? (
+          <div className="wb-room-stack">
+            <div className="wb-room-item" style={{ padding: '26px', flexDirection: 'column', alignItems: 'flex-start', gap: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '16px', overflow: 'hidden' }}>
+                  {currentAvatar.renderSvg()}
+                </div>
                 <div>
-                  <div className="quick-room-title" style={{ color: 'var(--arcade-cyan)' }}>
-                    1. Acertos Aceleram seu Multiplicador (Até 3.0x)
-                  </div>
-                  <div className="quick-room-sub">
-                    Cada resposta certa soma pontos provisórios no painel <strong>Em Risco</strong> e sobe seu combo: 1.0x → 1.2x → 1.5x → 2.0x → 2.5x → 3.0x.
-                  </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-emerald)', fontWeight: 800 }}>
+                    {rankInfo.season} • {rankInfo.division}
+                  </span>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>
+                    {profile.username} — {profile.careerXP} XP
+                  </h2>
+                  <p style={{ color: 'var(--wb-text-muted)' }}>
+                    Próxima promoção em {rankInfo.nextXp} XP • Recorde Bomba de Sílabas: {profile.bestScores.wordbomb} pts
+                  </p>
                 </div>
               </div>
-              <div className="quick-room-card">
-                <div>
-                  <div className="quick-room-title" style={{ color: 'var(--arcade-emerald)' }}>
-                    2. Blindar no Cofre Seguro [Tecla ESPAÇO ou TAB]
-                  </div>
-                  <div className="quick-room-sub">
-                    Aperte <strong>BLINDAR PONTOS</strong> a qualquer momento para transferir 100% dos pontos em risco para o seu Cofre Seguro. Blindar um combo de 4+ acertos ainda dá <strong>+1,5s de bônus no relógio!</strong>
-                  </div>
-                </div>
-              </div>
-              <div className="quick-room-card">
-                <div>
-                  <div className="quick-room-title" style={{ color: 'var(--arcade-coral)' }}>
-                    3. Cuidado com a Explosão do Pavio!
-                  </div>
-                  <div className="quick-room-sub">
-                    Se você errar ou o pavio zerar, todos os pontos que estavam <em>Em Risco</em> desaparecem! Os pontos já guardados no Cofre Seguro nunca são perdidos.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : activeView === 'stats' ? (
-          <section className="Selected-mode-stage">
-            <h1 className="stage-big-title">Seus Recordes e Estatísticas</h1>
-            <div className="stats-cards-grid">
-              <div className="stat-card-box">
-                <span className="stat-card-num">{Math.max(0, ...Object.values(profile.bestScores))}</span>
-                <span className="stat-card-label">Maior Pontuação</span>
-              </div>
-              <div className="stat-card-box">
-                <span className="stat-card-num">{profile.highestComboEver.toFixed(1)}x</span>
-                <span className="stat-card-label">Combo Máximo</span>
-              </div>
-              <div className="stat-card-box">
-                <span className="stat-card-num">{overallAccuracy}%</span>
-                <span className="stat-card-label">Precisão Geral</span>
-              </div>
-              <div className="stat-card-box">
-                <span className="stat-card-num">{profile.matchesPlayed}</span>
-                <span className="stat-card-label">Partidas Jogadas</span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '10px' }}>
               <button
                 type="button"
-                className="btn-arcade-secondary"
-                onClick={() => setProfile(p => ({ ...p, reducedMotion: !p.reducedMotion }))}
+                className="wb-illuminated-btn"
+                style={{ height: '48px', padding: '0 28px', fontSize: '1.05rem' }}
+                onClick={() => startNewMatch('wordbomb')}
               >
-                Partículas &amp; Efeitos: {profile.reducedMotion ? 'Reduzidos' : 'Máximos (60 FPS)'}
-              </button>
-              <button
-                type="button"
-                className="btn-arcade-secondary"
-                style={{ color: 'var(--arcade-coral)', borderColor: 'var(--arcade-coral)' }}
-                onClick={() => setProfile(clearProfileStorage())}
-              >
-                Zerar Recordes Locais
+                Iniciar Partida Ranqueada
               </button>
             </div>
-          </section>
-        ) : (
-          <section className="Selected-mode-stage">
-            <h1 className="stage-big-title">
-              Dicionário Oficial ({PORTUGUESE_WORD_SET.size} palavras)
-            </h1>
-            <p className="stage-desc">
-              Teste qualquer palavra abaixo para conferir se ela é aceita pelo reator da <strong>Bomba de Sílabas</strong>:
-            </p>
-            <div className="wordbomb-input-bar" style={{ maxWidth: '100%' }}>
+          </div>
+        ) : activeTab === 'shop' || activeTab === 'inventory' ? (
+          <div className="wb-room-stack">
+            <div className="wb-room-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '16px', padding: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
+                  Coleção de Avatares &amp; Fotos de Perfil
+                </h2>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-gold)', fontWeight: 800 }}>
+                  Saldo: {profile.coins} Moedas
+                </span>
+              </div>
+              <div className="avatar-picker-grid">
+                {AVATAR_CATALOG.map(av => {
+                  const unlocked = profile.unlockedAvatars.includes(av.id) || av.priceCoins === 0;
+                  const equipped = profile.avatarId === av.id;
+                  return (
+                    <button
+                      key={av.id}
+                      type="button"
+                      className={`avatar-choice-card ${equipped ? 'selected' : ''}`}
+                      onClick={() => {
+                        if (unlocked) {
+                          setProfile(p => ({ ...p, avatarId: av.id }));
+                        } else if (profile.coins >= av.priceCoins) {
+                          setProfile(p => ({
+                            ...p,
+                            coins: p.coins - av.priceCoins,
+                            unlockedAvatars: [...p.unlockedAvatars, av.id],
+                            avatarId: av.id,
+                          }));
+                        }
+                      }}
+                    >
+                      <div style={{ width: '64px', height: '64px', borderRadius: '14px', overflow: 'hidden' }}>
+                        {av.renderSvg()}
+                      </div>
+                      <strong style={{ fontSize: '0.96rem' }}>{av.name}</strong>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: equipped ? 'var(--wb-emerald)' : 'var(--wb-gold)' }}>
+                        {equipped ? '✓ Equipado' : unlocked ? 'Desbloqueado' : `🪙 ${av.priceCoins}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : activeTab === 'words' ? (
+          <div className="wb-room-stack">
+            <div className="wb-room-item" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '14px', padding: '24px' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
+                Verificador Oficial de Palavras ({PORTUGUESE_WORD_SET.size} vocábulos)
+              </h2>
               <input
                 type="text"
-                className="wordbomb-field"
-                placeholder="CONSULTAR PALAVRA..."
-                value={wordCheckInput}
-                onChange={e => setWordCheckInput(e.target.value)}
+                value={wordSearchQuery}
+                onChange={e => setWordSearchQuery(e.target.value)}
+                placeholder="Digite uma palavra para verificar no dicionário..."
+                style={{
+                  height: '52px',
+                  backgroundColor: 'var(--wb-bg)',
+                  border: '2px solid var(--wb-border-strong)',
+                  borderRadius: '12px',
+                  padding: '0 16px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '1.15rem',
+                  textTransform: 'uppercase',
+                }}
               />
+              {wordSearchQuery.trim().length >= 2 && (
+                <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>
+                  {PORTUGUESE_WORD_SET.has(
+                    wordSearchQuery
+                      .trim()
+                      .toUpperCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                  ) ? (
+                    <span style={{ color: 'var(--wb-emerald)' }}>✓ Palavra aceita e validada no dicionário!</span>
+                  ) : (
+                    <span style={{ color: 'var(--wb-coral)' }}>✕ Palavra não encontrada ou bloqueada.</span>
+                  )}
+                </div>
+              )}
             </div>
-            {wordCheckInput.trim().length >= 2 && (
-              <div style={{ fontSize: '1.15rem', fontWeight: 800 }}>
-                {PORTUGUESE_WORD_SET.has(
-                  wordCheckInput
-                    .trim()
-                    .toUpperCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                ) ? (
-                  <span style={{ color: 'var(--arcade-emerald)' }}>
-                    ✓ Palavra válida e aprovada pelo dicionário do jogo!
-                  </span>
-                ) : (
-                  <span style={{ color: 'var(--arcade-coral)' }}>
-                    ✕ Palavra não encontrada ou bloqueada pelo filtro de segurança.
-                  </span>
-                )}
-              </div>
-            )}
-
-            <div style={{ marginTop: '12px' }}>
-              <div className="cat-pills-row" style={{ marginBottom: '16px' }}>
-                {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
-                  <button
-                    key={cat}
-                    type="button"
-                    className={`cat-pill ${libraryCatFilter === cat ? 'active' : ''}`}
-                    onClick={() => setLibraryCatFilter(cat)}
+          </div>
+        ) : (
+          <div className="wb-room-stack">
+            {WORDBOMB_SYLLABLES.map(item => (
+              <div key={item.syl} className="wb-room-item">
+                <div className="wb-room-left">
+                  <div
+                    className="wb-room-thumb"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'var(--wb-bg)',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 900,
+                      color: 'var(--wb-cyan)',
+                    }}
                   >
-                    {CATEGORY_LABELS[cat]}
-                  </button>
-                ))}
-              </div>
-              <div className="quick-rooms-list">
-                {QUESTION_BANK.filter(
-                  q => libraryCatFilter === 'mixed' || q.category === libraryCatFilter
-                ).map(q => (
-                  <div key={q.id} className="quick-room-card">
-                    <div>
-                      <div className="quick-room-title">{q.prompt}</div>
-                      <div className="quick-room-sub" style={{ color: 'var(--arcade-emerald)', fontWeight: 700 }}>
-                        ✓ Resposta: {q.options[q.correctIndex]} — {q.explanation}
-                      </div>
-                    </div>
+                    {item.syl}
                   </div>
-                ))}
+                  <div className="wb-room-details">
+                    <div className="wb-room-name">Sílaba "{item.syl}"</div>
+                    <div className="wb-room-meta">{item.hint}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="wb-illuminated-btn wb-join-button"
+                  onClick={() => startNewMatch('wordbomb')}
+                >
+                  Treinar
+                </button>
               </div>
-            </div>
-          </section>
+            ))}
+          </div>
         )}
       </main>
 
-      <footer className="game-footer">
-        <strong>THE PULSE GAME</strong> • Atalhos rápidos: <strong>[1–4]</strong> Responder •{' '}
-        <strong>[ESPAÇO / TAB]</strong> Blindar Cofre • <strong>[ESC]</strong> Pausar
+      {/* =========================================================
+          3. MODAL DE CONFIGURAÇÕES COMPLETO (HAMBURGER MENU)
+         ========================================================= */}
+      {settingsOpen && (
+        <div className="wb-modal-backdrop" onClick={() => setSettingsOpen(false)}>
+          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>{t.settingsTitle}</h2>
+              <button type="button" className="wb-lang-trigger" onClick={() => setSettingsOpen(false)}>
+                ✕ Fechar
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div className="wb-room-item">
+                <div>
+                  <div className="wb-room-name">Idioma da Interface</div>
+                  <div className="wb-room-meta">Português (BR), English (US), Español</div>
+                </div>
+                <button type="button" className="wb-illuminated-btn" onClick={cycleLanguage}>
+                  {t.flag} {t.label}
+                </button>
+              </div>
+
+              <div className="wb-room-item">
+                <div>
+                  <div className="wb-room-name">Intensidade dos Efeitos Sonoros</div>
+                  <div className="wb-room-meta">Volume atual do sintetizador: {profile.sfxVolume}%</div>
+                </div>
+                <input
+                  type="range"
+                  min={15}
+                  max={100}
+                  value={profile.sfxVolume}
+                  onChange={e => setProfile(p => ({ ...p, sfxVolume: Number(e.target.value) }))}
+                />
+              </div>
+
+              <div className="wb-room-item">
+                <div>
+                  <div className="wb-room-name">Partículas e Ondas de Choque (60 FPS)</div>
+                  <div className="wb-room-meta">Ativar explosões luminosas no Canvas da Arena</div>
+                </div>
+                <button
+                  type="button"
+                  className="wb-lang-trigger"
+                  onClick={() => setProfile(p => ({ ...p, reducedMotion: !p.reducedMotion }))}
+                >
+                  {profile.reducedMotion ? 'Reduzido' : 'Ultra 60 FPS'}
+                </button>
+              </div>
+
+              <div className="wb-room-item">
+                <div>
+                  <div className="wb-room-name">Redefinir Dados Locais</div>
+                  <div className="wb-room-meta">Restaurar estatísticas e recordes para o padrão</div>
+                </div>
+                <button
+                  type="button"
+                  className="wb-lang-trigger"
+                  style={{ color: 'var(--wb-coral)', borderColor: 'var(--wb-coral)' }}
+                  onClick={() => {
+                    setProfile(clearProfileStorage());
+                    setSettingsOpen(false);
+                  }}
+                >
+                  Resetar Conta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          4. MODAL DE PERFIL & ESCOLHA DE FOTOS DE PERFIL BONITINHAS
+         ========================================================= */}
+      {profileModalOpen && (
+        <div className="wb-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
+          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>
+                Seu Perfil &amp; Avatares
+              </h2>
+              <button type="button" className="wb-lang-trigger" onClick={() => setProfileModalOpen(false)}>
+                ✓ Salvar
+              </button>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px' }}>
+                Nome de Exibição:
+              </label>
+              <input
+                type="text"
+                value={profile.username}
+                maxLength={18}
+                onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}
+                style={{
+                  width: '100%',
+                  height: '46px',
+                  backgroundColor: 'var(--wb-bg)',
+                  border: '1px solid var(--wb-border-strong)',
+                  borderRadius: '10px',
+                  padding: '0 14px',
+                  fontWeight: 700,
+                }}
+              />
+            </div>
+
+            <div>
+              <div style={{ fontWeight: 700, marginBottom: '10px' }}>
+                Escolha sua Foto de Perfil:
+              </div>
+              <div className="avatar-picker-grid">
+                {AVATAR_CATALOG.map(av => (
+                  <button
+                    key={av.id}
+                    type="button"
+                    className={`avatar-choice-card ${profile.avatarId === av.id ? 'selected' : ''}`}
+                    onClick={() => setProfile(p => ({ ...p, avatarId: av.id }))}
+                  >
+                    <div style={{ width: '56px', height: '56px', borderRadius: '14px', overflow: 'hidden' }}>
+                      {av.renderSvg()}
+                    </div>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>{av.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          5. MODAL PÓS-PARTIDA
+         ========================================================= */}
+      {postMatchModal && (
+        <div className="wb-modal-backdrop" onClick={() => setPostMatchModal(null)}>
+          <div className="wb-modal-panel" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--wb-cyan)', fontWeight: 800 }}>
+                  FIM DE PARTIDA • +{postMatchModal.coinsEarned} MOEDAS
+                </span>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>
+                  {postMatchModal.finalScore} Pontos
+                </h2>
+              </div>
+              <button
+                type="button"
+                className="wb-illuminated-btn"
+                onClick={() => {
+                  const m = profile.selectedMode;
+                  setPostMatchModal(null);
+                  startNewMatch(m, profile.selectedCategory);
+                }}
+              >
+                Jogar Novamente
+              </button>
+            </div>
+            <pre
+              style={{
+                backgroundColor: 'var(--wb-bg)',
+                padding: '14px',
+                borderRadius: '10px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.92rem',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {postMatchModal.shareText}
+            </pre>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================
+          6. RODAPÉ PROFISSIONAL CORPORATIVO (SEM ATALHOS DE TECLADO)
+         ========================================================= */}
+      <footer className="wb-pro-footer">
+        <div className="wb-pro-footer-inner">
+          <div>{t.footerRights}</div>
+          <div className="wb-footer-links">
+            <button type="button" className="wb-footer-link" onClick={() => setSettingsOpen(true)}>
+              {t.terms}
+            </button>
+            <button type="button" className="wb-footer-link" onClick={() => setSettingsOpen(true)}>
+              {t.privacy}
+            </button>
+            <span style={{ color: 'var(--wb-emerald)', fontWeight: 700 }}>● {t.status}</span>
+          </div>
+        </div>
       </footer>
     </div>
   );

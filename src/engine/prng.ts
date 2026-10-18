@@ -40,13 +40,6 @@ export function getBrasiliaDateKey(referenceDate: Date = new Date()): string {
   return `${brtDate.getFullYear()}-${String(brtDate.getMonth() + 1).padStart(2, '0')}-${String(brtDate.getDate()).padStart(2, '0')}`;
 }
 
-export function formatDatePtBr(dateKey: string): string {
-  const [y, m, d] = dateKey.split('-').map(Number);
-  const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-  if (!y || !m || !d) return dateKey;
-  return `${d} ${months[(m - 1) % 12]} ${y}`;
-}
-
 export function normalizeWord(raw: string): string {
   return (raw || '')
     .trim()

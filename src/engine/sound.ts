@@ -1,6 +1,6 @@
 class WebAudioSynthesizer {
   private ctx: AudioContext | null = null;
-  public enabled: boolean = true;
+  public volume: number = 0.85;
 
   private init(): void {
     if (!this.ctx && typeof window !== 'undefined') {
@@ -13,7 +13,7 @@ class WebAudioSynthesizer {
   }
 
   private playTone(freq: number, type: OscillatorType, durationMs: number, gainVal = 0.08, delayMs = 0): void {
-    if (!this.enabled) return;
+    if (this.volume <= 0.01) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -22,7 +22,7 @@ class WebAudioSynthesizer {
       const gain = this.ctx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, start);
-      gain.gain.setValueAtTime(gainVal, start);
+      gain.gain.setValueAtTime(gainVal * this.volume, start);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + durationMs / 1000);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -34,7 +34,7 @@ class WebAudioSynthesizer {
   }
 
   public keyClick(): void {
-    this.playTone(680, 'sine', 24, 0.025, 0);
+    this.playTone(680, 'sine', 24, 0.03, 0);
   }
 
   public hit(streak: number): void {
@@ -55,7 +55,7 @@ class WebAudioSynthesizer {
   }
 
   public tickUrgent(): void {
-    this.playTone(900, 'sine', 38, 0.03, 0);
+    this.playTone(900, 'sine', 38, 0.035, 0);
   }
 
   public finish(): void {

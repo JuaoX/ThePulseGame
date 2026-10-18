@@ -1,17 +1,23 @@
-import { CategoryId, GameModeId, PlayerProfile } from '../types/game';
+import { AvatarId, CategoryId, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'the_pulse_game_v6_state';
+const STORAGE_KEY = 'the_pulse_game_v7_profile';
 
 export function createDefaultProfile(): PlayerProfile {
-  const prefersReduced =
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   return {
-    version: 6,
-    soundEnabled: true,
-    reducedMotion: Boolean(prefersReduced),
+    version: 7,
+    username: 'PulsePlayer',
+    titleBadge: 'Challenger',
+    avatarId: 'cybercat',
+    language: 'pt',
+    reducedMotion: false,
+    highContrastGlow: true,
+    sfxVolume: 85,
+    coins: 250,
+    keys: 3,
+    careerXP: 420,
+    unlockedAvatars: ['cybercat', 'shiba', 'kitsune', 'astro'],
+    unlockedRings: ['indigo', 'cyan'],
+    equippedRing: 'indigo',
     selectedMode: 'wordbomb',
     selectedCategory: 'mixed',
     matchesPlayed: 0,
@@ -42,6 +48,8 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
 
   const validModes: GameModeId[] = ['wordbomb', 'daily', 'elevator', 'classic'];
   const validCats: CategoryId[] = ['mixed', 'math', 'logic', 'words', 'general'];
+  const validLangs: LanguageCode[] = ['pt', 'en', 'es'];
+  const validAvatars: AvatarId[] = ['cybercat', 'shiba', 'kitsune', 'astro', 'ghosty', 'owl', 'dragon', 'witch'];
 
   const safeNum = (val: unknown, fallback = 0): number =>
     typeof val === 'number' && Number.isFinite(val) && val >= 0 ? Math.floor(val) : fallback;
@@ -52,9 +60,20 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
     : {}) as Record<string, unknown>;
 
   return {
-    version: 6,
-    soundEnabled: typeof obj.soundEnabled === 'boolean' ? obj.soundEnabled : def.soundEnabled,
+    version: 7,
+    username: typeof obj.username === 'string' && obj.username.trim().length > 0 ? obj.username.slice(0, 18) : def.username,
+    titleBadge: typeof obj.titleBadge === 'string' ? obj.titleBadge : def.titleBadge,
+    avatarId: validAvatars.includes(obj.avatarId as AvatarId) ? (obj.avatarId as AvatarId) : def.avatarId,
+    language: validLangs.includes(obj.language as LanguageCode) ? (obj.language as LanguageCode) : def.language,
     reducedMotion: typeof obj.reducedMotion === 'boolean' ? obj.reducedMotion : def.reducedMotion,
+    highContrastGlow: typeof obj.highContrastGlow === 'boolean' ? obj.highContrastGlow : def.highContrastGlow,
+    sfxVolume: safeNum(obj.sfxVolume, 85),
+    coins: safeNum(obj.coins, 250),
+    keys: safeNum(obj.keys, 3),
+    careerXP: safeNum(obj.careerXP, 420),
+    unlockedAvatars: Array.isArray(obj.unlockedAvatars) ? (obj.unlockedAvatars as AvatarId[]) : def.unlockedAvatars,
+    unlockedRings: Array.isArray(obj.unlockedRings) ? (obj.unlockedRings as string[]) : def.unlockedRings,
+    equippedRing: typeof obj.equippedRing === 'string' ? obj.equippedRing : def.equippedRing,
     selectedMode: validModes.includes(obj.selectedMode as GameModeId)
       ? (obj.selectedMode as GameModeId)
       : def.selectedMode,
@@ -102,7 +121,7 @@ export function saveProfile(profile: PlayerProfile): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   } catch {
-    // Ignore storage quota issues
+    // Ignore quota issues
   }
 }
 
@@ -113,4 +132,12 @@ export function clearProfileStorage(): PlayerProfile {
     // Ignore
   }
   return createDefaultProfile();
+}
+
+export function getSeasonRankInfo(xp: number): { season: string; division: string; code: string; nextXp: number } {
+  if (xp >= 10000) return { season: 'SEASON 12', division: 'GRANDMASTER', code: 'GM', nextXp: 25000 };
+  if (xp >= 5000) return { season: 'SEASON 12', division: 'DIAMOND I', code: 'D1', nextXp: 10000 };
+  if (xp >= 2200) return { season: 'SEASON 12', division: 'GOLD I', code: 'G1', nextXp: 5000 };
+  if (xp >= 900) return { season: 'SEASON 12', division: 'SILVER I', code: 'S1', nextXp: 2200 };
+  return { season: 'SEASON 12', division: 'BRONZE I', code: 'B1', nextXp: 900 };
 }

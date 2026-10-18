@@ -1,6 +1,8 @@
 export type GameModeId = 'wordbomb' | 'daily' | 'elevator' | 'classic';
 export type CategoryId = 'mixed' | 'math' | 'logic' | 'words' | 'general';
-export type AppViewId = 'home' | 'rules' | 'stats' | 'library';
+export type NavTabId = 'rooms' | 'ranked' | 'shop' | 'inventory' | 'words' | 'syllables';
+export type LanguageCode = 'pt' | 'en' | 'es';
+export type AvatarId = 'cybercat' | 'shiba' | 'kitsune' | 'astro' | 'ghosty' | 'owl' | 'dragon' | 'witch';
 
 export interface QuestionItem {
   id: string;
@@ -43,8 +45,19 @@ export interface DailyAttemptRecord {
 
 export interface PlayerProfile {
   version: number;
-  soundEnabled: boolean;
+  username: string;
+  titleBadge: string;
+  avatarId: AvatarId;
+  language: LanguageCode;
   reducedMotion: boolean;
+  highContrastGlow: boolean;
+  sfxVolume: number;
+  coins: number;
+  keys: number;
+  careerXP: number;
+  unlockedAvatars: AvatarId[];
+  unlockedRings: string[];
+  equippedRing: string;
   selectedMode: GameModeId;
   selectedCategory: CategoryId;
   matchesPlayed: number;

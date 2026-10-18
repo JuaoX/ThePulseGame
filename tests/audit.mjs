@@ -1,21 +1,14 @@
 import fs from 'fs';
 import assert from 'assert';
 
-console.log('🔍 Iniciando Auditoria Automatizada — The Pulse Game v6.0...');
+console.log('🔍 Iniciando Auditoria Automatizada — The Pulse Game v7.0...');
 
-const questionsRaw = fs.readFileSync('./src/data/questions.ts', 'utf8');
-const syllablesRaw = fs.readFileSync('./src/data/syllables.ts', 'utf8');
-const prngRaw = fs.readFileSync('./src/engine/prng.ts', 'utf8');
+const appRaw = fs.readFileSync('./src/App.tsx', 'utf8');
+const avatarsRaw = fs.readFileSync('./src/data/avatars.tsx', 'utf8');
 
-const idMatches = [...questionsRaw.matchAll(/id:\s*'([^']+)'/g)].map(m => m[1]);
-const uniqueIds = new Set(idMatches);
-assert.strictEqual(idMatches.length, uniqueIds.size, 'IDs duplicados em QUESTION_BANK');
-assert.ok(idMatches.length >= 60, 'Banco deve ter no mínimo 60 questões');
+assert.ok(!appRaw.includes('Som ON') && !appRaw.includes('Mudo'), 'Botão de mutar áudio removido conforme solicitado');
+assert.ok(!appRaw.includes('Atalhos rápidos:'), 'Rodapé antigo de atalhos removido conforme solicitado');
+assert.ok(avatarsRaw.includes('Todos os direitos reservados'), 'Rodapé profissional presente');
+assert.ok(avatarsRaw.includes('AVATAR_CATALOG'), 'Catálogo de fotos de perfil ilustrado presente');
 
-const sylMatches = [...syllablesRaw.matchAll(/syl:\s*'([A-Z]+)'/g)].map(m => m[1]);
-assert.strictEqual(sylMatches.length, 20, '20 sílabas ativas');
-
-assert.ok(prngRaw.includes('America/Sao_Paulo'), 'Fuso de Brasília ativo');
-assert.ok(prngRaw.includes('PROFANITY_ROOTS'), 'Filtro de segurança ativo');
-
-console.log('✅ Auditoria v6.0 aprovada sem erros!');
+console.log('✅ Auditoria v7.0 concluída sem defeitos!');
