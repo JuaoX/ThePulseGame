@@ -1,8 +1,8 @@
 export type GameModeId = 'wordbomb' | 'daily' | 'elevator' | 'classic';
 export type CategoryId = 'mixed' | 'math' | 'logic' | 'words' | 'general';
-export type NavTabId = 'play' | 'ranked' | 'Customize' | 'lexicon' | 'syllables';
+export type NavTabId = 'play' | 'ranked' | 'customize' | 'lexicon' | 'syllables';
 export type LanguageCode = 'pt' | 'en' | 'es';
-export type DiceBearStyle = 'adventurer' | 'bottts' | 'lorelei' | 'avataaars' | 'pixel-art' | 'fun-emoji';
+export type AvatarStyleId = 'adventurer' | 'bottts' | 'lorelei' | 'avataaars' | 'pixel-art' | 'fun-emoji';
 
 export interface QuestionItem {
   id: string;
@@ -46,7 +46,7 @@ export interface DailyAttemptRecord {
 export interface PlayerProfile {
   version: number;
   username: string;
-  avatarStyle: DiceBearStyle;
+  avatarStyle: AvatarStyleId;
   avatarSeed: string;
   avatarBg: string;
   language: LanguageCode;

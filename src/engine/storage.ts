@@ -1,10 +1,10 @@
-import { CategoryId, DiceBearStyle, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
+import { AvatarStyleId, CategoryId, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'the_pulse_game_v8_profile';
+const STORAGE_KEY = 'the_pulse_game_v9_profile';
 
 export function createDefaultProfile(): PlayerProfile {
   return {
-    version: 8,
+    version: 9,
     username: 'PulsePlayer',
     avatarStyle: 'adventurer',
     avatarSeed: 'Felix',
@@ -12,9 +12,9 @@ export function createDefaultProfile(): PlayerProfile {
     language: 'pt',
     reducedMotion: false,
     sfxVolume: 85,
-    coins: 300,
+    coins: 350,
     keys: 3,
-    careerXP: 450,
+    careerXP: 520,
     selectedMode: 'wordbomb',
     selectedCategory: 'mixed',
     matchesPlayed: 0,
@@ -46,7 +46,7 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
   const validModes: GameModeId[] = ['wordbomb', 'daily', 'elevator', 'classic'];
   const validCats: CategoryId[] = ['mixed', 'math', 'logic', 'words', 'general'];
   const validLangs: LanguageCode[] = ['pt', 'en', 'es'];
-  const validStyles: DiceBearStyle[] = ['adventurer', 'bottts', 'lorelei', 'avataaars', 'pixel-art', 'fun-emoji'];
+  const validStyles: AvatarStyleId[] = ['adventurer', 'bottts', 'lorelei', 'avataaars', 'pixel-art', 'fun-emoji'];
 
   const safeNum = (val: unknown, fallback = 0): number =>
     typeof val === 'number' && Number.isFinite(val) && val >= 0 ? Math.floor(val) : fallback;
@@ -57,17 +57,17 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
     : {}) as Record<string, unknown>;
 
   return {
-    version: 8,
+    version: 9,
     username: typeof obj.username === 'string' && obj.username.trim().length > 0 ? obj.username.slice(0, 18) : def.username,
-    avatarStyle: validStyles.includes(obj.avatarStyle as DiceBearStyle) ? (obj.avatarStyle as DiceBearStyle) : def.avatarStyle,
+    avatarStyle: validStyles.includes(obj.avatarStyle as AvatarStyleId) ? (obj.avatarStyle as AvatarStyleId) : def.avatarStyle,
     avatarSeed: typeof obj.avatarSeed === 'string' && obj.avatarSeed.trim().length > 0 ? obj.avatarSeed.slice(0, 24) : def.avatarSeed,
     avatarBg: typeof obj.avatarBg === 'string' && obj.avatarBg.length === 6 ? obj.avatarBg : def.avatarBg,
     language: validLangs.includes(obj.language as LanguageCode) ? (obj.language as LanguageCode) : def.language,
     reducedMotion: typeof obj.reducedMotion === 'boolean' ? obj.reducedMotion : def.reducedMotion,
     sfxVolume: safeNum(obj.sfxVolume, 85),
-    coins: safeNum(obj.coins, 300),
+    coins: safeNum(obj.coins, 350),
     keys: safeNum(obj.keys, 3),
-    careerXP: safeNum(obj.careerXP, 450),
+    careerXP: safeNum(obj.careerXP, 520),
     selectedMode: validModes.includes(obj.selectedMode as GameModeId)
       ? (obj.selectedMode as GameModeId)
       : def.selectedMode,
@@ -129,9 +129,9 @@ export function clearProfileStorage(): PlayerProfile {
 }
 
 export function getPlayerLeague(xp: number): { division: string; tierCode: string; nextXp: number; progressPct: number } {
-  if (xp >= 10000) return { division: 'Liga Ametista', tierCode: 'AM', nextXp: 25000, progressPct: 100 };
-  if (xp >= 5000) return { division: 'Liga Diamante', tierCode: 'DM', nextXp: 10000, progressPct: Math.round(((xp - 5000) / 5000) * 100) };
-  if (xp >= 2200) return { division: 'Liga Ouro', tierCode: 'AU', nextXp: 5000, progressPct: Math.round(((xp - 2200) / 2800) * 100) };
-  if (xp >= 900) return { division: 'Liga Prata', tierCode: 'AG', nextXp: 2200, progressPct: Math.round(((xp - 900) / 1300) * 100) };
-  return { division: 'Liga Bronze', tierCode: 'BR', nextXp: 900, progressPct: Math.round((xp / 900) * 100) };
+  if (xp >= 10000) return { division: 'Mestre Pulse', tierCode: 'MP', nextXp: 25000, progressPct: 100 };
+  if (xp >= 5000) return { division: 'Diamante I', tierCode: 'DM', nextXp: 10000, progressPct: Math.round(((xp - 5000) / 5000) * 100) };
+  if (xp >= 2200) return { division: 'Ouro I', tierCode: 'AU', nextXp: 5000, progressPct: Math.round(((xp - 2200) / 2800) * 100) };
+  if (xp >= 900) return { division: 'Prata I', tierCode: 'AG', nextXp: 2200, progressPct: Math.round(((xp - 900) / 1300) * 100) };
+  return { division: 'Bronze I', tierCode: 'BR', nextXp: 900, progressPct: Math.round((xp / 900) * 100) };
 }

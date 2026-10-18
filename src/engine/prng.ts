@@ -71,29 +71,29 @@ export function validateWordSubmission(
   const syl = normalizeWord(requiredSyllable);
 
   if (!word || word.length < 3) {
-    return { valid: false, normalized: word, reason: 'Digite uma palavra com pelo menos 3 letras.' };
+    return { valid: false, normalized: word, reason: 'Digite pelo menos 3 letras!' };
   }
 
   for (const root of PROFANITY_ROOTS) {
     if (word.includes(root)) {
-      return { valid: false, normalized: word, reason: 'Termo bloqueado pelo filtro de segurança.' };
+      return { valid: false, normalized: word, reason: 'Palavra bloqueada!' };
     }
   }
 
   if (/(.)\1\1/.test(word) || /[BCDFGHJKLMNPQRSTVWXYZ]{5,}/.test(word)) {
-    return { valid: false, normalized: word, reason: 'Sequência de caracteres inválida.' };
+    return { valid: false, normalized: word, reason: 'Combinação inválida!' };
   }
 
   if (!word.includes(syl)) {
-    return { valid: false, normalized: word, reason: `A palavra precisa conter a sílaba "${syl}".` };
+    return { valid: false, normalized: word, reason: `Precisa ter "${syl}"!` };
   }
 
   if (usedWords.has(word)) {
-    return { valid: false, normalized: word, reason: `A palavra "${word}" já foi usada nesta partida!` };
+    return { valid: false, normalized: word, reason: `"${word}" já foi usada!` };
   }
 
   if (!dictionary.has(word)) {
-    return { valid: false, normalized: word, reason: `"${word}" não consta no dicionário oficial.` };
+    return { valid: false, normalized: word, reason: `"${word}" não existe no dicionário!` };
   }
 
   return { valid: true, normalized: word };
@@ -135,15 +135,15 @@ export function generateProceduralMathQuestion(
   if (difficulty === 1) {
     answer = a + b * 2;
     prompt = `Quanto é ${a} + (${b} × 2)?`;
-    explanation = `Multiplicamos primeiro: ${b} × 2 = ${b * 2}. Somando ${a}, temos ${answer}.`;
+    explanation = `${b} × 2 = ${b * 2}. Somando ${a} = ${answer}.`;
   } else if (difficulty === 2) {
     answer = a * b - c;
     prompt = `Calcule rápido: ${a} × ${b} - ${c}`;
-    explanation = `${a} × ${b} = ${a * b}. Subtraindo ${c}, o resultado é ${answer}.`;
+    explanation = `${a} × ${b} = ${a * b}. Subtraindo ${c} = ${answer}.`;
   } else {
     answer = (a + b) * c;
     prompt = `Qual é o valor de (${a} + ${b}) × ${c}?`;
-    explanation = `Somamos os parênteses (${a + b}) e multiplicamos por ${c}: ${answer}.`;
+    explanation = `(${a + b}) × ${c} = ${answer}.`;
   }
 
   const deltas = [-12, -6, -4, -2, 2, 4, 6, 8, 12];

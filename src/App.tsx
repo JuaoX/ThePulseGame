@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AnswerHistoryItem,
   CategoryId,
@@ -11,11 +11,12 @@ import {
 import { QUESTION_BANK } from './data/questions';
 import { PORTUGUESE_WORD_SET, WORDBOMB_SYLLABLES } from './data/syllables';
 import {
-  buildDiceBearUrl,
-  CURATED_COMMUNITY_AVATARS,
-  DICEBEAR_STYLE_LIST,
+  AVATAR_STYLE_OPTIONS,
+  buildAvatarUrl,
+  CURATED_AVATARS,
   I18N_STRINGS,
   LANGUAGE_OPTIONS,
+  ModeVisualArtwork,
   PulseBrandLogo,
 } from './data/avatars';
 import {
@@ -33,59 +34,44 @@ import { ArenaCanvasFX, ArenaCanvasFXHandle } from './components/ArenaCanvasFX';
 const COMBO_STEPS = [1.0, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0];
 const BASE_POINTS = { 1: 100, 2: 150, 3: 220 } as const;
 
-const ARENA_MODES: {
+const VISUAL_MODES: {
   id: GameModeId;
-  code: string;
   title: string;
-  subtitle: string;
-  tag: string;
+  badges: [string, string];
   accent: string;
-  bgTint: string;
 }[] = [
   {
     id: 'wordbomb',
-    code: 'SYL',
-    title: 'Bomba Léxica de Sílabas',
-    subtitle: 'O núcleo sorteia uma sílaba em tempo real. Digite vocábulos válidos antes que o pavio zere.',
-    tag: '3 Vidas • Dicionário Oficial',
+    title: 'Bomba de Sílabas',
+    badges: ['⚡ Rápido', '♥♥♥ 3 Vidas'],
     accent: '#22D3EE',
-    bgTint: 'rgba(34, 211, 238, 0.14)',
   },
   {
     id: 'daily',
-    code: '24H',
-    title: 'Pulso Diário Oficial',
-    subtitle: 'Sequência determinística única gerada pela data de Brasília. Mesma prova para todos hoje.',
-    tag: '60 Segundos • Semente Global',
+    title: 'Desafio Diário',
+    badges: ['📅 Hoje', '⏱ 60s'],
     accent: '#10B981',
-    bgTint: 'rgba(16, 185, 129, 0.14)',
   },
   {
     id: 'elevator',
-    code: 'ELV',
-    title: 'Torre de Sobrevivência',
-    subtitle: 'Suba andares infinitos com 3 vidas. A cada andar superado o reator reduz o tempo de resposta.',
-    tag: 'Sem Relógio Geral • Ritmo Crescente',
+    title: 'O Elevador',
+    badges: ['▲ Infinito', '♥♥♥ 3 Vidas'],
     accent: '#F43F5E',
-    bgTint: 'rgba(244, 63, 94, 0.14)',
   },
   {
     id: 'classic',
-    code: '60S',
-    title: 'Velocidade Clássica 60s',
-    subtitle: 'Acumule combos até 3.0x nas áreas de Matemática, Lógica, Linguagem ou Gerais e blinde seu cofre.',
-    tag: '60 Segundos • Multi-Categoria',
+    title: 'Arena Turbo 60s',
+    badges: ['🔥 Combo 3x', '⏱ 60s'],
     accent: '#818CF8',
-    bgTint: 'rgba(129, 140, 248, 0.16)',
   },
 ];
 
 const CATEGORY_LABELS: Record<CategoryId, string> = {
-  mixed: 'Pulso Misto (Todas)',
-  math: 'Matemática Mental',
-  logic: 'Lógica & Padrões',
-  words: 'Palavras & Idioma',
-  general: 'Conhecimentos Gerais',
+  mixed: '⚡ Misto',
+  math: '∑ Matemática',
+  logic: '◈ Lógica',
+  words: 'Aa Palavras',
+  general: '🌐 Gerais',
 };
 
 export default function App() {
@@ -171,7 +157,6 @@ export default function App() {
     saveProfile(profile);
   }, [profile]);
 
-  // Fecha o dropdown vertical de idioma ao clicar fora
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
@@ -184,7 +169,7 @@ export default function App() {
 
   const t = I18N_STRINGS[profile.language] || I18N_STRINGS.pt;
   const activeLangMeta = LANGUAGE_OPTIONS.find(l => l.code === profile.language) || LANGUAGE_OPTIONS[0];
-  const playerAvatarUrl = buildDiceBearUrl(profile.avatarStyle, profile.avatarSeed, profile.avatarBg);
+  const playerAvatarUrl = buildAvatarUrl(profile.avatarStyle, profile.avatarSeed, profile.avatarBg);
   const leagueInfo = getPlayerLeague(profile.careerXP);
 
   const clearPendingTransition = () => {
@@ -318,6 +303,7 @@ export default function App() {
       currentSyllable: WORDBOMB_SYLLABLES[0],
     };
 
+    SoundEngine.modeSelect();
     setProfile(prev => ({ ...prev, selectedMode: mode, selectedCategory: category }));
     setPostMatchModal(null);
     setIsPaused(false);
@@ -412,13 +398,13 @@ export default function App() {
     setStreak(0);
     setCombo(1.0);
     SoundEngine.bank();
-    fxRef.current?.spawnBurst('#10B981', 24);
+    fxRef.current?.spawnConfettiShower();
 
     setFeedback({
       visible: true,
       tone: 'positive',
       title: `🛡️ +${amount} PTS BLINDADOS NO COFRE!${hadHighStreak ? ' (+1,5s EXTRA)' : ''}`,
-      detail: 'Seus pontos estão 100% seguros.',
+      detail: '100% garantidos na partida!',
     });
   };
 
@@ -457,13 +443,13 @@ export default function App() {
       setFeedback({
         visible: true,
         tone: 'positive',
-        title: `✓ +${earned} PTS EM RISCO (${st.combo.toFixed(1)}X)`,
+        title: `✓ +${earned} PTS (${st.combo.toFixed(1)}X)`,
         detail: q.explanation,
       });
 
       transitionTimerRef.current = window.setTimeout(() => {
         loadStepChallenge(currentSessionId);
-      }, 900);
+      }, 850);
     } else {
       const lost = st.riskScore;
       st.riskScore = 0;
@@ -485,18 +471,18 @@ export default function App() {
       setFeedback({
         visible: true,
         tone: 'error',
-        title: `✕ SOBRECARGA! ${lost > 0 ? `-${lost} PTS PERDIDOS` : ''}`,
+        title: `✕ SOBRECARGA! ${lost > 0 ? `-${lost} PTS` : ''}`,
         detail: `Correta: ${q.options[q.correctIndex]} — ${q.explanation}`,
       });
 
       if ((st.mode === 'elevator' || st.mode === 'wordbomb') && st.lives <= 0) {
         transitionTimerRef.current = window.setTimeout(() => {
           if (sessionIdRef.current === currentSessionId) concludeMatch();
-        }, 1200);
+        }, 1150);
       } else {
         transitionTimerRef.current = window.setTimeout(() => {
           loadStepChallenge(currentSessionId);
-        }, 1400);
+        }, 1350);
       }
     }
   };
@@ -518,8 +504,8 @@ export default function App() {
       setFeedback({
         visible: true,
         tone: 'error',
-        title: '✕ PALAVRA RECUSADA',
-        detail: validation.reason || 'Digite uma palavra válida.',
+        title: `✕ ${validation.reason}`,
+        detail: `Exemplos: ${st.currentSyllable.hint}`,
       });
       return;
     }
@@ -547,8 +533,8 @@ export default function App() {
     setFeedback({
       visible: true,
       tone: 'positive',
-      title: `✓ "${validation.normalized}" ACEITA! +${earned} PTS (${st.combo.toFixed(1)}X)`,
-      detail: 'Aperte TAB para blindar seus pontos no Cofre Seguro!',
+      title: `✓ "${validation.normalized}" +${earned} PTS (${st.combo.toFixed(1)}X)`,
+      detail: 'Aperte TAB para blindar no cofre!',
     });
   };
 
@@ -608,18 +594,18 @@ export default function App() {
             setFeedback({
               visible: true,
               tone: 'error',
-              title: '💥 A BOMBA EXPLODIU! -1 VIDA',
-              detail: `Exemplos possíveis: ${st.currentSyllable.samples.slice(0, 4).join(', ')}.`,
+              title: '💥 EXPLODIU! -1 VIDA',
+              detail: `Possíveis: ${st.currentSyllable.samples.slice(0, 4).join(', ')}`,
             });
 
             if (st.lives <= 0) {
               transitionTimerRef.current = window.setTimeout(() => {
                 if (sessionIdRef.current === currentSessionId) concludeMatch();
-              }, 1250);
+              }, 1150);
             } else {
               transitionTimerRef.current = window.setTimeout(() => {
                 loadStepChallenge(currentSessionId);
-              }, 1350);
+              }, 1250);
             }
           } else {
             handleAnswerOption(-1);
@@ -668,14 +654,23 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   });
 
+  // Spotlight radial que segue o mouse nos cartões
+  const handlePosterMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   const fuseRatio = Math.max(0, Math.min(1, fuseClock / fuseTotal));
   const dialDashOffset = 502 * (1 - fuseRatio);
-  const selectedArenaMeta = ARENA_MODES.find(m => m.id === profile.selectedMode) || ARENA_MODES[0];
+  const selectedVisualMeta = VISUAL_MODES.find(m => m.id === profile.selectedMode) || VISUAL_MODES[0];
 
   return (
     <div className="pg-shell">
       {/* =========================================================
-          1. BARRA SUPERIOR DE ESTÚDIO (SEM BOTÃO DUPLICADO E COM DROPDOWN DE IDIOMA)
+          1. BARRA SUPERIOR DE ESTÚDIO
          ========================================================= */}
       <header className="pg-navbar">
         <div className="pg-nav-left">
@@ -705,12 +700,12 @@ export default function App() {
             <span className="pg-brand-text">THE PULSE</span>
           </button>
 
-          <nav className="pg-nav-links" aria-label="Navegação Principal">
+          <nav className="pg-nav-links" aria-label="Menu">
             {(
               [
                 ['play', t.navPlay],
                 ['ranked', t.navRanked],
-                ['Customize', t.navCustomize],
+                ['customize', t.navCustomize],
                 ['lexicon', t.navLexicon],
                 ['syllables', t.navSyllables],
               ] as [NavTabId, string][]
@@ -720,6 +715,7 @@ export default function App() {
                 type="button"
                 className={`pg-nav-tab ${activeTab === tabKey && !inMatch ? 'active' : ''}`}
                 onClick={() => {
+                  SoundEngine.hoverTick();
                   if (inMatch) abortMatchToHome();
                   setActiveTab(tabKey);
                 }}
@@ -731,21 +727,18 @@ export default function App() {
         </div>
 
         <div className="pg-nav-right">
-          {/* Moedas */}
-          <div className="pg-stat-pill" title="Moedas Acumuladas">
+          <div className="pg-stat-pill" title="Moedas">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B">
               <circle cx="12" cy="12" r="10" />
             </svg>
             <span>{profile.coins}</span>
           </div>
 
-          {/* XP / Liga */}
-          <div className="pg-stat-pill" title="Experiência de Carreira">
+          <div className="pg-stat-pill" title="XP">
             <span style={{ color: 'var(--pg-cyan-bright)' }}>⚡</span>
-            <span>{profile.careerXP} XP</span>
+            <span>{profile.careerXP}</span>
           </div>
 
-          {/* Botão Único Unificado de Perfil (Foto DiceBear + Nome) */}
           <button
             type="button"
             className="pg-profile-unified-btn"
@@ -758,7 +751,6 @@ export default function App() {
             <span className="pg-profile-name">{profile.username}</span>
           </button>
 
-          {/* Seletor de Idioma com Lista Vertical Suspensa (Dropdown) */}
           <div className="pg-lang-dropdown-wrap" ref={langMenuRef}>
             <button
               type="button"
@@ -786,6 +778,7 @@ export default function App() {
                       aria-selected={isSelected}
                       className={`pg-lang-option ${isSelected ? 'selected' : ''}`}
                       onClick={() => {
+                        SoundEngine.modeSelect();
                         setProfile(p => ({ ...p, language: opt.code as LanguageCode }));
                         setLangDropdownOpen(false);
                       }}
@@ -805,7 +798,7 @@ export default function App() {
       </header>
 
       {/* =========================================================
-          2. PALCO CENTRAL DE JOGO
+          2. PALCO CENTRAL DE ENTRETENIMENTO (PÔSTERES VISUAIS + SPOTLIGHT)
          ========================================================= */}
       <main className="pg-main-container">
         {inMatch ? (
@@ -813,15 +806,13 @@ export default function App() {
             <ArenaCanvasFX ref={fxRef} reducedMotion={profile.reducedMotion} />
 
             <div className="arena-hud-bar">
-              <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 900 }}>
-                  {selectedArenaMeta.title}
-                </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 900 }}>
+                {selectedVisualMeta.title}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
                 {(matchRef.current.mode === 'wordbomb' || matchRef.current.mode === 'elevator') && (
-                  <div style={{ fontSize: '1.35rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
+                  <div style={{ fontSize: '1.4rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
                     {[0, 1, 2].map(i => (
                       <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '4px' }}>
                         ♥
@@ -834,7 +825,7 @@ export default function App() {
                   <div
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '2rem',
+                      fontSize: '2.05rem',
                       fontWeight: 800,
                       color: matchClock <= 10 ? 'var(--pg-coral)' : 'var(--pg-text-bright)',
                     }}
@@ -852,8 +843,8 @@ export default function App() {
             <div className="arena-vaults-row">
               <div className="vault-card safe">
                 <div className="vault-title">
-                  <span>🛡️ Cofre Seguro</span>
-                  <span>100% Garantido</span>
+                  <span>🛡️ Cofre</span>
+                  <span>Seguro</span>
                 </div>
                 <div className="vault-value" style={{ color: 'var(--pg-emerald)' }}>
                   {safeScore}
@@ -867,13 +858,13 @@ export default function App() {
                 disabled={riskScore <= 0}
                 onClick={handleProtectPulse}
               >
-                🛡️ Blindar +{riskScore} pts [TAB]
+                🛡️ Blindar +{riskScore} [TAB]
               </button>
 
               <div className="vault-card risk">
                 <div className="vault-title">
-                  <span>⚡ Em Risco</span>
-                  <span>Combo {combo.toFixed(1)}x</span>
+                  <span>⚡ Risco</span>
+                  <span>{combo.toFixed(1)}x</span>
                 </div>
                 <div className="vault-value" style={{ color: 'var(--pg-gold)' }}>
                   {riskScore}
@@ -884,7 +875,7 @@ export default function App() {
             <section className="arena-core-box">
               <div className="bomb-dial">
                 <svg className="bomb-svg" viewBox="0 0 180 180">
-                  <circle cx="90" cy="90" r="80" fill="#090B10" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                  <circle cx="90" cy="90" r="80" fill="#07090E" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
                   <circle
                     cx="90"
                     cy="90"
@@ -898,13 +889,13 @@ export default function App() {
                   />
                 </svg>
                 <div className="bomb-core-circle">
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--pg-text-muted)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
                     {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
                   </span>
                   <div
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '2.4rem',
+                      fontSize: '2.45rem',
                       fontWeight: 800,
                       color: 'var(--pg-cyan-bright)',
                     }}
@@ -920,10 +911,9 @@ export default function App() {
               {matchRef.current.mode === 'wordbomb' ? (
                 <>
                   <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
-                    Digite uma palavra que contenha{' '}
-                    <span style={{ color: 'var(--pg-cyan-bright)' }}>{currentSyllable.syl}</span>
+                    Palavra com <span style={{ color: 'var(--pg-cyan-bright)' }}>{currentSyllable.syl}</span>
                   </h2>
-                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '1rem' }}>{currentSyllable.hint}</p>
+                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.98rem' }}>{currentSyllable.hint}</p>
 
                   <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '520px' }}>
                     <input
@@ -939,13 +929,13 @@ export default function App() {
                           handleWordBombSubmit();
                         }
                       }}
-                      placeholder="DIGITE A PALAVRA..."
+                      placeholder="DIGITE AQUI..."
                       style={{
                         flex: 1,
-                        height: '54px',
+                        height: '56px',
                         backgroundColor: 'var(--pg-bg)',
                         border: '2px solid var(--pg-indigo-light)',
-                        borderRadius: '12px',
+                        borderRadius: '14px',
                         padding: '0 18px',
                         fontFamily: 'var(--font-mono)',
                         fontSize: '1.35rem',
@@ -957,10 +947,10 @@ export default function App() {
                     <button
                       type="button"
                       className="pg-illuminated-cta"
-                      style={{ minHeight: '54px', padding: '0 24px', fontSize: '1.05rem' }}
+                      style={{ minHeight: '56px', padding: '0 26px', fontSize: '1.05rem' }}
                       onClick={handleWordBombSubmit}
                     >
-                      Detonar
+                      OK
                     </button>
                   </div>
                 </>
@@ -1012,14 +1002,14 @@ export default function App() {
                   style={{
                     width: '100%',
                     padding: '14px 18px',
-                    borderRadius: '12px',
+                    borderRadius: '14px',
                     backgroundColor:
                       feedback.tone === 'positive' ? 'rgba(16, 185, 129, 0.16)' : 'rgba(244, 63, 94, 0.16)',
                     border: `1px solid ${feedback.tone === 'positive' ? '#10B981' : '#F43F5E'}`,
                   }}
                 >
                   <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>{feedback.title}</div>
-                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.96rem', marginTop: '2px' }}>
+                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.95rem', marginTop: '2px' }}>
                     {feedback.detail}
                   </div>
                 </div>
@@ -1028,24 +1018,43 @@ export default function App() {
           </div>
         ) : activeTab === 'play' ? (
           <>
-            {/* CONSOLE HERO DE LANÇAMENTO — IDENTIDADE PRÓPRIA */}
-            <section className="pg-hero-console">
-              <div className="pg-hero-top">
-                <span className="pg-pill-tag">
-                  ⚡ {selectedArenaMeta.tag}
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.92rem', color: 'var(--pg-text-muted)' }}>
-                  {t.dailySeedLabel}: #{getBrasiliaDateKey()}
-                </span>
-              </div>
+            {/* 4 PÔSTERES ILUSTRADOS E ANIMADOS COM SPOTLIGHT (ZERO TEXTÃO) */}
+            <section className="pg-posters-grid" aria-label="Modos de Jogo">
+              {VISUAL_MODES.map(mode => {
+                const isSelected = profile.selectedMode === mode.id;
+                const best = profile.bestScores[mode.id] || 0;
+                return (
+                  <div
+                    key={mode.id}
+                    className={`pg-poster-card ${isSelected ? 'selected' : ''}`}
+                    style={{ '--poster-accent': mode.accent } as React.CSSProperties}
+                    onMouseMove={handlePosterMouseMove}
+                    onMouseEnter={() => SoundEngine.hoverTick()}
+                    onClick={() => {
+                      SoundEngine.modeSelect();
+                      setProfile(p => ({ ...p, selectedMode: mode.id }));
+                    }}
+                    onDoubleClick={() => startNewMatch(mode.id, profile.selectedCategory)}
+                  >
+                    <div className="pg-poster-art-box">
+                      <ModeVisualArtwork mode={mode.id} />
+                    </div>
 
-              <div>
-                <h1 className="pg-hero-title">{selectedArenaMeta.title}</h1>
-                <p className="pg-hero-desc" style={{ marginTop: '6px' }}>
-                  {selectedArenaMeta.subtitle}
-                </p>
-              </div>
+                    <div className="pg-poster-title">{mode.title}</div>
 
+                    <div className="pg-poster-pills">
+                      <span className="pg-mini-badge">{mode.badges[0]}</span>
+                      <span className="pg-mini-badge">{mode.badges[1]}</span>
+                    </div>
+
+                    <div className="pg-poster-record">★ {best} pts</div>
+                  </div>
+                );
+              })}
+            </section>
+
+            {/* CONSOLE CENTRAL DE AÇÃO IMEDIATA */}
+            <section className="pg-action-dock">
               {profile.selectedMode === 'classic' && (
                 <div className="pg-cat-row">
                   {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
@@ -1053,7 +1062,10 @@ export default function App() {
                       key={cat}
                       type="button"
                       className={`pg-cat-chip ${profile.selectedCategory === cat ? 'active' : ''}`}
-                      onClick={() => setProfile(p => ({ ...p, selectedCategory: cat }))}
+                      onClick={() => {
+                        SoundEngine.hoverTick();
+                        setProfile(p => ({ ...p, selectedCategory: cat }));
+                      }}
                     >
                       {CATEGORY_LABELS[cat]}
                     </button>
@@ -1061,114 +1073,83 @@ export default function App() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div className="pg-action-buttons-row">
                 <button
                   type="button"
                   className="pg-illuminated-cta"
                   onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
                 >
-                  ▶ {t.launchSelected}
+                  ▶ {t.playBigBtn} — {selectedVisualMeta.title.toUpperCase()}
                 </button>
+
                 <button
                   type="button"
-                  className="pg-secondary-btn"
-                  onClick={() => setActiveTab('ranked')}
+                  className="pg-rank-showcase-btn"
+                  onClick={() => {
+                    SoundEngine.modeSelect();
+                    setActiveTab('ranked');
+                  }}
                 >
-                  🏆 {leagueInfo.division} ({profile.careerXP} XP)
-                </button>
-              </div>
-            </section>
-
-            {/* BENTO GRID 2x2 DAS ARENAS ORIGINAIS DO THE PULSE GAME */}
-            <section className="pg-bento-grid" aria-label="Arenas de Jogo">
-              {ARENA_MODES.map(arena => {
-                const isSelected = profile.selectedMode === arena.id;
-                const best = profile.bestScores[arena.id] || 0;
-                return (
-                  <div
-                    key={arena.id}
-                    className={`pg-bento-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setProfile(p => ({ ...p, selectedMode: arena.id }))}
-                  >
-                    <div>
-                      <div className="pg-bento-header">
-                        <div
-                          className="pg-mode-icon-box"
-                          style={{ backgroundColor: arena.bgTint, color: arena.accent }}
-                        >
-                          {arena.code}
-                        </div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
-                          {arena.tag}
-                        </span>
-                      </div>
-                      <h2 className="pg-bento-title" style={{ marginTop: '14px' }}>
-                        {arena.title}
-                      </h2>
-                      <p className="pg-bento-desc">{arena.subtitle}</p>
+                  <div className="pg-rank-emblem">{leagueInfo.tierCode}</div>
+                  <div style={{ textAlign: 'left', lineHeight: 1.15 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--pg-text-muted)' }}>
+                      LIGA ATUAL
                     </div>
-
-                    <div className="pg-bento-footer">
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-gold)' }}>
-                        ★ {t.bestScore}: {best} pts
-                      </span>
-                      <button
-                        type="button"
-                        className="pg-illuminated-cta"
-                        style={{ minHeight: '38px', padding: '0 18px', fontSize: '0.92rem' }}
-                        onClick={e => {
-                          e.stopPropagation();
-                          startNewMatch(arena.id, profile.selectedCategory);
-                        }}
-                      >
-                        {t.playNow} →
-                      </button>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 900 }}>
+                      {leagueInfo.division}
                     </div>
                   </div>
-                );
-              })}
+                </button>
+              </div>
             </section>
           </>
         ) : activeTab === 'ranked' ? (
-          <section className="pg-hero-console">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
-              <div style={{ width: '76px', height: '76px', borderRadius: '20px', overflow: 'hidden', border: '2px solid var(--pg-indigo-light)' }}>
-                <img src={playerAvatarUrl} alt={profile.username} style={{ width: '100%', height: '100%' }} />
-              </div>
+          <section className="pg-action-dock" style={{ maxWidth: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', width: '100%' }}>
+              <img
+                src={playerAvatarUrl}
+                alt={profile.username}
+                style={{ width: '78px', height: '78px', borderRadius: '20px', border: '2px solid var(--pg-indigo-light)' }}
+              />
               <div style={{ flex: 1 }}>
-                <span className="pg-pill-tag">{leagueInfo.division}</span>
-                <h2 className="pg-hero-title" style={{ marginTop: '6px' }}>
+                <span className="pg-mini-badge" style={{ color: 'var(--pg-cyan-bright)' }}>
+                  {leagueInfo.division}
+                </span>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', marginTop: '6px' }}>
                   {profile.username} — {profile.careerXP} XP
                 </h2>
-                <p style={{ color: 'var(--pg-text-muted)', marginTop: '4px' }}>
-                  Próximo marco em {leagueInfo.nextXp} XP • {profile.matchesPlayed} partidas disputadas • Combo máximo: {profile.highestComboEver.toFixed(1)}x
+                <p style={{ color: 'var(--pg-text-muted)' }}>
+                  Próxima divisão em {leagueInfo.nextXp} XP • Combo Máximo: {profile.highestComboEver.toFixed(1)}x
                 </p>
               </div>
+              <button type="button" className="pg-illuminated-cta" onClick={() => startNewMatch('wordbomb')}>
+                ▶ Jogar Ranqueado
+              </button>
             </div>
           </section>
-        ) : activeTab === 'Customize' ? (
-          <section className="pg-hero-console">
-            <h2 className="pg-hero-title">Galeria Oficial de Avatares (DiceBear Open-Source)</h2>
-            <p className="pg-hero-desc">
-              Selecione qualquer personagem ilustrado pela comunidade ou personalize sua própria semente no perfil:
-            </p>
+        ) : activeTab === 'customize' ? (
+          <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+              Coleção de Personagens
+            </h2>
             <div className="avatar-picker-grid">
-              {CURATED_COMMUNITY_AVATARS.map(preset => {
-                const url = buildDiceBearUrl(preset.style, preset.seed, preset.bg);
+              {CURATED_AVATARS.map(preset => {
+                const url = buildAvatarUrl(preset.style, preset.seed, preset.bg);
                 const isCurrent = profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
                 return (
                   <button
                     key={preset.id}
                     type="button"
                     className={`avatar-choice-card ${isCurrent ? 'selected' : ''}`}
-                    onClick={() =>
+                    onClick={() => {
+                      SoundEngine.modeSelect();
                       setProfile(p => ({
                         ...p,
                         avatarStyle: preset.style,
                         avatarSeed: preset.seed,
                         avatarBg: preset.bg,
-                      }))
-                    }
+                      }));
+                    }}
                   >
                     <img
                       src={url}
@@ -1176,24 +1157,21 @@ export default function App() {
                       style={{ width: '68px', height: '68px', borderRadius: '16px' }}
                     />
                     <strong style={{ fontSize: '0.96rem' }}>{preset.label}</strong>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--pg-cyan-bright)' }}>
-                      {preset.style}
-                    </span>
                   </button>
                 );
               })}
             </div>
           </section>
         ) : activeTab === 'lexicon' ? (
-          <section className="pg-hero-console">
-            <h2 className="pg-hero-title">
-              Verificador Léxico ({PORTUGUESE_WORD_SET.size} palavras higienizadas)
+          <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem' }}>
+              Dicionário do Jogo ({PORTUGUESE_WORD_SET.size} palavras)
             </h2>
             <input
               type="text"
               value={wordSearchQuery}
               onChange={e => setWordSearchQuery(e.target.value)}
-              placeholder="Digite uma palavra para verificar no dicionário..."
+              placeholder="Consultar palavra..."
               style={{
                 height: '54px',
                 backgroundColor: 'var(--pg-bg)',
@@ -1214,29 +1192,35 @@ export default function App() {
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, '')
                 ) ? (
-                  <span style={{ color: 'var(--pg-emerald)' }}>✓ Palavra aceita e validada no dicionário!</span>
+                  <span style={{ color: 'var(--pg-emerald)' }}>✓ Palavra aceita na arena!</span>
                 ) : (
-                  <span style={{ color: 'var(--pg-coral)' }}>✕ Palavra não encontrada ou bloqueada.</span>
+                  <span style={{ color: 'var(--pg-coral)' }}>✕ Palavra não encontrada.</span>
                 )}
               </div>
             )}
           </section>
         ) : (
-          <div className="pg-bento-grid">
+          <div className="pg-posters-grid">
             {WORDBOMB_SYLLABLES.map(item => (
-              <div key={item.syl} className="pg-bento-card" onClick={() => startNewMatch('wordbomb')}>
-                <div className="pg-bento-header">
-                  <div
-                    className="pg-mode-icon-box"
-                    style={{ backgroundColor: 'rgba(6, 182, 212, 0.14)', color: 'var(--pg-cyan-bright)' }}
-                  >
-                    {item.syl}
-                  </div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
-                    Nível {item.difficulty}
-                  </span>
+              <div
+                key={item.syl}
+                className="pg-poster-card"
+                onMouseMove={handlePosterMouseMove}
+                onClick={() => startNewMatch('wordbomb')}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '2rem',
+                    fontWeight: 900,
+                    color: 'var(--pg-cyan-bright)',
+                  }}
+                >
+                  {item.syl}
                 </div>
-                <div className="pg-bento-desc">{item.hint}</div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--pg-text-muted)', textAlign: 'center' }}>
+                  {item.hint}
+                </div>
               </div>
             ))}
           </div>
@@ -1244,7 +1228,7 @@ export default function App() {
       </main>
 
       {/* =========================================================
-          3. MODAL DE CONFIGURAÇÕES COMPLETO
+          3. MODAL DE CONFIGURAÇÕES
          ========================================================= */}
       {settingsOpen && (
         <div className="pg-modal-backdrop" onClick={() => setSettingsOpen(false)}>
@@ -1275,9 +1259,9 @@ export default function App() {
 
               <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>Partículas e Ondas de Choque (60 FPS)</strong>
+                  <strong style={{ fontSize: '1.05rem' }}>Partículas e Explosões (60 FPS)</strong>
                   <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
-                    Explosões luminosas no Canvas da Arena
+                    Efeitos visuais na Arena
                   </div>
                 </div>
                 <button
@@ -1291,9 +1275,9 @@ export default function App() {
 
               <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>Redefinir Dados Locais</strong>
+                  <strong style={{ fontSize: '1.05rem' }}>Redefinir Progresso</strong>
                   <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
-                    Zera recordes e restaura o perfil inicial
+                    Zera recordes locais
                   </div>
                 </div>
                 <button
@@ -1305,7 +1289,7 @@ export default function App() {
                     setSettingsOpen(false);
                   }}
                 >
-                  Resetar Conta
+                  Resetar
                 </button>
               </div>
             </div>
@@ -1314,14 +1298,19 @@ export default function App() {
       )}
 
       {/* =========================================================
-          4. MODAL DE PERFIL & ESTÚDIO DE AVATARES DICEBEAR
+          4. MODAL DE PERFIL NATIVO (SEM MENÇÕES A FONTES EXTERNAS)
          ========================================================= */}
       {profileModalOpen && (
         <div className="pg-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
           <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>{t.profileTitle}</h2>
-              <button type="button" className="pg-illuminated-cta" style={{ minHeight: '42px', padding: '0 18px', fontSize: '0.95rem' }} onClick={() => setProfileModalOpen(false)}>
+              <button
+                type="button"
+                className="pg-illuminated-cta"
+                style={{ minHeight: '42px', padding: '0 20px', fontSize: '0.95rem' }}
+                onClick={() => setProfileModalOpen(false)}
+              >
                 ✓ Salvar
               </button>
             </div>
@@ -1334,7 +1323,7 @@ export default function App() {
               />
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px' }}>
-                  Nome de Exibição:
+                  Nome do Jogador:
                 </label>
                 <input
                   type="text"
@@ -1356,16 +1345,19 @@ export default function App() {
 
             <div>
               <div style={{ fontWeight: 700, marginBottom: '8px' }}>
-                Gerador Customizado DiceBear (Escolha o Estilo + Semente):
+                Personalizar Personagem:
               </div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                {DICEBEAR_STYLE_LIST.map(st => (
+                {AVATAR_STYLE_OPTIONS.map(st => (
                   <button
                     key={st.id}
                     type="button"
                     className={`pg-cat-chip ${profile.avatarStyle === st.id ? 'active' : ''}`}
                     style={{ height: '36px', fontSize: '0.88rem' }}
-                    onClick={() => setProfile(p => ({ ...p, avatarStyle: st.id }))}
+                    onClick={() => {
+                      SoundEngine.hoverTick();
+                      setProfile(p => ({ ...p, avatarStyle: st.id }));
+                    }}
                   >
                     {st.name}
                   </button>
@@ -1375,7 +1367,7 @@ export default function App() {
                 type="text"
                 value={profile.avatarSeed}
                 onChange={e => setProfile(p => ({ ...p, avatarSeed: e.target.value }))}
-                placeholder="Digite qualquer nome/semente para gerar um avatar único..."
+                placeholder="Digite qualquer palavra para criar um visual único..."
                 style={{
                   width: '100%',
                   height: '42px',
@@ -1389,11 +1381,11 @@ export default function App() {
 
             <div>
               <div style={{ fontWeight: 700, marginBottom: '10px' }}>
-                Ou escolha um Avatar Curado da Comunidade:
+                Personagens Prontos:
               </div>
               <div className="avatar-picker-grid">
-                {CURATED_COMMUNITY_AVATARS.map(preset => {
-                  const url = buildDiceBearUrl(preset.style, preset.seed, preset.bg);
+                {CURATED_AVATARS.map(preset => {
+                  const url = buildAvatarUrl(preset.style, preset.seed, preset.bg);
                   const isSelected =
                     profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
                   return (
@@ -1401,14 +1393,15 @@ export default function App() {
                       key={preset.id}
                       type="button"
                       className={`avatar-choice-card ${isSelected ? 'selected' : ''}`}
-                      onClick={() =>
+                      onClick={() => {
+                        SoundEngine.modeSelect();
                         setProfile(p => ({
                           ...p,
                           avatarStyle: preset.style,
                           avatarSeed: preset.seed,
                           avatarBg: preset.bg,
-                        }))
-                      }
+                        }));
+                      }}
                     >
                       <img
                         src={url}

@@ -33,6 +33,15 @@ class WebAudioSynthesizer {
     }
   }
 
+  public hoverTick(): void {
+    this.playTone(540, 'sine', 18, 0.018, 0);
+  }
+
+  public modeSelect(): void {
+    this.playTone(480, 'triangle', 55, 0.05, 0);
+    this.playTone(720, 'sine', 90, 0.06, 35);
+  }
+
   public keyClick(): void {
     this.playTone(680, 'sine', 24, 0.03, 0);
   }
@@ -59,8 +68,9 @@ class WebAudioSynthesizer {
   }
 
   public finish(): void {
-    this.playTone(587.33, 'triangle', 140, 0.09, 0);
-    this.playTone(880, 'triangle', 290, 0.1, 105);
+    this.playTone(523.25, 'triangle', 110, 0.09, 0);
+    this.playTone(659.25, 'triangle', 130, 0.09, 85);
+    this.playTone(880, 'triangle', 320, 0.11, 175);
   }
 }
 

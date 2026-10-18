@@ -3,6 +3,7 @@ import { useEffect, useImperativeHandle, useRef, forwardRef } from 'react';
 export interface ArenaCanvasFXHandle {
   spawnShockwave: (colorHex: string) => void;
   spawnBurst: (colorHex: string, count?: number) => void;
+  spawnConfettiShower: () => void;
 }
 
 interface RingParticle {
@@ -22,7 +23,10 @@ interface SparkParticle {
   alpha: number;
   color: string;
   size: number;
+  gravity?: number;
 }
+
+const CONFETTI_COLORS = ['#22D3EE', '#6366F1', '#10B981', '#F59E0B', '#F43F5E', '#A855F7'];
 
 export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: boolean }>(
   ({ reducedMotion }, ref) => {
@@ -36,29 +40,45 @@ export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: bo
         const c = canvasRef.current;
         ringsRef.current.push({
           x: c.width / 2,
-          y: c.height * 0.38,
-          r: 80,
+          y: c.height * 0.4,
+          r: 75,
           maxR: Math.max(c.width, c.height) * 0.55,
-          alpha: 0.55,
+          alpha: 0.6,
           color: colorHex,
         });
       },
-      spawnBurst(colorHex: string, count = 22) {
+      spawnBurst(colorHex: string, count = 24) {
         if (reducedMotion || !canvasRef.current) return;
         const c = canvasRef.current;
         const cx = c.width / 2;
-        const cy = c.height * 0.38;
+        const cy = c.height * 0.4;
         for (let i = 0; i < count; i++) {
           const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.35;
-          const spd = 2.5 + Math.random() * 5.5;
+          const spd = 2.8 + Math.random() * 6;
           sparksRef.current.push({
-            x: cx + Math.cos(ang) * 60,
-            y: cy + Math.sin(ang) * 60,
+            x: cx + Math.cos(ang) * 55,
+            y: cy + Math.sin(ang) * 55,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd,
             alpha: 0.95,
             color: colorHex,
-            size: 2.5 + Math.random() * 3,
+            size: 2.5 + Math.random() * 3.2,
+          });
+        }
+      },
+      spawnConfettiShower() {
+        if (reducedMotion || !canvasRef.current) return;
+        const c = canvasRef.current;
+        for (let i = 0; i < 65; i++) {
+          sparksRef.current.push({
+            x: c.width * (0.2 + Math.random() * 0.6),
+            y: c.height * 0.25,
+            vx: (Math.random() - 0.5) * 11,
+            vy: -4 - Math.random() * 7,
+            alpha: 1,
+            color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+            size: 3.5 + Math.random() * 3.5,
+            gravity: 0.18,
           });
         }
       },
@@ -71,10 +91,8 @@ export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: bo
       if (!ctx) return;
 
       const handleResize = () => {
-        if (!canvas.parentElement) return;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width || window.innerWidth;
-        canvas.height = rect.height || window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       };
 
       handleResize();
@@ -101,9 +119,15 @@ export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: bo
           const sp = sparksRef.current[i];
           sp.x += sp.vx;
           sp.y += sp.vy;
-          sp.vx *= 0.95;
-          sp.vy *= 0.95;
-          sp.alpha *= 0.91;
+          if (sp.gravity) {
+            sp.vy += sp.gravity;
+            sp.vx *= 0.98;
+            sp.alpha *= 0.985;
+          } else {
+            sp.vx *= 0.95;
+            sp.vy *= 0.95;
+            sp.alpha *= 0.91;
+          }
           ctx.fillStyle = sp.color;
           ctx.globalAlpha = sp.alpha;
           ctx.beginPath();

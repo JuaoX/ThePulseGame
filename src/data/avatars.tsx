@@ -1,11 +1,7 @@
 import React from 'react';
-import { DiceBearStyle, LanguageCode } from '../types/game';
+import { AvatarStyleId, GameModeId, LanguageCode } from '../types/game';
 
-/**
- * Integração Oficial com DiceBear Open-Source Avatar Library (github.com/dicebear/dicebear — 8.2k+ stars)
- * Gera ilustrações vetoriais de alta qualidade (CC0 / MIT)
- */
-export function buildDiceBearUrl(style: DiceBearStyle, seed: string, bgHex: string = '1e293b'): string {
+export function buildAvatarUrl(style: AvatarStyleId, seed: string, bgHex: string = '1e293b'): string {
   const cleanSeed = encodeURIComponent(seed.trim() || 'Pulse');
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${cleanSeed}&backgroundColor=${bgHex}&radius=20`;
 }
@@ -13,12 +9,12 @@ export function buildDiceBearUrl(style: DiceBearStyle, seed: string, bgHex: stri
 export interface CuratedAvatarPreset {
   id: string;
   label: string;
-  style: DiceBearStyle;
+  style: AvatarStyleId;
   seed: string;
   bg: string;
 }
 
-export const CURATED_COMMUNITY_AVATARS: CuratedAvatarPreset[] = [
+export const CURATED_AVATARS: CuratedAvatarPreset[] = [
   { id: 'adv_felix', label: 'Felix', style: 'adventurer', seed: 'Felix', bg: '1e293b' },
   { id: 'adv_amaya', label: 'Amaya', style: 'adventurer', seed: 'Amaya', bg: '312e81' },
   { id: 'lor_kael', label: 'Kael', style: 'lorelei', seed: 'Kael', bg: '0f172a' },
@@ -27,24 +23,21 @@ export const CURATED_COMMUNITY_AVATARS: CuratedAvatarPreset[] = [
   { id: 'bot_nexus', label: 'Nexus-9', style: 'bottts', seed: 'Nexus9', bg: '1e1b4b' },
   { id: 'ava_leo', label: 'Leo', style: 'avataaars', seed: 'LeoPulse', bg: '14532d' },
   { id: 'ava_maya', label: 'Maya', style: 'avataaars', seed: 'MayaPulse', bg: '4c1d95' },
-  { id: 'pix_arcade', label: '8-Bit Hero', style: 'pixel-art', seed: 'ArcadeHero', bg: '1e293b' },
-  { id: 'pix_cyber', label: 'Cyber Ninja', style: 'pixel-art', seed: 'CyberNinja', bg: '31102F' },
+  { id: 'pix_arcade', label: '8-Bit', style: 'pixel-art', seed: 'ArcadeHero', bg: '1e293b' },
+  { id: 'pix_cyber', label: 'Shinobi', style: 'pixel-art', seed: 'CyberNinja', bg: '31102F' },
   { id: 'fun_spark', label: 'Sparky', style: 'fun-emoji', seed: 'Sparky', bg: '1e293b' },
   { id: 'fun_chill', label: 'Vibe', style: 'fun-emoji', seed: 'ChillVibe', bg: '0f292a' },
 ];
 
-export const DICEBEAR_STYLE_LIST: { id: DiceBearStyle; name: string }[] = [
-  { id: 'adventurer', name: 'Adventurer' },
-  { id: 'lorelei', name: 'Lorelei Anime' },
-  { id: 'bottts', name: 'Mecha Bottts' },
-  { id: 'avataaars', name: 'Avataaars' },
-  { id: 'pixel-art', name: 'Pixel Art' },
-  { id: 'fun-emoji', name: 'Fun Emoji' },
+export const AVATAR_STYLE_OPTIONS: { id: AvatarStyleId; name: string }[] = [
+  { id: 'adventurer', name: 'Herói' },
+  { id: 'lorelei', name: 'Anime' },
+  { id: 'bottts', name: 'Mecha' },
+  { id: 'avataaars', name: 'Urbano' },
+  { id: 'pixel-art', name: '8-Bit' },
+  { id: 'fun-emoji', name: 'Arcade' },
 ];
 
-/**
- * Integração Oficial com HatScripts Circle-Flags (github.com/HatScripts/circle-flags — 2.6k+ stars)
- */
 export const LANGUAGE_OPTIONS: {
   code: LanguageCode;
   name: string;
@@ -79,58 +72,43 @@ export const I18N_STRINGS: Record<
     navCustomize: string;
     navLexicon: string;
     navSyllables: string;
-    launchSelected: string;
-    dailySeedLabel: string;
+    playBigBtn: string;
     settingsTitle: string;
     profileTitle: string;
-    playNow: string;
-    bestScore: string;
   }
 > = {
   pt: {
-    navPlay: 'Arenas',
-    navRanked: 'Carreira & Ligas',
+    navPlay: 'Jogar',
+    navRanked: 'Ranqueado',
     navCustomize: 'Avatares',
-    navLexicon: 'Dicionário',
+    navLexicon: 'Palavras',
     navSyllables: 'Sílabas',
-    launchSelected: 'Iniciar Partida Agora',
-    dailySeedLabel: 'Semente Diária Oficial',
-    settingsTitle: 'Configurações do Sistema',
-    profileTitle: 'Seu Perfil & Estúdio de Avatar',
-    playNow: 'Jogar Arena',
-    bestScore: 'Recorde Pessoal',
+    playBigBtn: 'JOGAR AGORA',
+    settingsTitle: 'Configurações do Jogo',
+    profileTitle: 'Seu Perfil & Personagem',
   },
   en: {
-    navPlay: 'Arenas',
-    navRanked: 'Career & Leagues',
+    navPlay: 'Play',
+    navRanked: 'Ranked',
     navCustomize: 'Avatars',
-    navLexicon: 'Dictionary',
+    navLexicon: 'Words',
     navSyllables: 'Syllables',
-    launchSelected: 'Launch Match Now',
-    dailySeedLabel: 'Official Daily Seed',
-    settingsTitle: 'System Settings',
-    profileTitle: 'Your Profile & Avatar Studio',
-    playNow: 'Play Arena',
-    bestScore: 'Personal Best',
+    playBigBtn: 'PLAY NOW',
+    settingsTitle: 'Game Settings',
+    profileTitle: 'Your Profile & Character',
   },
   es: {
-    navPlay: 'Arenas',
-    navRanked: 'Carrera y Ligas',
+    navPlay: 'Jugar',
+    navRanked: 'Clasificatoria',
     navCustomize: 'Avatares',
-    navLexicon: 'Diccionario',
+    navLexicon: 'Palabras',
     navSyllables: 'Sílabas',
-    launchSelected: 'Iniciar Partida Ahora',
-    dailySeedLabel: 'Semilla Diaria Oficial',
-    settingsTitle: 'Configuración del Sistema',
-    profileTitle: 'Tu Perfil y Estudio de Avatar',
-    playNow: 'Jugar Arena',
-    bestScore: 'Récord Personal',
+    playBigBtn: 'JUGAR AHORA',
+    settingsTitle: 'Ajustes del Juego',
+    profileTitle: 'Tu Perfil y Personaje',
   },
 };
 
-/**
- * Logo Oficial Minimalista — The Pulse Game (Squircle Geométrico + Pulso Harmônico)
- */
 export function PulseBrandLogo({ size = 40 }: { size?: number }): React.ReactElement {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-label="The Pulse Game">
@@ -149,7 +127,7 @@ export function PulseBrandLogo({ size = 40 }: { size?: number }): React.ReactEle
         height="58"
         rx="15"
         fill="url(#pulseLogoGrad)"
-        fillOpacity="0.14"
+        fillOpacity="0.16"
         stroke="url(#pulseLogoGrad)"
         strokeWidth="3"
       />
@@ -160,6 +138,96 @@ export function PulseBrandLogo({ size = 40 }: { size?: number }): React.ReactEle
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+/**
+ * Ilustrações Vetoriais Animadas dos 4 Modos de Jogo (Zero Texto Longo, Puro Entretenimento)
+ */
+export function ModeVisualArtwork({ mode }: { mode: GameModeId }): React.ReactElement {
+  if (mode === 'wordbomb') {
+    return (
+      <svg viewBox="0 0 180 110" className="mode-art-svg">
+        <defs>
+          <radialGradient id="bombGlow" cx="50%" cy="55%" r="50%">
+            <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="90" cy="62" r="50" fill="url(#bombGlow)" className="art-pulse-slow" />
+        <path d="M98 28 Q116 12 130 22" fill="none" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" />
+        <circle cx="132" cy="22" r="7" fill="#FACC15" className="art-spark-flicker" />
+        <circle cx="132" cy="22" r="13" fill="#F43F5E" fillOpacity="0.4" className="art-spark-flicker" />
+        <circle cx="88" cy="62" r="34" fill="#111726" stroke="#22D3EE" strokeWidth="3.5" />
+        <rect x="64" y="49" width="48" height="26" rx="7" fill="#090D16" stroke="#38BDF8" strokeWidth="1.5" />
+        <text x="88" y="67" textAnchor="middle" fill="#22D3EE" fontFamily="JetBrains Mono, monospace" fontWeight="800" fontSize="16">
+          PRO
+        </text>
+      </svg>
+    );
+  }
+
+  if (mode === 'daily') {
+    return (
+      <svg viewBox="0 0 180 110" className="mode-art-svg">
+        <defs>
+          <radialGradient id="dailyGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="90" cy="55" r="48" fill="url(#dailyGlow)" className="art-pulse-slow" />
+        <g className="art-float">
+          <rect x="44" y="24" width="38" height="38" rx="9" fill="#10B981" stroke="#34D399" strokeWidth="2" />
+          <text x="63" y="49" textAnchor="middle" fill="#052E16" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="20">
+            24
+          </text>
+          <rect x="92" y="24" width="38" height="38" rx="9" fill="#F59E0B" stroke="#FBBF24" strokeWidth="2" />
+          <text x="111" y="49" textAnchor="middle" fill="#451A03" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="20">
+            H
+          </text>
+          <rect x="44" y="68" width="86" height="18" rx="6" fill="#172033" stroke="#334155" strokeWidth="1.5" />
+          <circle cx="58" cy="77" r="4" fill="#10B981" />
+          <circle cx="76" cy="77" r="4" fill="#10B981" />
+          <circle cx="94" cy="77" r="4" fill="#F59E0B" />
+          <circle cx="112" cy="77" r="4" fill="#38BDF8" />
+        </g>
+      </svg>
+    );
+  }
+
+  if (mode === 'elevator') {
+    return (
+      <svg viewBox="0 0 180 110" className="mode-art-svg">
+        <defs>
+          <radialGradient id="elevGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#F43F5E" stopOpacity="0.42" />
+            <stop offset="100%" stopColor="#F43F5E" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="90" cy="55" r="48" fill="url(#elevGlow)" className="art-pulse-slow" />
+        <rect x="56" y="16" width="68" height="78" rx="12" fill="#141824" stroke="#F43F5E" strokeWidth="2.5" />
+        <line x1="90" y1="22" x2="90" y2="88" stroke="rgba(244,63,94,0.3)" strokeWidth="2" strokeDasharray="4 4" />
+        <g className="art-rise">
+          <path d="M74 52 L90 36 L106 52" fill="none" stroke="#FB7185" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M74 70 L90 54 L106 70" fill="none" stroke="#F43F5E" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 180 110" className="mode-art-svg">
+      <defs>
+        <radialGradient id="classicGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#818CF8" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#818CF8" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle cx="90" cy="55" r="48" fill="url(#classicGlow)" className="art-pulse-slow" />
+      <circle cx="90" cy="56" r="34" fill="#131829" stroke="#818CF8" strokeWidth="3.5" strokeDasharray="160 40" />
+      <polygon points="94,30 74,58 90,58 84,82 108,52 92,52" fill="#FACC15" className="art-spark-flicker" />
     </svg>
   );
 }

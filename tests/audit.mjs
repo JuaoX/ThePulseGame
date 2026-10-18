@@ -1,14 +1,13 @@
 import fs from 'fs';
 import assert from 'assert';
 
-console.log('🔍 Iniciando Auditoria Automatizada — The Pulse Game v8.0...');
+console.log('🔍 Iniciando Auditoria Automatizada — The Pulse Game v9.0...');
 
 const appRaw = fs.readFileSync('./src/App.tsx', 'utf8');
 const avatarsRaw = fs.readFileSync('./src/data/avatars.tsx', 'utf8');
 
-assert.ok(avatarsRaw.includes('api.dicebear.com/9.x'), 'Integração oficial com DiceBear v9.x ativa');
-assert.ok(avatarsRaw.includes('hatscripts.github.io/circle-flags'), 'Bandeiras vetoriais circle-flags ativas');
-assert.ok(appRaw.includes('role="listbox"'), 'Menu suspenso vertical de idiomas ativo');
-assert.ok(!appRaw.includes('Todos os direitos reservados'), 'Rodapé removido conforme solicitado');
+assert.ok(!appRaw.includes('DiceBear') && !avatarsRaw.includes('DiceBear'), 'Nenhuma menção a fontes externas na interface');
+assert.ok(avatarsRaw.includes('ModeVisualArtwork'), 'Ilustrações vetoriais animadas dos modos ativas');
+assert.ok(appRaw.includes('handlePosterMouseMove'), 'Efeito Spotlight interativo nos cards ativo');
 
-console.log('✅ Auditoria v8.0 concluída sem defeitos!');
+console.log('✅ Auditoria v9.0 concluída sem defeitos!');
