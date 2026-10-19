@@ -1,10 +1,10 @@
 import { AvatarStyleId, CategoryId, GameModeId, LanguageCode, PlayerProfile } from '../types/game';
 
-const STORAGE_KEY = 'the_pulse_game_v9_profile';
+const STORAGE_KEY = 'the_pulse_game_v10_profile';
 
 export function createDefaultProfile(): PlayerProfile {
   return {
-    version: 9,
+    version: 10,
     username: 'PulsePlayer',
     avatarStyle: 'adventurer',
     avatarSeed: 'Felix',
@@ -57,7 +57,7 @@ export function sanitizeProfile(raw: unknown): PlayerProfile {
     : {}) as Record<string, unknown>;
 
   return {
-    version: 9,
+    version: 10,
     username: typeof obj.username === 'string' && obj.username.trim().length > 0 ? obj.username.slice(0, 18) : def.username,
     avatarStyle: validStyles.includes(obj.avatarStyle as AvatarStyleId) ? (obj.avatarStyle as AvatarStyleId) : def.avatarStyle,
     avatarSeed: typeof obj.avatarSeed === 'string' && obj.avatarSeed.trim().length > 0 ? obj.avatarSeed.slice(0, 24) : def.avatarSeed,

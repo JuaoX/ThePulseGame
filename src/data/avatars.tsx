@@ -47,13 +47,13 @@ export const LANGUAGE_OPTIONS: {
   {
     code: 'pt',
     name: 'Português (Brasil)',
-    short: 'PT-BR',
+    short: 'PT',
     flagUrl: 'https://hatscripts.github.io/circle-flags/flags/br.svg',
   },
   {
     code: 'en',
     name: 'English (US)',
-    short: 'EN-US',
+    short: 'EN',
     flagUrl: 'https://hatscripts.github.io/circle-flags/flags/us.svg',
   },
   {
@@ -79,7 +79,7 @@ export const I18N_STRINGS: Record<
 > = {
   pt: {
     navPlay: 'Jogar',
-    navRanked: 'Ranqueado',
+    navRanked: 'Ligas',
     navCustomize: 'Avatares',
     navLexicon: 'Palavras',
     navSyllables: 'Sílabas',
@@ -99,7 +99,7 @@ export const I18N_STRINGS: Record<
   },
   es: {
     navPlay: 'Jugar',
-    navRanked: 'Clasificatoria',
+    navRanked: 'Ligas',
     navCustomize: 'Avatares',
     navLexicon: 'Palabras',
     navSyllables: 'Sílabas',
@@ -109,7 +109,7 @@ export const I18N_STRINGS: Record<
   },
 };
 
-export function PulseBrandLogo({ size = 40 }: { size?: number }): React.ReactElement {
+export function PulseBrandLogo({ size = 38 }: { size?: number }): React.ReactElement {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-label="The Pulse Game">
       <defs>
@@ -142,26 +142,23 @@ export function PulseBrandLogo({ size = 40 }: { size?: number }): React.ReactEle
   );
 }
 
-/**
- * Ilustrações Vetoriais Animadas dos 4 Modos de Jogo (Zero Texto Longo, Puro Entretenimento)
- */
 export function ModeVisualArtwork({ mode }: { mode: GameModeId }): React.ReactElement {
   if (mode === 'wordbomb') {
     return (
-      <svg viewBox="0 0 180 110" className="mode-art-svg">
+      <svg viewBox="0 0 180 100" className="mode-art-svg">
         <defs>
           <radialGradient id="bombGlow" cx="50%" cy="55%" r="50%">
             <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.45" />
             <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <circle cx="90" cy="62" r="50" fill="url(#bombGlow)" className="art-pulse-slow" />
-        <path d="M98 28 Q116 12 130 22" fill="none" stroke="#94A3B8" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="132" cy="22" r="7" fill="#FACC15" className="art-spark-flicker" />
-        <circle cx="132" cy="22" r="13" fill="#F43F5E" fillOpacity="0.4" className="art-spark-flicker" />
-        <circle cx="88" cy="62" r="34" fill="#111726" stroke="#22D3EE" strokeWidth="3.5" />
-        <rect x="64" y="49" width="48" height="26" rx="7" fill="#090D16" stroke="#38BDF8" strokeWidth="1.5" />
-        <text x="88" y="67" textAnchor="middle" fill="#22D3EE" fontFamily="JetBrains Mono, monospace" fontWeight="800" fontSize="16">
+        <circle cx="90" cy="56" r="44" fill="url(#bombGlow)" className="art-pulse-slow" />
+        <path d="M98 24 Q116 10 128 20" fill="none" stroke="#94A3B8" strokeWidth="3.5" strokeLinecap="round" />
+        <circle cx="130" cy="20" r="6" fill="#FACC15" className="art-spark-flicker" />
+        <circle cx="130" cy="20" r="11" fill="#F43F5E" fillOpacity="0.4" className="art-spark-flicker" />
+        <circle cx="88" cy="56" r="30" fill="#111726" stroke="#22D3EE" strokeWidth="3" />
+        <rect x="65" y="44" width="46" height="24" rx="6" fill="#090D16" stroke="#38BDF8" strokeWidth="1.5" />
+        <text x="88" y="61" textAnchor="middle" fill="#22D3EE" fontFamily="JetBrains Mono, monospace" fontWeight="800" fontSize="15">
           PRO
         </text>
       </svg>
@@ -170,28 +167,28 @@ export function ModeVisualArtwork({ mode }: { mode: GameModeId }): React.ReactEl
 
   if (mode === 'daily') {
     return (
-      <svg viewBox="0 0 180 110" className="mode-art-svg">
+      <svg viewBox="0 0 180 100" className="mode-art-svg">
         <defs>
           <radialGradient id="dailyGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <circle cx="90" cy="55" r="48" fill="url(#dailyGlow)" className="art-pulse-slow" />
+        <circle cx="90" cy="50" r="44" fill="url(#dailyGlow)" className="art-pulse-slow" />
         <g className="art-float">
-          <rect x="44" y="24" width="38" height="38" rx="9" fill="#10B981" stroke="#34D399" strokeWidth="2" />
-          <text x="63" y="49" textAnchor="middle" fill="#052E16" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="20">
+          <rect x="46" y="20" width="36" height="36" rx="8" fill="#10B981" stroke="#34D399" strokeWidth="2" />
+          <text x="64" y="44" textAnchor="middle" fill="#052E16" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="19">
             24
           </text>
-          <rect x="92" y="24" width="38" height="38" rx="9" fill="#F59E0B" stroke="#FBBF24" strokeWidth="2" />
-          <text x="111" y="49" textAnchor="middle" fill="#451A03" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="20">
+          <rect x="92" y="20" width="36" height="36" rx="8" fill="#F59E0B" stroke="#FBBF24" strokeWidth="2" />
+          <text x="110" y="44" textAnchor="middle" fill="#451A03" fontFamily="Outfit, sans-serif" fontWeight="900" fontSize="19">
             H
           </text>
-          <rect x="44" y="68" width="86" height="18" rx="6" fill="#172033" stroke="#334155" strokeWidth="1.5" />
-          <circle cx="58" cy="77" r="4" fill="#10B981" />
-          <circle cx="76" cy="77" r="4" fill="#10B981" />
-          <circle cx="94" cy="77" r="4" fill="#F59E0B" />
-          <circle cx="112" cy="77" r="4" fill="#38BDF8" />
+          <rect x="46" y="62" width="82" height="16" rx="5" fill="#172033" stroke="#334155" strokeWidth="1.5" />
+          <circle cx="60" cy="70" r="3.5" fill="#10B981" />
+          <circle cx="78" cy="70" r="3.5" fill="#10B981" />
+          <circle cx="96" cy="70" r="3.5" fill="#F59E0B" />
+          <circle cx="114" cy="70" r="3.5" fill="#38BDF8" />
         </g>
       </svg>
     );
@@ -199,35 +196,35 @@ export function ModeVisualArtwork({ mode }: { mode: GameModeId }): React.ReactEl
 
   if (mode === 'elevator') {
     return (
-      <svg viewBox="0 0 180 110" className="mode-art-svg">
+      <svg viewBox="0 0 180 100" className="mode-art-svg">
         <defs>
           <radialGradient id="elevGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#F43F5E" stopOpacity="0.42" />
             <stop offset="100%" stopColor="#F43F5E" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <circle cx="90" cy="55" r="48" fill="url(#elevGlow)" className="art-pulse-slow" />
-        <rect x="56" y="16" width="68" height="78" rx="12" fill="#141824" stroke="#F43F5E" strokeWidth="2.5" />
-        <line x1="90" y1="22" x2="90" y2="88" stroke="rgba(244,63,94,0.3)" strokeWidth="2" strokeDasharray="4 4" />
+        <circle cx="90" cy="50" r="44" fill="url(#elevGlow)" className="art-pulse-slow" />
+        <rect x="58" y="14" width="64" height="72" rx="11" fill="#141824" stroke="#F43F5E" strokeWidth="2.5" />
+        <line x1="90" y1="20" x2="90" y2="80" stroke="rgba(244,63,94,0.3)" strokeWidth="2" strokeDasharray="4 4" />
         <g className="art-rise">
-          <path d="M74 52 L90 36 L106 52" fill="none" stroke="#FB7185" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M74 70 L90 54 L106 70" fill="none" stroke="#F43F5E" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M75 48 L90 33 L105 48" fill="none" stroke="#FB7185" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M75 65 L90 50 L105 65" fill="none" stroke="#F43F5E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
         </g>
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 180 110" className="mode-art-svg">
+    <svg viewBox="0 0 180 100" className="mode-art-svg">
       <defs>
         <radialGradient id="classicGlow" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#818CF8" stopOpacity="0.45" />
           <stop offset="100%" stopColor="#818CF8" stopOpacity="0" />
         </radialGradient>
       </defs>
-      <circle cx="90" cy="55" r="48" fill="url(#classicGlow)" className="art-pulse-slow" />
-      <circle cx="90" cy="56" r="34" fill="#131829" stroke="#818CF8" strokeWidth="3.5" strokeDasharray="160 40" />
-      <polygon points="94,30 74,58 90,58 84,82 108,52 92,52" fill="#FACC15" className="art-spark-flicker" />
+      <circle cx="90" cy="50" r="44" fill="url(#classicGlow)" className="art-pulse-slow" />
+      <circle cx="90" cy="50" r="30" fill="#131829" stroke="#818CF8" strokeWidth="3" strokeDasharray="140 36" />
+      <polygon points="94,26 75,52 90,52 84,74 106,46 91,46" fill="#FACC15" className="art-spark-flicker" />
     </svg>
   );
 }

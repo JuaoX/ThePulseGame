@@ -40,44 +40,44 @@ export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: bo
         const c = canvasRef.current;
         ringsRef.current.push({
           x: c.width / 2,
-          y: c.height * 0.4,
-          r: 75,
-          maxR: Math.max(c.width, c.height) * 0.55,
+          y: c.height * 0.35,
+          r: 65,
+          maxR: Math.max(c.width, c.height) * 0.5,
           alpha: 0.6,
           color: colorHex,
         });
       },
-      spawnBurst(colorHex: string, count = 24) {
+      spawnBurst(colorHex: string, count = 22) {
         if (reducedMotion || !canvasRef.current) return;
         const c = canvasRef.current;
         const cx = c.width / 2;
-        const cy = c.height * 0.4;
+        const cy = c.height * 0.35;
         for (let i = 0; i < count; i++) {
           const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.35;
-          const spd = 2.8 + Math.random() * 6;
+          const spd = 2.5 + Math.random() * 5.5;
           sparksRef.current.push({
-            x: cx + Math.cos(ang) * 55,
-            y: cy + Math.sin(ang) * 55,
+            x: cx + Math.cos(ang) * 45,
+            y: cy + Math.sin(ang) * 45,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd,
             alpha: 0.95,
             color: colorHex,
-            size: 2.5 + Math.random() * 3.2,
+            size: 2.2 + Math.random() * 3,
           });
         }
       },
       spawnConfettiShower() {
         if (reducedMotion || !canvasRef.current) return;
         const c = canvasRef.current;
-        for (let i = 0; i < 65; i++) {
+        for (let i = 0; i < 60; i++) {
           sparksRef.current.push({
-            x: c.width * (0.2 + Math.random() * 0.6),
-            y: c.height * 0.25,
-            vx: (Math.random() - 0.5) * 11,
-            vy: -4 - Math.random() * 7,
+            x: c.width * (0.15 + Math.random() * 0.7),
+            y: c.height * 0.22,
+            vx: (Math.random() - 0.5) * 10,
+            vy: -4 - Math.random() * 6,
             alpha: 1,
             color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-            size: 3.5 + Math.random() * 3.5,
+            size: 3 + Math.random() * 3.5,
             gravity: 0.18,
           });
         }

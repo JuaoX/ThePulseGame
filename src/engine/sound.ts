@@ -34,16 +34,16 @@ class WebAudioSynthesizer {
   }
 
   public hoverTick(): void {
-    this.playTone(540, 'sine', 18, 0.018, 0);
+    this.playTone(540, 'sine', 16, 0.015, 0);
   }
 
   public modeSelect(): void {
-    this.playTone(480, 'triangle', 55, 0.05, 0);
-    this.playTone(720, 'sine', 90, 0.06, 35);
+    this.playTone(480, 'triangle', 50, 0.045, 0);
+    this.playTone(720, 'sine', 85, 0.055, 32);
   }
 
   public keyClick(): void {
-    this.playTone(680, 'sine', 24, 0.03, 0);
+    this.playTone(680, 'sine', 22, 0.028, 0);
   }
 
   public hit(streak: number): void {

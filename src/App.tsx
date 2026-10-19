@@ -81,7 +81,6 @@ export default function App() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
 
-  // Estado da partida ativa
   const [inMatch, setInMatch] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [matchClock, setMatchClock] = useState(60.0);
@@ -403,7 +402,7 @@ export default function App() {
     setFeedback({
       visible: true,
       tone: 'positive',
-      title: `🛡️ +${amount} PTS BLINDADOS NO COFRE!${hadHighStreak ? ' (+1,5s EXTRA)' : ''}`,
+      title: `🛡️ +${amount} PTS BLINDADOS!${hadHighStreak ? ' (+1,5s EXTRA)' : ''}`,
       detail: '100% garantidos na partida!',
     });
   };
@@ -534,7 +533,7 @@ export default function App() {
       visible: true,
       tone: 'positive',
       title: `✓ "${validation.normalized}" +${earned} PTS (${st.combo.toFixed(1)}X)`,
-      detail: 'Aperte TAB para blindar no cofre!',
+      detail: 'Toque em BLINDAR para salvar os pontos no cofre!',
     });
   };
 
@@ -654,7 +653,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   });
 
-  // Spotlight radial que segue o mouse nos cartões
   const handlePosterMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -670,7 +668,7 @@ export default function App() {
   return (
     <div className="pg-shell">
       {/* =========================================================
-          1. BARRA SUPERIOR DE ESTÚDIO
+          1. BARRA SUPERIOR (NUNCA QUEBRA LINHA NEM CORTA NO CELULAR)
          ========================================================= */}
       <header className="pg-navbar">
         <div className="pg-nav-left">
@@ -696,11 +694,11 @@ export default function App() {
               setActiveTab('play');
             }}
           >
-            <PulseBrandLogo size={40} />
+            <PulseBrandLogo size={36} />
             <span className="pg-brand-text">THE PULSE</span>
           </button>
 
-          <nav className="pg-nav-links" aria-label="Menu">
+          <nav className="pg-nav-links" aria-label="Menu Desktop">
             {(
               [
                 ['play', t.navPlay],
@@ -728,13 +726,13 @@ export default function App() {
 
         <div className="pg-nav-right">
           <div className="pg-stat-pill" title="Moedas">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#F59E0B">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#F59E0B">
               <circle cx="12" cy="12" r="10" />
             </svg>
             <span>{profile.coins}</span>
           </div>
 
-          <div className="pg-stat-pill" title="XP">
+          <div className="pg-stat-pill hide-xs" title="XP">
             <span style={{ color: 'var(--pg-cyan-bright)' }}>⚡</span>
             <span>{profile.careerXP}</span>
           </div>
@@ -761,9 +759,6 @@ export default function App() {
             >
               <img src={activeLangMeta.flagUrl} alt={activeLangMeta.short} className="pg-flag-img" />
               <span>{activeLangMeta.short}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
             </button>
 
             {langDropdownOpen && (
@@ -798,7 +793,7 @@ export default function App() {
       </header>
 
       {/* =========================================================
-          2. PALCO CENTRAL DE ENTRETENIMENTO (PÔSTERES VISUAIS + SPOTLIGHT)
+          2. CONTEÚDO CENTRAL MOBILE-FIRST
          ========================================================= */}
       <main className="pg-main-container">
         {inMatch ? (
@@ -806,15 +801,15 @@ export default function App() {
             <ArenaCanvasFX ref={fxRef} reducedMotion={profile.reducedMotion} />
 
             <div className="arena-hud-bar">
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 900 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 900 }}>
                 {selectedVisualMeta.title}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {(matchRef.current.mode === 'wordbomb' || matchRef.current.mode === 'elevator') && (
-                  <div style={{ fontSize: '1.4rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
+                  <div style={{ fontSize: '1.25rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
                     {[0, 1, 2].map(i => (
-                      <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '4px' }}>
+                      <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '3px' }}>
                         ♥
                       </span>
                     ))}
@@ -825,7 +820,7 @@ export default function App() {
                   <div
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '2.05rem',
+                      fontSize: '1.65rem',
                       fontWeight: 800,
                       color: matchClock <= 10 ? 'var(--pg-coral)' : 'var(--pg-text-bright)',
                     }}
@@ -844,7 +839,6 @@ export default function App() {
               <div className="vault-card safe">
                 <div className="vault-title">
                   <span>🛡️ Cofre</span>
-                  <span>Seguro</span>
                 </div>
                 <div className="vault-value" style={{ color: 'var(--pg-emerald)' }}>
                   {safeScore}
@@ -854,17 +848,16 @@ export default function App() {
               <button
                 type="button"
                 className="pg-illuminated-cta"
-                style={{ height: '100%', minHeight: '64px', fontSize: '1.08rem' }}
+                style={{ minWidth: 'auto', minHeight: '54px', padding: '0 16px', fontSize: '0.96rem' }}
                 disabled={riskScore <= 0}
                 onClick={handleProtectPulse}
               >
-                🛡️ Blindar +{riskScore} [TAB]
+                🛡️ Blindar +{riskScore}
               </button>
 
               <div className="vault-card risk">
                 <div className="vault-title">
-                  <span>⚡ Risco</span>
-                  <span>{combo.toFixed(1)}x</span>
+                  <span>⚡ {combo.toFixed(1)}x</span>
                 </div>
                 <div className="vault-value" style={{ color: 'var(--pg-gold)' }}>
                   {riskScore}
@@ -889,20 +882,20 @@ export default function App() {
                   />
                 </svg>
                 <div className="bomb-core-circle">
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--pg-text-muted)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--pg-text-muted)' }}>
                     {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
                   </span>
                   <div
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '2.45rem',
+                      fontSize: '2rem',
                       fontWeight: 800,
                       color: 'var(--pg-cyan-bright)',
                     }}
                   >
                     {matchRef.current.mode === 'wordbomb' ? currentSyllable.syl : `${combo.toFixed(1)}x`}
                   </div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', color: 'var(--pg-gold)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: 'var(--pg-gold)' }}>
                     {fuseClock.toFixed(1)}s
                   </span>
                 </div>
@@ -910,12 +903,14 @@ export default function App() {
 
               {matchRef.current.mode === 'wordbomb' ? (
                 <>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.38rem', textAlign: 'center' }}>
                     Palavra com <span style={{ color: 'var(--pg-cyan-bright)' }}>{currentSyllable.syl}</span>
                   </h2>
-                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.98rem' }}>{currentSyllable.hint}</p>
+                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.9rem', textAlign: 'center' }}>
+                    {currentSyllable.hint}
+                  </p>
 
-                  <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '520px' }}>
+                  <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '520px' }}>
                     <input
                       type="text"
                       value={typedWord}
@@ -932,13 +927,14 @@ export default function App() {
                       placeholder="DIGITE AQUI..."
                       style={{
                         flex: 1,
-                        height: '56px',
+                        minWidth: 0,
+                        height: '52px',
                         backgroundColor: 'var(--pg-bg)',
                         border: '2px solid var(--pg-indigo-light)',
-                        borderRadius: '14px',
-                        padding: '0 18px',
+                        borderRadius: '13px',
+                        padding: '0 14px',
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '1.35rem',
+                        fontSize: '1.2rem',
                         fontWeight: 800,
                         textTransform: 'uppercase',
                       }}
@@ -947,7 +943,7 @@ export default function App() {
                     <button
                       type="button"
                       className="pg-illuminated-cta"
-                      style={{ minHeight: '56px', padding: '0 26px', fontSize: '1.05rem' }}
+                      style={{ minWidth: 'auto', minHeight: '52px', padding: '0 22px', fontSize: '1rem', flex: 'none' }}
                       onClick={handleWordBombSubmit}
                     >
                       OK
@@ -956,7 +952,7 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', textAlign: 'center' }}>
                     {currentQuestion?.prompt}
                   </h2>
 
@@ -976,8 +972,8 @@ export default function App() {
                         >
                           <span
                             style={{
-                              width: '32px',
-                              height: '32px',
+                              width: '30px',
+                              height: '30px',
                               borderRadius: '8px',
                               backgroundColor: 'var(--pg-bg)',
                               display: 'inline-flex',
@@ -985,6 +981,7 @@ export default function App() {
                               justifyContent: 'center',
                               fontFamily: 'var(--font-mono)',
                               color: 'var(--pg-cyan-bright)',
+                              flexShrink: 0,
                             }}
                           >
                             {idx + 1}
@@ -1001,15 +998,15 @@ export default function App() {
                 <div
                   style={{
                     width: '100%',
-                    padding: '14px 18px',
-                    borderRadius: '14px',
+                    padding: '12px 16px',
+                    borderRadius: '13px',
                     backgroundColor:
                       feedback.tone === 'positive' ? 'rgba(16, 185, 129, 0.16)' : 'rgba(244, 63, 94, 0.16)',
                     border: `1px solid ${feedback.tone === 'positive' ? '#10B981' : '#F43F5E'}`,
                   }}
                 >
-                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>{feedback.title}</div>
-                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.95rem', marginTop: '2px' }}>
+                  <div style={{ fontWeight: 800, fontSize: '1rem' }}>{feedback.title}</div>
+                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.9rem', marginTop: '2px' }}>
                     {feedback.detail}
                   </div>
                 </div>
@@ -1018,43 +1015,37 @@ export default function App() {
           </div>
         ) : activeTab === 'play' ? (
           <>
-            {/* 4 PÔSTERES ILUSTRADOS E ANIMADOS COM SPOTLIGHT (ZERO TEXTÃO) */}
-            <section className="pg-posters-grid" aria-label="Modos de Jogo">
-              {VISUAL_MODES.map(mode => {
-                const isSelected = profile.selectedMode === mode.id;
-                const best = profile.bestScores[mode.id] || 0;
-                return (
-                  <div
-                    key={mode.id}
-                    className={`pg-poster-card ${isSelected ? 'selected' : ''}`}
-                    style={{ '--poster-accent': mode.accent } as React.CSSProperties}
-                    onMouseMove={handlePosterMouseMove}
-                    onMouseEnter={() => SoundEngine.hoverTick()}
-                    onClick={() => {
-                      SoundEngine.modeSelect();
-                      setProfile(p => ({ ...p, selectedMode: mode.id }));
-                    }}
-                    onDoubleClick={() => startNewMatch(mode.id, profile.selectedCategory)}
-                  >
-                    <div className="pg-poster-art-box">
-                      <ModeVisualArtwork mode={mode.id} />
-                    </div>
-
-                    <div className="pg-poster-title">{mode.title}</div>
-
-                    <div className="pg-poster-pills">
-                      <span className="pg-mini-badge">{mode.badges[0]}</span>
-                      <span className="pg-mini-badge">{mode.badges[1]}</span>
-                    </div>
-
-                    <div className="pg-poster-record">★ {best} pts</div>
-                  </div>
-                );
-              })}
-            </section>
-
-            {/* CONSOLE CENTRAL DE AÇÃO IMEDIATA */}
+            {/* CONSOLE CENTRAL DE AÇÃO IMEDIATA (SEMPRE VISÍVEL ACIMA DA DOBRA NO CELULAR) */}
             <section className="pg-action-dock">
+              <div className="pg-action-buttons-row">
+                <button
+                  type="button"
+                  className="pg-illuminated-cta"
+                  onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
+                >
+                  ▶ {t.playBigBtn}: {selectedVisualMeta.title}
+                </button>
+
+                <button
+                  type="button"
+                  className="pg-rank-showcase-btn"
+                  onClick={() => {
+                    SoundEngine.modeSelect();
+                    setActiveTab('ranked');
+                  }}
+                >
+                  <div className="pg-rank-emblem">{leagueInfo.tierCode}</div>
+                  <div style={{ textAlign: 'left', lineHeight: 1.15 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--pg-text-muted)' }}>
+                      LIGA
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.98rem', fontWeight: 900 }}>
+                      {leagueInfo.division}
+                    </div>
+                  </div>
+                </button>
+              </div>
+
               {profile.selectedMode === 'classic' && (
                 <div className="pg-cat-row">
                   {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
@@ -1072,53 +1063,69 @@ export default function App() {
                   ))}
                 </div>
               )}
+            </section>
 
-              <div className="pg-action-buttons-row">
-                <button
-                  type="button"
-                  className="pg-illuminated-cta"
-                  onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
-                >
-                  ▶ {t.playBigBtn} — {selectedVisualMeta.title.toUpperCase()}
-                </button>
-
-                <button
-                  type="button"
-                  className="pg-rank-showcase-btn"
-                  onClick={() => {
-                    SoundEngine.modeSelect();
-                    setActiveTab('ranked');
-                  }}
-                >
-                  <div className="pg-rank-emblem">{leagueInfo.tierCode}</div>
-                  <div style={{ textAlign: 'left', lineHeight: 1.15 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--pg-text-muted)' }}>
-                      LIGA ATUAL
+            {/* 4 PÔSTERES ILUSTRADOS COMPACTOS COM BOTÃO DIRETO "JOGAR ▶" */}
+            <section className="pg-posters-grid" aria-label="Modos de Jogo">
+              {VISUAL_MODES.map(mode => {
+                const isSelected = profile.selectedMode === mode.id;
+                const best = profile.bestScores[mode.id] || 0;
+                return (
+                  <div
+                    key={mode.id}
+                    className={`pg-poster-card ${isSelected ? 'selected' : ''}`}
+                    style={{ '--poster-accent': mode.accent } as React.CSSProperties}
+                    onMouseMove={handlePosterMouseMove}
+                    onClick={() => {
+                      SoundEngine.modeSelect();
+                      setProfile(p => ({ ...p, selectedMode: mode.id }));
+                    }}
+                  >
+                    <div className="pg-poster-art-box">
+                      <ModeVisualArtwork mode={mode.id} />
                     </div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 900 }}>
-                      {leagueInfo.division}
+
+                    <div className="pg-poster-title">{mode.title}</div>
+
+                    <div className="pg-poster-pills">
+                      <span className="pg-mini-badge">{mode.badges[0]}</span>
+                      <span className="pg-mini-badge">{mode.badges[1]}</span>
+                    </div>
+
+                    <div className="pg-poster-bottom-row">
+                      <span className="pg-poster-record">★ {best}</span>
+                      <button
+                        type="button"
+                        className="pg-card-quickplay"
+                        onClick={e => {
+                          e.stopPropagation();
+                          startNewMatch(mode.id, profile.selectedCategory);
+                        }}
+                      >
+                        Jogar ▶
+                      </button>
                     </div>
                   </div>
-                </button>
-              </div>
+                );
+              })}
             </section>
           </>
         ) : activeTab === 'ranked' ? (
           <section className="pg-action-dock" style={{ maxWidth: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', width: '100%' }}>
               <img
                 src={playerAvatarUrl}
                 alt={profile.username}
-                style={{ width: '78px', height: '78px', borderRadius: '20px', border: '2px solid var(--pg-indigo-light)' }}
+                style={{ width: '72px', height: '72px', borderRadius: '18px', border: '2px solid var(--pg-indigo-light)' }}
               />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: '180px' }}>
                 <span className="pg-mini-badge" style={{ color: 'var(--pg-cyan-bright)' }}>
                   {leagueInfo.division}
                 </span>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', marginTop: '6px' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', marginTop: '4px' }}>
                   {profile.username} — {profile.careerXP} XP
                 </h2>
-                <p style={{ color: 'var(--pg-text-muted)' }}>
+                <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
                   Próxima divisão em {leagueInfo.nextXp} XP • Combo Máximo: {profile.highestComboEver.toFixed(1)}x
                 </p>
               </div>
@@ -1129,7 +1136,7 @@ export default function App() {
           </section>
         ) : activeTab === 'customize' ? (
           <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', textAlign: 'center' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', textAlign: 'center' }}>
               Coleção de Personagens
             </h2>
             <div className="avatar-picker-grid">
@@ -1154,9 +1161,9 @@ export default function App() {
                     <img
                       src={url}
                       alt={preset.label}
-                      style={{ width: '68px', height: '68px', borderRadius: '16px' }}
+                      style={{ width: '58px', height: '58px', borderRadius: '14px' }}
                     />
-                    <strong style={{ fontSize: '0.96rem' }}>{preset.label}</strong>
+                    <strong style={{ fontSize: '0.88rem' }}>{preset.label}</strong>
                   </button>
                 );
               })}
@@ -1164,7 +1171,7 @@ export default function App() {
           </section>
         ) : activeTab === 'lexicon' ? (
           <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>
               Dicionário do Jogo ({PORTUGUESE_WORD_SET.size} palavras)
             </h2>
             <input
@@ -1173,18 +1180,18 @@ export default function App() {
               onChange={e => setWordSearchQuery(e.target.value)}
               placeholder="Consultar palavra..."
               style={{
-                height: '54px',
+                height: '50px',
                 backgroundColor: 'var(--pg-bg)',
                 border: '2px solid var(--pg-border-strong)',
-                borderRadius: '14px',
-                padding: '0 18px',
+                borderRadius: '12px',
+                padding: '0 16px',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '1.15rem',
+                fontSize: '1.1rem',
                 textTransform: 'uppercase',
               }}
             />
             {wordSearchQuery.trim().length >= 2 && (
-              <div style={{ fontWeight: 800, fontSize: '1.08rem' }}>
+              <div style={{ fontWeight: 800, fontSize: '1rem' }}>
                 {PORTUGUESE_WORD_SET.has(
                   wordSearchQuery
                     .trim()
@@ -1205,20 +1212,19 @@ export default function App() {
               <div
                 key={item.syl}
                 className="pg-poster-card"
-                onMouseMove={handlePosterMouseMove}
                 onClick={() => startNewMatch('wordbomb')}
               >
                 <div
                   style={{
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '2rem',
+                    fontSize: '1.85rem',
                     fontWeight: 900,
                     color: 'var(--pg-cyan-bright)',
                   }}
                 >
                   {item.syl}
                 </div>
-                <div style={{ fontSize: '0.88rem', color: 'var(--pg-text-muted)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.82rem', color: 'var(--pg-text-muted)', textAlign: 'center' }}>
                   {item.hint}
                 </div>
               </div>
@@ -1228,24 +1234,106 @@ export default function App() {
       </main>
 
       {/* =========================================================
-          3. MODAL DE CONFIGURAÇÕES
+          3. BARRA DE NAVEGAÇÃO INFERIOR NATIVA PARA MOBILE (< 860PX)
+         ========================================================= */}
+      {!inMatch && (
+        <nav className="pg-bottom-nav" aria-label="Navegação Mobile">
+          <button
+            type="button"
+            className={`pg-bnav-item ${activeTab === 'play' ? 'active' : ''}`}
+            onClick={() => {
+              SoundEngine.hoverTick();
+              setActiveTab('play');
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            <span>{t.navPlay}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`pg-bnav-item ${activeTab === 'ranked' ? 'active' : ''}`}
+            onClick={() => {
+              SoundEngine.hoverTick();
+              setActiveTab('ranked');
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" />
+            </svg>
+            <span>{t.navRanked}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`pg-bnav-item ${activeTab === 'customize' ? 'active' : ''}`}
+            onClick={() => {
+              SoundEngine.hoverTick();
+              setActiveTab('customize');
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <circle cx="12" cy="8" r="5" />
+              <path d="M20 21a8 8 0 1 0-16 0" />
+            </svg>
+            <span>{t.navCustomize}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`pg-bnav-item ${activeTab === 'lexicon' ? 'active' : ''}`}
+            onClick={() => {
+              SoundEngine.hoverTick();
+              setActiveTab('lexicon');
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            <span>{t.navLexicon}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`pg-bnav-item ${activeTab === 'syllables' ? 'active' : ''}`}
+            onClick={() => {
+              SoundEngine.hoverTick();
+              setActiveTab('syllables');
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span>{t.navSyllables}</span>
+          </button>
+        </nav>
+      )}
+
+      {/* =========================================================
+          4. MODAL DE CONFIGURAÇÕES
          ========================================================= */}
       {settingsOpen && (
         <div className="pg-modal-backdrop" onClick={() => setSettingsOpen(false)}>
           <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>{t.settingsTitle}</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem' }}>{t.settingsTitle}</h2>
               <button type="button" className="pg-secondary-btn" onClick={() => setSettingsOpen(false)}>
                 ✕ Fechar
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>Volume dos Efeitos Sonoros</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
-                    Intensidade atual: {profile.sfxVolume}%
+                  <strong style={{ fontSize: '1rem' }}>Volume dos Efeitos Sonoros</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
+                    Intensidade: {profile.sfxVolume}%
                   </div>
                 </div>
                 <input
@@ -1259,8 +1347,8 @@ export default function App() {
 
               <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>Partículas e Explosões (60 FPS)</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
+                  <strong style={{ fontSize: '1rem' }}>Partículas e Explosões (60 FPS)</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
                     Efeitos visuais na Arena
                   </div>
                 </div>
@@ -1269,14 +1357,14 @@ export default function App() {
                   className="pg-secondary-btn"
                   onClick={() => setProfile(p => ({ ...p, reducedMotion: !p.reducedMotion }))}
                 >
-                  {profile.reducedMotion ? 'Reduzido' : 'Máximo (60 FPS)'}
+                  {profile.reducedMotion ? 'Reduzido' : 'Máximo'}
                 </button>
               </div>
 
               <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong style={{ fontSize: '1.05rem' }}>Redefinir Progresso</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
+                  <strong style={{ fontSize: '1rem' }}>Redefinir Progresso</strong>
+                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
                     Zera recordes locais
                   </div>
                 </div>
@@ -1298,31 +1386,31 @@ export default function App() {
       )}
 
       {/* =========================================================
-          4. MODAL DE PERFIL NATIVO (SEM MENÇÕES A FONTES EXTERNAS)
+          5. MODAL DE PERFIL NATIVO
          ========================================================= */}
       {profileModalOpen && (
         <div className="pg-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
           <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>{t.profileTitle}</h2>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem' }}>{t.profileTitle}</h2>
               <button
                 type="button"
                 className="pg-illuminated-cta"
-                style={{ minHeight: '42px', padding: '0 20px', fontSize: '0.95rem' }}
+                style={{ minWidth: 'auto', minHeight: '40px', padding: '0 18px', fontSize: '0.92rem', flex: 'none' }}
                 onClick={() => setProfileModalOpen(false)}
               >
                 ✓ Salvar
               </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <img
                 src={playerAvatarUrl}
                 alt={profile.username}
-                style={{ width: '76px', height: '76px', borderRadius: '18px', border: '2px solid var(--pg-indigo-light)' }}
+                style={{ width: '68px', height: '68px', borderRadius: '16px', border: '2px solid var(--pg-indigo-light)' }}
               />
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontWeight: 700, marginBottom: '4px', fontSize: '0.92rem' }}>
                   Nome do Jogador:
                 </label>
                 <input
@@ -1332,11 +1420,11 @@ export default function App() {
                   onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}
                   style={{
                     width: '100%',
-                    height: '44px',
+                    height: '42px',
                     backgroundColor: 'var(--pg-bg)',
                     border: '1px solid var(--pg-border-strong)',
                     borderRadius: '10px',
-                    padding: '0 14px',
+                    padding: '0 12px',
                     fontWeight: 700,
                   }}
                 />
@@ -1344,16 +1432,16 @@ export default function App() {
             </div>
 
             <div>
-              <div style={{ fontWeight: 700, marginBottom: '8px' }}>
-                Personalizar Personagem:
+              <div style={{ fontWeight: 700, marginBottom: '8px', fontSize: '0.92rem' }}>
+                Estilo do Personagem:
               </div>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
                 {AVATAR_STYLE_OPTIONS.map(st => (
                   <button
                     key={st.id}
                     type="button"
                     className={`pg-cat-chip ${profile.avatarStyle === st.id ? 'active' : ''}`}
-                    style={{ height: '36px', fontSize: '0.88rem' }}
+                    style={{ height: '34px', fontSize: '0.84rem' }}
                     onClick={() => {
                       SoundEngine.hoverTick();
                       setProfile(p => ({ ...p, avatarStyle: st.id }));
@@ -1370,17 +1458,17 @@ export default function App() {
                 placeholder="Digite qualquer palavra para criar um visual único..."
                 style={{
                   width: '100%',
-                  height: '42px',
+                  height: '40px',
                   backgroundColor: 'var(--pg-bg)',
                   border: '1px solid var(--pg-border-strong)',
                   borderRadius: '10px',
-                  padding: '0 14px',
+                  padding: '0 12px',
                 }}
               />
             </div>
 
             <div>
-              <div style={{ fontWeight: 700, marginBottom: '10px' }}>
+              <div style={{ fontWeight: 700, marginBottom: '8px', fontSize: '0.92rem' }}>
                 Personagens Prontos:
               </div>
               <div className="avatar-picker-grid">
@@ -1406,9 +1494,9 @@ export default function App() {
                       <img
                         src={url}
                         alt={preset.label}
-                        style={{ width: '58px', height: '58px', borderRadius: '14px' }}
+                        style={{ width: '52px', height: '52px', borderRadius: '12px' }}
                       />
-                      <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>{preset.label}</span>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>{preset.label}</span>
                     </button>
                   );
                 })}
@@ -1419,23 +1507,24 @@ export default function App() {
       )}
 
       {/* =========================================================
-          5. MODAL PÓS-PARTIDA
+          6. MODAL PÓS-PARTIDA
          ========================================================= */}
       {postMatchModal && (
         <div className="pg-modal-backdrop" onClick={() => setPostMatchModal(null)}>
           <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-cyan-bright)', fontWeight: 800 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-cyan-bright)', fontWeight: 800, fontSize: '0.86rem' }}>
                   FIM DE PARTIDA • +{postMatchModal.coinsEarned} MOEDAS
                 </span>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.9rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem' }}>
                   {postMatchModal.finalScore} Pontos
                 </h2>
               </div>
               <button
                 type="button"
                 className="pg-illuminated-cta"
+                style={{ minWidth: 'auto', minHeight: '44px', padding: '0 20px', fontSize: '0.96rem', flex: 'none' }}
                 onClick={() => {
                   const m = profile.selectedMode;
                   setPostMatchModal(null);
@@ -1448,10 +1537,10 @@ export default function App() {
             <pre
               style={{
                 backgroundColor: 'var(--pg-bg)',
-                padding: '16px',
+                padding: '14px',
                 borderRadius: '12px',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.94rem',
+                fontSize: '0.88rem',
                 whiteSpace: 'pre-wrap',
               }}
             >
