@@ -1,0 +1,8 @@
+{
+  "disposition": "ship",
+  "scope": "User-requested simplification of incumbent four-game portal",
+  "materialIssue": "Word syllable was disconnected from the focused input",
+  "resolution": "Complete changing live prompt associated through aria-describedby; visual duplicate aria-hidden",
+  "verification": "Independent scoped re-review and passing final browser assertions",
+  "limits": ["No physical mobile keyboard verification", "No actual screen-reader session"]
+}

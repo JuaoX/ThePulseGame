@@ -1,0 +1,14 @@
+{
+  "source": "https://github.com/fserb/pt-br",
+  "commit": "93ba2a6f3b2f85262fba72df09d448c6bb2fa50a",
+  "license": "MIT",
+  "files": [
+    "lexico",
+    "conjugações"
+  ],
+  "editorialAdditions": 28,
+  "normalization": "NFC; one word; 3–32 letters; compare accents using separate NFD keys",
+  "entries": 317695,
+  "bytes": 3530316,
+  "sha256": "ebcbef3429696006e85f167c3ba10e2be03b3e07c9ac609131c1c9d7c816254f"
+}

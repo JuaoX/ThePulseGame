@@ -1,0 +1,3 @@
+# Quality bar
+
+Six immediate experiences, minimal Portuguese copy, no technical credits or marketing entry. Native crossword cells at least 44px, complete clue readable outside the panning grid, reliable continuous typing and same-letter replacement, directional navigation and shared letters. Three real assistance levels over imported editions. Save/restore and clear confirmation must work; Tab must have an exit. Timed words remain timed for old profiles. Character purchase is atomic and effects cannot change rules. Mobile widths 320/390/768 and wide 1440, reduced motion, persisted mute and bounded hover sound. No physical-device or worldwide-originality claims.

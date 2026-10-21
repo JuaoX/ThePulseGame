@@ -2,8 +2,19 @@ import React from 'react';
 import { AvatarStyleId, GameModeId, LanguageCode } from '../types/game';
 
 export function buildAvatarUrl(style: AvatarStyleId, seed: string, bgHex: string = '1e293b'): string {
-  const cleanSeed = encodeURIComponent(seed.trim() || 'Pulse');
-  return `https://api.dicebear.com/9.x/${style}/svg?seed=${cleanSeed}&backgroundColor=${bgHex}&radius=20`;
+  const normalizedSeed = seed.trim() || 'Pulse';
+  const background = /^[0-9a-f]{6}$/i.test(bgHex) ? bgHex.toLowerCase() : '1e293b';
+  const preset = CURATED_AVATARS.find(item =>
+    item.style === style && item.seed === normalizedSeed && item.bg.toLowerCase() === background
+  );
+  if (preset) return `${import.meta.env.BASE_URL}avatars/${preset.id}.svg`;
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(normalizedSeed)}&backgroundColor=${background}&radius=20`;
+}
+
+export function handleAvatarError(event: React.SyntheticEvent<HTMLImageElement>): void {
+  const image = event.currentTarget;
+  const fallback = `${import.meta.env.BASE_URL}avatars/lor_kael.svg`;
+  if (image.getAttribute('src') !== fallback) image.src = fallback;
 }
 
 export interface CuratedAvatarPreset {
@@ -15,18 +26,12 @@ export interface CuratedAvatarPreset {
 }
 
 export const CURATED_AVATARS: CuratedAvatarPreset[] = [
-  { id: 'adv_felix', label: 'Felix', style: 'adventurer', seed: 'Felix', bg: '1e293b' },
-  { id: 'adv_amaya', label: 'Amaya', style: 'adventurer', seed: 'Amaya', bg: '312e81' },
   { id: 'lor_kael', label: 'Kael', style: 'lorelei', seed: 'Kael', bg: '0f172a' },
   { id: 'lor_luna', label: 'Luna', style: 'lorelei', seed: 'Luna', bg: '3b0764' },
-  { id: 'bot_volt', label: 'Volt-X', style: 'bottts', seed: 'VoltX', bg: '083344' },
-  { id: 'bot_nexus', label: 'Nexus-9', style: 'bottts', seed: 'Nexus9', bg: '1e1b4b' },
   { id: 'ava_leo', label: 'Leo', style: 'avataaars', seed: 'LeoPulse', bg: '14532d' },
   { id: 'ava_maya', label: 'Maya', style: 'avataaars', seed: 'MayaPulse', bg: '4c1d95' },
   { id: 'pix_arcade', label: '8-Bit', style: 'pixel-art', seed: 'ArcadeHero', bg: '1e293b' },
   { id: 'pix_cyber', label: 'Shinobi', style: 'pixel-art', seed: 'CyberNinja', bg: '31102F' },
-  { id: 'fun_spark', label: 'Sparky', style: 'fun-emoji', seed: 'Sparky', bg: '1e293b' },
-  { id: 'fun_chill', label: 'Vibe', style: 'fun-emoji', seed: 'ChillVibe', bg: '0f292a' },
 ];
 
 export const AVATAR_STYLE_OPTIONS: { id: AvatarStyleId; name: string }[] = [

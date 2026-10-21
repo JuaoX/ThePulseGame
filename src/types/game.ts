@@ -12,6 +12,9 @@ export interface QuestionItem {
   options: [string, string, string, string];
   correctIndex: 0 | 1 | 2 | 3;
   explanation: string;
+  skill?: string;
+  context?: string;
+  transfer?: boolean;
 }
 
 export interface SyllableChallenge {
@@ -29,6 +32,10 @@ export interface AnswerHistoryItem {
   isCorrect: boolean;
   pointsDelta: number;
   explanation: string;
+  questionId?: string;
+  skill?: string;
+  transfer?: boolean;
+  question?: QuestionItem;
 }
 
 export interface DailyAttemptRecord {
@@ -64,4 +71,13 @@ export interface PlayerProfile {
   bestScores: Record<GameModeId, number>;
   bestCategoryScores: Record<CategoryId, number>;
   dailyHistory: Record<string, DailyAttemptRecord>;
+  relaxedMode: boolean;
+  autoAdvance: boolean;
+  fragments: number;
+  ownedCharacters: string[];
+  equippedCharacter: string;
+  discoveries: string[];
+  recentQuestionIds: string[];
+  reviewHistory: AnswerHistoryItem[];
+  missionBest: Record<string, { correct: number; total: number; transfer: number }>;
 }

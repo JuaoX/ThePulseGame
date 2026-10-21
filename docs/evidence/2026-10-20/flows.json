@@ -1,0 +1,100 @@
+{
+  "lookup": "Dicionário do Jogo (4623 palavras)\n✓ Palavra aceita na arena!",
+  "league": "Bronze I\nPulsePlayer — 520 XP\n\nPróxima divisão em 900 XP • Combo Máximo: 1.0x\n\n▶ JOGAR RANQUEADO",
+  "syllableCards": 20,
+  "quiz": [
+    {
+      "step": 1,
+      "prompt": "Se ontem foi terça-feira, que dia será depois de amanhã?",
+      "category": "logic"
+    },
+    {
+      "step": 2,
+      "prompt": "Em uma corrida, você ultrapassa o 2º colocado. Em que posição você fica?",
+      "category": "logic"
+    },
+    {
+      "step": 3,
+      "prompt": "Qual número destoa dos demais no conjunto: {2, 3, 5, 7, 9, 11, 13}?",
+      "category": "logic"
+    },
+    {
+      "step": 4,
+      "prompt": "Se 2 gatos capturam 2 ratos em 2 minutos, quantos gatos capturam 60 ratos em 60 minutos?",
+      "category": "logic"
+    },
+    {
+      "step": 5,
+      "prompt": "Na gaveta há 5 meias pretas e 5 brancas no escuro. Quantas pegar no mínimo para garantir um par igual?",
+      "category": "logic"
+    },
+    {
+      "step": 6,
+      "prompt": "Uma vitória-régia dobra de área todo dia e cobre o lago em 30 dias. Em que dia cobria metade?",
+      "category": "logic"
+    },
+    {
+      "step": 7,
+      "prompt": "A negação lógica da frase \"Chove E faz frio\" é:",
+      "category": "logic"
+    },
+    {
+      "step": 8,
+      "prompt": "Se \"Todo programador gosta de lógica\" e \"Lucas não gosta de lógica\", conclui-se que:",
+      "category": "logic"
+    },
+    {
+      "step": 9,
+      "prompt": "Complete a sequência: 2, 3, 5, 9, 17, 33, ...",
+      "category": "logic"
+    },
+    {
+      "step": 10,
+      "prompt": "Quantos apertos de mão únicos ocorrem se 6 pessoas se cumprimentam uma única vez?",
+      "category": "logic"
+    },
+    {
+      "step": 11,
+      "prompt": "Complete a sequência: 2, 4, 8, 16, 32, ...",
+      "category": "logic"
+    },
+    {
+      "step": 12,
+      "prompt": "Complete a sequência de Fibonacci: 1, 1, 2, 3, 5, 8, 13, ...",
+      "category": "logic"
+    },
+    {
+      "step": 13,
+      "prompt": "Qual número completa os quadrados perfeitos: 1, 4, 9, 16, 25, ...",
+      "category": "logic"
+    },
+    {
+      "step": 14,
+      "prompt": "Qual palavra tem a mesma propriedade de leitura de \"RADAR\" e \"OSSO\"?",
+      "category": "logic"
+    },
+    {
+      "step": 15,
+      "prompt": "Complete a sequência: 3, 5, 9, 15, 23, ...",
+      "category": "logic"
+    },
+    {
+      "step": 16,
+      "prompt": "Qual é o valor de (14 + 11) × 13?",
+      "category": "procedural-math"
+    }
+  ],
+  "keyboard": {
+    "beforeTab": "✕ Sair",
+    "afterTab": "✕ Sair"
+  },
+  "pause": {
+    "visiblePauseText": false,
+    "visiblePauseButton": 0
+  },
+  "dailyFirst": "Quem escreveu o romance clássico brasileiro \"Dom Casmurro\"?",
+  "elevator": {
+    "text": "O Elevador\n♥♥♥\n✕ Sair\n🛡️ COFRE\n0\n🛡️ BLINDAR +0\n⚡ 1.0X\n0\nCOMBO 0X\n1.0x\n11.0s\nQual número completa os quadrados perfeitos: 1, 4, 9, 16, 25, ...\n1\n36\n2\n30\n3\n49\n4\n32",
+    "floorDisplayed": false
+  }
+}

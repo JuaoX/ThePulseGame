@@ -1,0 +1,352 @@
+{
+  "questions": {
+    "total": 60,
+    "byCategory": {
+      "math": 15,
+      "logic": 15,
+      "words": 15,
+      "general": 15
+    },
+    "uniqueIds": 60,
+    "uniquePrompts": 60,
+    "invalidOptions": [],
+    "nonLatinOptions": [
+      {
+        "id": "words_02",
+        "option": "Exceссão"
+      }
+    ],
+    "proceduralSample": {
+      "generated": 2000,
+      "duplicatePrompts": 1874
+    }
+  },
+  "lexicon": {
+    "size": 4623,
+    "challenges": 20,
+    "examples": 377,
+    "mismatches": [
+      {
+        "syllable": "TRA",
+        "word": "ESTRELA"
+      },
+      {
+        "syllable": "TRA",
+        "word": "TEATRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "QUATRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "CONTROLE"
+      },
+      {
+        "syllable": "TRA",
+        "word": "ENCONTRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "REGISTRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "MESTRE"
+      },
+      {
+        "syllable": "TRA",
+        "word": "RASTRO"
+      },
+      {
+        "syllable": "TER",
+        "word": "CADERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "MODERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "INVERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "GOVERNO"
+      },
+      {
+        "syllable": "EST",
+        "word": "RESPOSTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "PROPOSTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "CONQUISTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "REVISTA"
+      },
+      {
+        "syllable": "LAN",
+        "word": "BRILHANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "SEMELHANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "ESTUDANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "IMPORTANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "ELEFANTE"
+      },
+      {
+        "syllable": "FOR",
+        "word": "FLORESTA"
+      },
+      {
+        "syllable": "SEN",
+        "word": "SEMENTE"
+      },
+      {
+        "syllable": "SEN",
+        "word": "PENSAMENTO"
+      },
+      {
+        "syllable": "LIN",
+        "word": "VITAMINA"
+      }
+    ],
+    "rejectedExamples": [
+      {
+        "syllable": "TRA",
+        "word": "ESTRELA"
+      },
+      {
+        "syllable": "TRA",
+        "word": "TEATRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "QUATRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "CONTROLE"
+      },
+      {
+        "syllable": "TRA",
+        "word": "ENCONTRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "REGISTRO"
+      },
+      {
+        "syllable": "TRA",
+        "word": "MESTRE"
+      },
+      {
+        "syllable": "TRA",
+        "word": "RASTRO"
+      },
+      {
+        "syllable": "TER",
+        "word": "CADERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "MODERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "INVERNO"
+      },
+      {
+        "syllable": "TER",
+        "word": "GOVERNO"
+      },
+      {
+        "syllable": "COM",
+        "word": "COMPUTADOR"
+      },
+      {
+        "syllable": "EST",
+        "word": "RESPOSTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "PROPOSTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "CONQUISTA"
+      },
+      {
+        "syllable": "EST",
+        "word": "REVISTA"
+      },
+      {
+        "syllable": "LAN",
+        "word": "BRILHANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "SEMELHANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "ESTUDANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "IMPORTANTE"
+      },
+      {
+        "syllable": "LAN",
+        "word": "ELEFANTE"
+      },
+      {
+        "syllable": "FOR",
+        "word": "FLORESTA"
+      },
+      {
+        "syllable": "SEN",
+        "word": "SEMENTE"
+      },
+      {
+        "syllable": "SEN",
+        "word": "PENSAMENTO"
+      },
+      {
+        "syllable": "LIN",
+        "word": "VITAMINA"
+      }
+    ],
+    "probes": [
+      {
+        "word": "computador",
+        "syllable": "COM",
+        "inDictionary": true,
+        "valid": false,
+        "normalized": "COMPUTADOR",
+        "reason": "Palavra bloqueada!"
+      },
+      {
+        "word": "reputação",
+        "syllable": "PUT",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "REPUTACAO",
+        "reason": "Palavra bloqueada!"
+      },
+      {
+        "word": "deputado",
+        "syllable": "PUT",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "DEPUTADO",
+        "reason": "Palavra bloqueada!"
+      },
+      {
+        "word": "carneiro",
+        "syllable": "CAR",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "CARNEIRO",
+        "reason": "\"CARNEIRO\" não existe no dicionário!"
+      },
+      {
+        "word": "carros",
+        "syllable": "CAR",
+        "inDictionary": true,
+        "valid": true,
+        "normalized": "CARROS"
+      },
+      {
+        "word": "corações",
+        "syllable": "COR",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "CORACOES",
+        "reason": "\"CORACOES\" não existe no dicionário!"
+      },
+      {
+        "word": "flores",
+        "syllable": "FLO",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "FLORES",
+        "reason": "\"FLORES\" não existe no dicionário!"
+      },
+      {
+        "word": "pães",
+        "syllable": "PA",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "PAES",
+        "reason": "\"PAES\" não existe no dicionário!"
+      },
+      {
+        "word": "mulheres",
+        "syllable": "LHE",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "MULHERES",
+        "reason": "\"MULHERES\" não existe no dicionário!"
+      },
+      {
+        "word": "compreender",
+        "syllable": "COM",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "COMPREENDER",
+        "reason": "\"COMPREENDER\" não existe no dicionário!"
+      },
+      {
+        "word": "professorndo",
+        "syllable": "PRO",
+        "inDictionary": false,
+        "valid": false,
+        "normalized": "PROFESSORNDO",
+        "reason": "\"PROFESSORNDO\" não existe no dicionário!"
+      },
+      {
+        "word": "computadors",
+        "syllable": "COM",
+        "inDictionary": true,
+        "valid": false,
+        "normalized": "COMPUTADORS",
+        "reason": "Palavra bloqueada!"
+      },
+      {
+        "word": "amors",
+        "syllable": "MOR",
+        "inDictionary": true,
+        "valid": true,
+        "normalized": "AMORS"
+      },
+      {
+        "word": "c@a1sa",
+        "syllable": "CAS",
+        "inDictionary": true,
+        "valid": true,
+        "normalized": "CASA"
+      }
+    ]
+  },
+  "profile": {
+    "unclampedVolume": 999,
+    "invalidBackground": "zzzzzz"
+  }
+}

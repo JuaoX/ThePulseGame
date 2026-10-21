@@ -1,0 +1,14 @@
+{
+  "pass": true,
+  "method": "Chromium touchscreen tap events at 390x844 plus emulated keyboard; not physical",
+  "cases": [
+    "one-tap start",
+    "answer and automatic next",
+    "pause/resume",
+    "leave",
+    "bottom navigation",
+    "character selection",
+    "tap arrow clue and continuous crossword typing",
+    "echo touch controls"
+  ]
+}

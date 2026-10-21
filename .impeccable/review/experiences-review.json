@@ -1,0 +1,8 @@
+{
+  "disposition": "ship",
+  "scope": "Six experiences, native arrow crosswords and cosmetic character collection",
+  "reviewedFix": "Hard incomplete last-entry Tab attempted to focus disabled check button",
+  "resolution": "Forward exit uses enabled clear control; reverse exit reaches difficulty selector",
+  "evidence": ["passing hard incomplete forward/reverse Tab assertions", "recaptured 18 views", "independent scoped verdict: resolved"],
+  "limits": ["No physical mobile keyboard session", "No actual screen-reader verification", "No worldwide originality claim"]
+}

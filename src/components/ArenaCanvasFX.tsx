@@ -1,151 +1,58 @@
-import { useEffect, useImperativeHandle, useRef, forwardRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 export interface ArenaCanvasFXHandle {
-  spawnShockwave: (colorHex: string) => void;
-  spawnBurst: (colorHex: string, count?: number) => void;
+  spawnShockwave: (color: string) => void;
+  spawnBurst: (color: string, count?: number) => void;
   spawnConfettiShower: () => void;
 }
+interface Particle { x: number; y: number; vx: number; vy: number; life: number; color: string; }
 
-interface RingParticle {
-  x: number;
-  y: number;
-  r: number;
-  maxR: number;
-  alpha: number;
-  color: string;
-}
-
-interface SparkParticle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  alpha: number;
-  color: string;
-  size: number;
-  gravity?: number;
-}
-
-const CONFETTI_COLORS = ['#22D3EE', '#6366F1', '#10B981', '#F59E0B', '#F43F5E', '#A855F7'];
-
-export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: boolean }>(
-  ({ reducedMotion }, ref) => {
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const ringsRef = useRef<RingParticle[]>([]);
-    const sparksRef = useRef<SparkParticle[]>([]);
-
-    useImperativeHandle(ref, () => ({
-      spawnShockwave(colorHex: string) {
-        if (reducedMotion || !canvasRef.current) return;
-        const c = canvasRef.current;
-        ringsRef.current.push({
-          x: c.width / 2,
-          y: c.height * 0.35,
-          r: 65,
-          maxR: Math.max(c.width, c.height) * 0.5,
-          alpha: 0.6,
-          color: colorHex,
-        });
-      },
-      spawnBurst(colorHex: string, count = 22) {
-        if (reducedMotion || !canvasRef.current) return;
-        const c = canvasRef.current;
-        const cx = c.width / 2;
-        const cy = c.height * 0.35;
-        for (let i = 0; i < count; i++) {
-          const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.35;
-          const spd = 2.5 + Math.random() * 5.5;
-          sparksRef.current.push({
-            x: cx + Math.cos(ang) * 45,
-            y: cy + Math.sin(ang) * 45,
-            vx: Math.cos(ang) * spd,
-            vy: Math.sin(ang) * spd,
-            alpha: 0.95,
-            color: colorHex,
-            size: 2.2 + Math.random() * 3,
-          });
-        }
-      },
-      spawnConfettiShower() {
-        if (reducedMotion || !canvasRef.current) return;
-        const c = canvasRef.current;
-        for (let i = 0; i < 60; i++) {
-          sparksRef.current.push({
-            x: c.width * (0.15 + Math.random() * 0.7),
-            y: c.height * 0.22,
-            vx: (Math.random() - 0.5) * 10,
-            vy: -4 - Math.random() * 6,
-            alpha: 1,
-            color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-            size: 3 + Math.random() * 3.5,
-            gravity: 0.18,
-          });
-        }
-      },
-    }));
-
-    useEffect(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const handleResize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      };
-
-      handleResize();
-      window.addEventListener('resize', handleResize);
-
-      let rafId = 0;
-      const render = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        for (let i = ringsRef.current.length - 1; i >= 0; i--) {
-          const rg = ringsRef.current[i];
-          rg.r += (rg.maxR - rg.r) * 0.08 + 2.5;
-          rg.alpha *= 0.92;
-          ctx.beginPath();
-          ctx.arc(rg.x, rg.y, rg.r, 0, Math.PI * 2);
-          ctx.strokeStyle = rg.color;
-          ctx.globalAlpha = rg.alpha;
-          ctx.lineWidth = 3;
-          ctx.stroke();
-          if (rg.alpha < 0.02) ringsRef.current.splice(i, 1);
-        }
-
-        for (let i = sparksRef.current.length - 1; i >= 0; i--) {
-          const sp = sparksRef.current[i];
-          sp.x += sp.vx;
-          sp.y += sp.vy;
-          if (sp.gravity) {
-            sp.vy += sp.gravity;
-            sp.vx *= 0.98;
-            sp.alpha *= 0.985;
-          } else {
-            sp.vx *= 0.95;
-            sp.vy *= 0.95;
-            sp.alpha *= 0.91;
-          }
-          ctx.fillStyle = sp.color;
-          ctx.globalAlpha = sp.alpha;
-          ctx.beginPath();
-          ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
-          ctx.fill();
-          if (sp.alpha < 0.03) sparksRef.current.splice(i, 1);
-        }
-        ctx.globalAlpha = 1;
-        rafId = requestAnimationFrame(render);
-      };
-
-      rafId = requestAnimationFrame(render);
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        cancelAnimationFrame(rafId);
-      };
-    }, []);
-
-    return <canvas ref={canvasRef} className="arena-fx-canvas" />;
-  }
-);
+// One short, event-bound celebration. No animation work while the canvas is idle.
+export const ArenaCanvasFX = forwardRef<ArenaCanvasFXHandle, { reducedMotion: boolean }>(({ reducedMotion }, ref) => {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const particles = useRef<Particle[]>([]);
+  const frame = useRef(0);
+  const animate = useRef<() => void>(() => {});
+  const motion = useRef(reducedMotion);
+  motion.current = reducedMotion;
+  useEffect(() => {
+    const element = canvas.current, context = element?.getContext('2d');
+    if (!element || !context) return;
+    let last = 0;
+    const clear = () => { cancelAnimationFrame(frame.current); frame.current = 0; particles.current = []; context.clearRect(0, 0, element.width, element.height); };
+    const resize = () => { clear(); element.width = innerWidth; element.height = innerHeight; };
+    resize();
+    const render = (time: number) => {
+      frame.current = 0;
+      const dt = Math.min(2, (time - (last || time - 16)) / 16.67); last = time;
+      context.clearRect(0, 0, element.width, element.height);
+      particles.current = particles.current.filter(particle => particle.life > 0);
+      for (const p of particles.current) {
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 0.12 * dt; p.life -= 0.035 * dt;
+        context.globalAlpha = Math.max(0, p.life); context.fillStyle = p.color;
+        context.fillRect(p.x, p.y, 3, 5);
+      }
+      context.globalAlpha = 1;
+      if (particles.current.length && !motion.current && !document.hidden) frame.current = requestAnimationFrame(render);
+      else { last = 0; clear(); }
+    };
+    animate.current = () => { if (!frame.current) frame.current = requestAnimationFrame(render); };
+    const visibility = () => { if (document.hidden) clear(); };
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', visibility);
+    return () => { clear(); window.removeEventListener('resize', resize); document.removeEventListener('visibilitychange', visibility); animate.current = () => {}; };
+  }, []);
+  useEffect(() => { if (reducedMotion) particles.current = []; }, [reducedMotion]);
+  useImperativeHandle(ref, () => {
+    const spawn = (color: string, count: number) => {
+      if (motion.current || document.hidden || !canvas.current) return;
+      for (let i = 0; i < Math.min(count, 40); i++) {
+        const angle = Math.PI * 2 * i / count;
+        particles.current.push({ x: innerWidth / 2, y: Math.min(innerHeight * 0.45, 380), vx: Math.cos(angle) * (2 + Math.random() * 3), vy: Math.sin(angle) * 4 - 2, life: 1, color });
+      }
+      particles.current = particles.current.slice(-100); animate.current();
+    };
+    return { spawnShockwave: color => spawn(color, 14), spawnBurst: (color, count = 12) => spawn(color, count), spawnConfettiShower: () => spawn('#55d8e8', 28) };
+  }, []);
+  return <canvas ref={canvas} className="arena-fx-canvas" aria-hidden="true" />;
+});

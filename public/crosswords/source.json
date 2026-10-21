@@ -1,0 +1,10 @@
+{
+  "retrieved": "2026-10-20",
+  "file": "editions.json",
+  "license": "MIT",
+  "commit": "1331d55ca4e3e523233d7faa2a32a06cbd5200cf",
+  "url": "https://github.com/4u-Labs/cruzadas",
+  "sha256": "23919020c3faf4dc1391bccaf3ee58c88d46f9be426fe8d6e714510ef53413df",
+  "editions": 20,
+  "answers": 160
+}

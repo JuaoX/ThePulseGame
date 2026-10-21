@@ -35,9 +35,7 @@ export function getBrasiliaDateKey(referenceDate: Date = new Date()): string {
   } catch {
     // Fallback UTC-3
   }
-  const utcMs = referenceDate.getTime() + referenceDate.getTimezoneOffset() * 60000;
-  const brtDate = new Date(utcMs - 3 * 3600000);
-  return `${brtDate.getFullYear()}-${String(brtDate.getMonth() + 1).padStart(2, '0')}-${String(brtDate.getDate()).padStart(2, '0')}`;
+  return new Date(referenceDate.getTime() - 3 * 3600000).toISOString().slice(0, 10);
 }
 
 export function normalizeWord(raw: string): string {
@@ -49,11 +47,11 @@ export function normalizeWord(raw: string): string {
     .replace(/[^A-Z]/g, '');
 }
 
-const PROFANITY_ROOTS = [
-  'BUCET', 'CARALH', 'PORRA', 'MERDA', 'FODER', 'FODA', 'PUTA', 'PUTO',
-  'VIADO', 'BOSTA', 'CUZAO', 'CACETE', 'PUNHET', 'ARROMBAD', 'VAGABUND',
-  'PIRANH', 'PIROCA', 'XOXOT', 'SIRIRIC', 'BOQUET', 'CHUPAR', 'CORNO'
-];
+const BLOCKED_WORDS = new Set([
+  'BUCETA', 'CARALHO', 'PORRA', 'MERDA', 'FODER', 'FODA', 'PUTA', 'PUTO',
+  'VIADO', 'BOSTA', 'CUZAO', 'CACETE', 'PUNHETA', 'ARROMBADO', 'ARROMBADA',
+  'VAGABUNDO', 'VAGABUNDA', 'PIROCA', 'XOXOTA', 'BOQUETE'
+]);
 
 export interface WordValidationResult {
   valid: boolean;
@@ -65,19 +63,21 @@ export function validateWordSubmission(
   rawInput: string,
   requiredSyllable: string,
   usedWords: Set<string>,
-  dictionary: ReadonlySet<string>
+  dictionary: Pick<ReadonlySet<string>, 'has'>
 ): WordValidationResult {
   const word = normalizeWord(rawInput);
   const syl = normalizeWord(requiredSyllable);
+
+  if (!/^[a-zà-ü]+$/iu.test(rawInput.trim()) || /[×÷]/u.test(rawInput)) {
+    return { valid: false, normalized: word, reason: 'Use uma palavra, só com letras. Acentos são bem-vindos.' };
+  }
 
   if (!word || word.length < 3) {
     return { valid: false, normalized: word, reason: 'Digite pelo menos 3 letras!' };
   }
 
-  for (const root of PROFANITY_ROOTS) {
-    if (word.includes(root)) {
-      return { valid: false, normalized: word, reason: 'Palavra bloqueada!' };
-    }
+  if (BLOCKED_WORDS.has(word)) {
+    return { valid: false, normalized: word, reason: 'Essa palavra não faz parte do vocabulário desta atividade.' };
   }
 
   if (/(.)\1\1/.test(word) || /[BCDFGHJKLMNPQRSTVWXYZ]{5,}/.test(word)) {
@@ -93,7 +93,7 @@ export function validateWordSubmission(
   }
 
   if (!dictionary.has(word)) {
-    return { valid: false, normalized: word, reason: `"${word}" não existe no dicionário!` };
+    return { valid: false, normalized: word, reason: `Ainda não encontramos "${word}" no vocabulário do jogo. Tente outra palavra.` };
   }
 
   return { valid: true, normalized: word };

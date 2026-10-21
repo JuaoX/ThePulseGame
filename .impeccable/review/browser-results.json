@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "browser": "Chromium desktop and touch emulation; no physical device",
+  "cases": [
+    "responsive selector, game, optional explanation, pause and focus: 320",
+    "responsive selector, game, optional explanation, pause and focus: 375",
+    "responsive selector, game, optional explanation, pause and focus: 390",
+    "responsive selector, game, optional explanation, pause and focus: 768",
+    "responsive selector, game, optional explanation, pause and focus: 1440",
+    "automatic next round; opening help suspends feedback and resumes safely",
+    "dictionary consistency; word input keeps focus; local avatars, no visible credits, persisted mute",
+    "dictionary failure/retry; real timeout auto-advances and timer continues; pause; Tab",
+    "manual preference, full daily, compact result, copy recovery, first score retained on replay, records"
+  ],
+  "pageErrors": []
+}

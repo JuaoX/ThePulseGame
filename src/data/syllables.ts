@@ -1,6 +1,6 @@
 import { SyllableChallenge } from '../types/game';
 
-export const WORDBOMB_SYLLABLES: SyllableChallenge[] = [
+const RAW_CHALLENGES: SyllableChallenge[] = [
   { syl: 'MEN', difficulty: 1, hint: 'MENTE • SEMENTE • MOMENTO', samples: ['MENTE', 'MOMENTO', 'ELEMENTO', 'SEMENTE', 'COMENTAR', 'MENSAGEM', 'MENTAL', 'DOCUMENTO', 'PENSAMENTO', 'ALIMENTO', 'MOVIMENTO', 'SENTIMENTO', 'FUNDAMENTO', 'ARGUMENTO', 'INSTRUMENTO', 'TREINAMENTO', 'CONHECIMENTO', 'EXPERIMENTO', 'CRESCIMENTO', 'ATENDIMENTO'] },
   { syl: 'TRA', difficulty: 1, hint: 'TRABALHO • ENTRADA • LETRA', samples: ['TRABALHO', 'ESTRADA', 'LETRA', 'ENTRADA', 'MOSTRAR', 'CONTRA', 'TRATO', 'RETRATO', 'ATRASO', 'CENTRAL', 'ESTRELA', 'TEATRO', 'QUATRO', 'CONTROLE', 'ENCONTRO', 'REGISTRO', 'MESTRE', 'RASTRO', 'CONTRATO', 'TRANSPORTE', 'TRADICAO', 'TRAJETO'] },
   { syl: 'CON', difficulty: 1, hint: 'CONTA • CONTROLE • CONVITE', samples: ['CONTA', 'CONTATO', 'CONTROLE', 'CONCEITO', 'CONHECIMENTO', 'CONFIAR', 'ESCONDER', 'CONVITE', 'CONQUISTA', 'CONSELHO', 'CONTEXTO', 'CONJUNTO', 'CONVERSA', 'CONFORTO', 'CONDICAO', 'CONEXAO', 'CONSTRUIR', 'CONTINUAR', 'CONTRATO', 'CONTRASTE', 'CONCORRER'] },
@@ -23,13 +23,17 @@ export const WORDBOMB_SYLLABLES: SyllableChallenge[] = [
   { syl: 'NAT', difficulty: 3, hint: 'NATUREZA • NATAL • NATURAL', samples: ['NATUREZA', 'NATAL', 'NATIVO', 'NATURAL', 'ANATOMIA', 'MAGNATA', 'SONATA', 'NATO', 'ASSINATURA', 'ALTERNATIVA', 'IMAGINATIVO', 'CAMPEONATO', 'ARTESANATO', 'ORFANATO'] }
 ];
 
+export const WORDBOMB_SYLLABLES: SyllableChallenge[] = RAW_CHALLENGES.map(item => {
+  const samples = item.samples.filter(word => word.includes(item.syl));
+  return { ...item, samples, hint: samples.slice(0, 3).join(' • ') };
+});
+
 function buildVerifiedLexicon(): ReadonlySet<string> {
   const set = new Set<string>();
   for (const item of WORDBOMB_SYLLABLES) {
     for (const w of item.samples) {
       const clean = w.toUpperCase();
       set.add(clean);
-      if (!clean.endsWith('S')) set.add(clean + 'S');
     }
   }
 
@@ -183,20 +187,6 @@ function buildVerifiedLexicon(): ReadonlySet<string> {
 
   for (const w of coreRoots) {
     set.add(w);
-    if (!w.endsWith('S')) set.add(w + 'S');
-    if (w.endsWith('R') && w.length >= 4) {
-      const stem = w.slice(0, -1);
-      set.add(stem + 'NDO');
-      set.add(stem + 'DO');
-      set.add(stem + 'DA');
-      set.add(stem + 'DOS');
-      set.add(stem + 'DAS');
-      set.add(stem + 'MOS');
-      set.add(stem + 'VA');
-      set.add(stem + 'VAM');
-      set.add(stem + 'REI');
-      set.add(stem + 'RA');
-    }
   }
 
   return set;

@@ -1,0 +1,13 @@
+{
+  "src/App.tsx": "114c044a35b1d33a6242895db28ca425dd3672564c34b4907049888ae60ae216",
+  "src/engine/session.ts": "caa65e62abf964b62ae91d81a128e90559af41df4c46ef284906985f28c4f534",
+  "src/engine/deck.ts": "16dd09b8745bb51e856dddce105ce0f43a584b700bbff24aea6021872f4fb50e",
+  "src/engine/lexicon.ts": "d651dfabb4bc426e188900adfe7c813f7dbb32175fd4dc707ed1956a727a6b95",
+  "src/engine/storage.ts": "a345baab127b0eaa6b151377ad3aa38c45549c22538da67dbe8eb027879d2634",
+  "src/styles/global.css": "6c47126ef3842c7df44f730a081a7c728bcf9eab151785d767f9c9577ab946ab",
+  "src/types/game.ts": "3143aff974e3b5dd3f18f04693a5d0bebee118b6d053e11580cef26dd9ef4b5f",
+  "tests/browser.cjs": "59ac3c0df79225325fa287383840c4df9ed03278af8fc85d6f13f1811127ca63",
+  "tests/game.test.cjs": "1c160594daee2cc93f07df369cdc6501b6ebcaca52476fdd3a32ebfd61534165",
+  "tests/touch.cjs": "c671d0537764ca4d96b0bbd129dffff04a2ef645bf7c982a4a888bb81b8f4c52",
+  "package-lock.json": "a6a0650d9708d52ff7d11173667de15f38ca00d56962edd39fe587d9a4c06376"
+}

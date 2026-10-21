@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "cases": [
+    "home, echo solution, purchase, reduced motion and crossword keyboard: 320",
+    "crossword three levels, full completions, shared letters, space direction, backspace, Tab, paste, check, persistence and no repeat reward",
+    "home, echo solution, purchase, reduced motion and crossword keyboard: 390",
+    "home, echo solution, purchase, reduced motion and crossword keyboard: 768",
+    "home, echo solution, purchase, reduced motion and crossword keyboard: 1440",
+    "crossword load failure and retry"
+  ],
+  "pageErrors": [],
+  "limitation": "Chromium viewport/touch emulation, not a physical mobile keyboard or screen reader"
+}

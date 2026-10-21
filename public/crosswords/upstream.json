@@ -1,0 +1,1701 @@
+[
+  {
+    "title": "Edição 01 — Brasil & Raízes",
+    "difficulty": "Fácil",
+    "rows": 9,
+    "cols": 10,
+    "grid": [
+      "#V##C#####",
+      "#I##A#P###",
+      "#O#PRAIA#F",
+      "#L##N#P##U",
+      "SAMBA#O##T",
+      "#O##V#CAFE",
+      "####A#A##B",
+      "##SOL####O",
+      "#########L"
+    ],
+    "words": [
+      {
+        "word": "VIOLAO",
+        "clue": "Companheiro das serenatas e da MPB",
+        "r": 0,
+        "c": 1,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "CARNAVAL",
+        "clue": "A maior festa popular do calendário nacional",
+        "r": 0,
+        "c": 4,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "PIPOCA",
+        "clue": "Par perfeito de uma boa sessão de cinema",
+        "r": 1,
+        "c": 6,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "PRAIA",
+        "clue": "Faixa de areia à beira-mar favorita no verão",
+        "r": 2,
+        "c": 3,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "FUTEBOL",
+        "clue": "Paixão esportiva das multidões nos gramados",
+        "r": 2,
+        "c": 9,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "SAMBA",
+        "clue": "Ritmo musical e alma vibrante do Carnaval",
+        "r": 4,
+        "c": 0,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "CAFE",
+        "clue": "Pretinho quente aromático indispensável pela manhã",
+        "r": 5,
+        "c": 6,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "SOL",
+        "clue": "Nossa estrela-mãe que ilumina e aquece os dias",
+        "r": 7,
+        "c": 2,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 02 — Sabores do Brasil",
+    "difficulty": "Fácil",
+    "rows": 12,
+    "cols": 12,
+    "grid": [
+      "########F###",
+      "########E#C#",
+      "###B#COXINHA",
+      "###R####J#U#",
+      "###I##T#O#R#",
+      "###GOIABA#R#",
+      "###A##P#D#A#",
+      "#M#D##I#A#S#",
+      "#A#E##O###C#",
+      "#N#I##C###O#",
+      "#G#R##A#####",
+      "FAROFA######"
+    ],
+    "words": [
+      {
+        "word": "FEIJOADA",
+        "clue": "Prato típico com arroz, couve e feijão preto",
+        "r": 0,
+        "c": 8,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "CHURRASCO",
+        "clue": "Carne assada na brasa aos fins de semana",
+        "r": 1,
+        "c": 10,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "BRIGADEIRO",
+        "clue": "Doce enrolado de chocolate com granulado",
+        "r": 2,
+        "c": 3,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "COXINHA",
+        "clue": "Salgadinho clássico recheado de frango",
+        "r": 2,
+        "c": 5,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "TAPIOCA",
+        "clue": "Iguaria de goma de mandioca na frigideira",
+        "r": 4,
+        "c": 6,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "GOIABA",
+        "clue": "Fruta doce da qual se faz a goiabada cascão",
+        "r": 5,
+        "c": 3,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "MANGA",
+        "clue": "Fruta tropical carnosa com grande caroço",
+        "r": 7,
+        "c": 1,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "FAROFA",
+        "clue": "Acompanhamento crocante feito de farinha",
+        "r": 11,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 03 — Fauna & Natureza",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 11,
+    "grid": [
+      "####T######",
+      "####U######",
+      "####C#####C",
+      "TROVAO####A",
+      "####N#####C",
+      "####ONCA##H",
+      "######O###O",
+      "##A###R###E",
+      "TARTARUGA#I",
+      "##A###J###R",
+      "##R##BALEIA",
+      "##A########"
+    ],
+    "words": [
+      {
+        "word": "TUCANO",
+        "clue": "Ave brasileira com um bico enorme e colorido",
+        "r": 0,
+        "c": 4,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "CACHOEIRA",
+        "clue": "Bela queda d água natural nas serras",
+        "r": 2,
+        "c": 10,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "TROVAO",
+        "clue": "Estrondo sonoro que ecoa após o relâmpago",
+        "r": 3,
+        "c": 0,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "ONCA",
+        "clue": "O maior felino das Américas, com belas pintas",
+        "r": 5,
+        "c": 4,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "CORUJA",
+        "clue": "Ave de hábitos noturnos símbolo da sabedoria",
+        "r": 5,
+        "c": 6,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "ARARA",
+        "clue": "Ave exuberante de penas azuis ou vermelhas",
+        "r": 7,
+        "c": 2,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "TARTARUGA",
+        "clue": "Réptil marinho que desova na areia da praia",
+        "r": 8,
+        "c": 0,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "BALEIA",
+        "clue": "O maior mamífero marinho dos oceanos",
+        "r": 10,
+        "c": 5,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 04 — Cinema & Telona",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 11,
+    "grid": [
+      "##DRAMA####",
+      "####T######",
+      "###COMEDIA#",
+      "####R######",
+      "####E######",
+      "###OSCAR###",
+      "#####I##T##",
+      "#####NOVELA",
+      "#####E##L##",
+      "#####M##O##",
+      "PIPOCA##N##",
+      "########A##"
+    ],
+    "words": [
+      {
+        "word": "DRAMA",
+        "clue": "Gênero com narrativas profundas e comoventes",
+        "r": 0,
+        "c": 2,
+        "dir": "H",
+        "num": 1
+      },
+      {
+        "word": "ATORES",
+        "clue": "Profissionais que encenam os personagens",
+        "r": 0,
+        "c": 4,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "COMEDIA",
+        "clue": "Gênero cinematográfico focado no humor",
+        "r": 2,
+        "c": 3,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "OSCAR",
+        "clue": "A estatueta dourada mais famosa do cinema",
+        "r": 5,
+        "c": 3,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "CINEMA",
+        "clue": "A sétima arte assistida na sala escura",
+        "r": 5,
+        "c": 5,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "TELONA",
+        "clue": "A grande superfície onde o filme é projetado",
+        "r": 6,
+        "c": 8,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "NOVELA",
+        "clue": "Dramaturgia seriada muito assistida na TV",
+        "r": 7,
+        "c": 5,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "PIPOCA",
+        "clue": "O lanche clássico dos cinéfilos na sessão",
+        "r": 10,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 05 — Ciência & Futuro",
+    "difficulty": "Médio",
+    "rows": 10,
+    "cols": 11,
+    "grid": [
+      "#####FISICA",
+      "#########O#",
+      "S#####ATOMO",
+      "A########P#",
+      "T########U#",
+      "E#INTERNET#",
+      "L##U##O##A#",
+      "I##V##B##D#",
+      "TELESCOPIO#",
+      "E##M#####R#"
+    ],
+    "words": [
+      {
+        "word": "FISICA",
+        "clue": "Ciência que investiga as forças da natureza",
+        "r": 0,
+        "c": 5,
+        "dir": "H",
+        "num": 1
+      },
+      {
+        "word": "COMPUTADOR",
+        "clue": "Máquina eletrônica de cálculo e informação",
+        "r": 0,
+        "c": 9,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "SATELITE",
+        "clue": "Aparelho em órbita que retransmite dados",
+        "r": 2,
+        "c": 0,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "ATOMO",
+        "clue": "Bloco fundamental constitutivo de toda matéria",
+        "r": 2,
+        "c": 6,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "INTERNET",
+        "clue": "A rede mundial que conecta bilhões de pessoas",
+        "r": 5,
+        "c": 2,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "NUVEM",
+        "clue": "Armazenamento remoto de arquivos e dados",
+        "r": 5,
+        "c": 3,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "ROBO",
+        "clue": "Autômato programado para executar tarefas",
+        "r": 5,
+        "c": 6,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "TELESCOPIO",
+        "clue": "Instrumento usado para espiar os astros",
+        "r": 8,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 06 — Desafio dos Mestres",
+    "difficulty": "Difícil",
+    "rows": 9,
+    "cols": 12,
+    "grid": [
+      "########J###",
+      "#######DAMAS",
+      "#C##R###N#M#",
+      "XADREZ##E#I#",
+      "#N##L###L#G#",
+      "#E#POESIA#O#",
+      "#T##G#######",
+      "#A##I#######",
+      "###DOMINO###"
+    ],
+    "words": [
+      {
+        "word": "JANELA",
+        "clue": "Abertura que permite contemplar a paisagem",
+        "r": 0,
+        "c": 8,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "DAMAS",
+        "clue": "Jogo em tabuleiro quadriculado em diagonal",
+        "r": 1,
+        "c": 7,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "AMIGO",
+        "clue": "Companheiro leal com quem dividimos momentos",
+        "r": 1,
+        "c": 10,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "CANETA",
+        "clue": "Objeto com carga de tinta para escrever no papel",
+        "r": 2,
+        "c": 1,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "RELOGIO",
+        "clue": "Aparelho de ponteiros ou digital que mede as horas",
+        "r": 2,
+        "c": 4,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "XADREZ",
+        "clue": "O clássico jogo de reis, rainhas e estratégia",
+        "r": 3,
+        "c": 0,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "POESIA",
+        "clue": "Arte de combinar palavras com ritmo e rima",
+        "r": 5,
+        "c": 3,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "DOMINO",
+        "clue": "Jogo de peças retangulares com pontinhos",
+        "r": 8,
+        "c": 3,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 07 — Cidades & Viagens",
+    "difficulty": "Médio",
+    "rows": 8,
+    "cols": 11,
+    "grid": [
+      "#######P#S#",
+      "####C#VALE#",
+      "#DUNAS#N#R#",
+      "####P##T#R#",
+      "####ILHA#A#",
+      "####T##N###",
+      "BAHIA#FAROL",
+      "####L##L###"
+    ],
+    "words": [
+      {
+        "word": "PANTANAL",
+        "clue": "Paraíso ecológico de araras e jacarés",
+        "r": 0,
+        "c": 7,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "SERRA",
+        "clue": "Relevo acidentado de ar puro e cachoeiras",
+        "r": 0,
+        "c": 9,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "CAPITAL",
+        "clue": "Sede do poder executivo e legislativo",
+        "r": 1,
+        "c": 4,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "VALE",
+        "clue": "Região rebaixada entre duas elevações ou serras",
+        "r": 1,
+        "c": 6,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "DUNAS",
+        "clue": "Montanhas douradas de areia no Nordeste",
+        "r": 2,
+        "c": 1,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "ILHA",
+        "clue": "Território cercado por água em todas as bordas",
+        "r": 4,
+        "c": 4,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "BAHIA",
+        "clue": "Terra do Pelourinho, axé e mar cristalino",
+        "r": 6,
+        "c": 0,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "FAROL",
+        "clue": "Torre costeira que guia navios à noite",
+        "r": 6,
+        "c": 6,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 08 — Frutas Tropicais",
+    "difficulty": "Fácil",
+    "rows": 11,
+    "cols": 9,
+    "grid": [
+      "##G######",
+      "##O#M####",
+      "##I#A#L##",
+      "##A#N#A##",
+      "##B#G#R#L",
+      "B#ABACAXI",
+      "A#####N#M",
+      "N###C#J#A",
+      "ACEROLA#O",
+      "N###C####",
+      "A###O####"
+    ],
+    "words": [
+      {
+        "word": "GOIABA",
+        "clue": "Recheio doce de queijo na sobremesa Romeu e Julieta",
+        "r": 0,
+        "c": 2,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "MANGA",
+        "clue": "Fruta tropical carnosa originária da Ásia",
+        "r": 1,
+        "c": 4,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "LARANJA",
+        "clue": "Cítrico campeão para sucos ricos em vitamina C",
+        "r": 2,
+        "c": 6,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "LIMAO",
+        "clue": "O cítrico azedinho essencial da limonada",
+        "r": 4,
+        "c": 8,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "BANANA",
+        "clue": "A fruta amarela mais consumida do país",
+        "r": 5,
+        "c": 0,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "ABACAXI",
+        "clue": "Fruta coroada de casca áspera e polpa doce",
+        "r": 5,
+        "c": 2,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "COCO",
+        "clue": "Doador de água límpida nos quiosques de praia",
+        "r": 7,
+        "c": 4,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "ACEROLA",
+        "clue": "Pequena e vermelha, um tesouro nutricional",
+        "r": 8,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 09 — Música & Ritmos",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 8,
+    "grid": [
+      "#T######",
+      "PANDEIRO",
+      "#M######",
+      "#B######",
+      "#O##F###",
+      "FREVO###",
+      "####R#V#",
+      "##B#R#I#",
+      "PIANO#O#",
+      "##I###L#",
+      "#FLAUTA#",
+      "##E###O#"
+    ],
+    "words": [
+      {
+        "word": "TAMBOR",
+        "clue": "Pulsar tribal que ecoa nas festividades afros",
+        "r": 0,
+        "c": 1,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "PANDEIRO",
+        "clue": "Marcação rítmica essencial do samba de raiz",
+        "r": 1,
+        "c": 0,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "FORRO",
+        "clue": "Arrasta-pé animado do Nordeste brasileiro",
+        "r": 4,
+        "c": 4,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "FREVO",
+        "clue": "Dança vigorosa com pequenas sombrinhas coloridas",
+        "r": 5,
+        "c": 0,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "VIOLAO",
+        "clue": "Cordas dedilhadas que embalam a Bossa Nova",
+        "r": 6,
+        "c": 6,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "BAILE",
+        "clue": "Reunião festiva com música alta e dança de salão",
+        "r": 7,
+        "c": 2,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "PIANO",
+        "clue": "Harmonias sofisticadas de Tom Jobim",
+        "r": 8,
+        "c": 0,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "FLAUTA",
+        "clue": "Melodias agudas e ágeis no choro brasileiro",
+        "r": 10,
+        "c": 1,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 10 — Universo & Galáxias",
+    "difficulty": "Difícil",
+    "rows": 11,
+    "cols": 11,
+    "grid": [
+      "F##########",
+      "O#P########",
+      "GALAXIA####",
+      "U#A########",
+      "E#N########",
+      "T#ESTRELA##",
+      "E#T####U#V#",
+      "##A###LASER",
+      "#########N#",
+      "#########T#",
+      "####OCEANO#"
+    ],
+    "words": [
+      {
+        "word": "FOGUETE",
+        "clue": "Veículo potente que desafia a gravidade",
+        "r": 0,
+        "c": 0,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "PLANETA",
+        "clue": "A Terra, Marte ou Júpiter em órbita",
+        "r": 1,
+        "c": 2,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "GALAXIA",
+        "clue": "A Via Láctea repleta de sistemas solares",
+        "r": 2,
+        "c": 0,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "ESTRELA",
+        "clue": "Fornalha nuclear brilhante no céu noturno",
+        "r": 5,
+        "c": 2,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "LUA",
+        "clue": "Musa prateada dos poetas e noites de luar",
+        "r": 5,
+        "c": 7,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "VENTO",
+        "clue": "Brisas suaves ou vendavais que movem o ar",
+        "r": 6,
+        "c": 9,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "LASER",
+        "clue": "Feixe luminoso ultrapreciso de fótons",
+        "r": 7,
+        "c": 6,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "OCEANO",
+        "clue": "Imensidão azul que cobre mais de 70% da Terra",
+        "r": 10,
+        "c": 4,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 11 — Paixão & Futebol",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 11,
+    "grid": [
+      "C###G######",
+      "H###O######",
+      "U###L######",
+      "TROFEU#####",
+      "E###I#####G",
+      "###DRIBLE#R",
+      "####O###S#A",
+      "########T#M",
+      "###CAMISA#A",
+      "########D#D",
+      "#ARTILHEIRO",
+      "########O##"
+    ],
+    "words": [
+      {
+        "word": "CHUTE",
+        "clue": "Disparo veloz de perna em direção às redes",
+        "r": 0,
+        "c": 0,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "GOLEIRO",
+        "clue": "Guardião que defende a meta entre as traves",
+        "r": 0,
+        "c": 4,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "TROFEU",
+        "clue": "A taça dourada erguida pelo time campeão",
+        "r": 3,
+        "c": 0,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "GRAMADO",
+        "clue": "O tapete verde onde a bola rola nos 90 minutos",
+        "r": 4,
+        "c": 10,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "DRIBLE",
+        "clue": "Finta desconcertante que deixa o marcador no chão",
+        "r": 5,
+        "c": 3,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "ESTADIO",
+        "clue": "O templo lotado onde a torcida canta e vibra",
+        "r": 5,
+        "c": 8,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "CAMISA",
+        "clue": "O manto sagrado vestido com amor pela torcida",
+        "r": 8,
+        "c": 3,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "ARTILHEIRO",
+        "clue": "Aquele que balança as redes e decide o clássico",
+        "r": 10,
+        "c": 1,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 12 — História & Tradições",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 10,
+    "grid": [
+      "########H#",
+      "########E#",
+      "#N######R#",
+      "#A#ESCUDO#",
+      "#V###O##I#",
+      "#IMPERIO##",
+      "#O###O####",
+      "###TRATADO",
+      "######R###",
+      "CASTELO###",
+      "######N###",
+      "######O###"
+    ],
+    "words": [
+      {
+        "word": "HEROI",
+        "clue": "Personagem histórico aclamado por atos de bravura",
+        "r": 0,
+        "c": 8,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "NAVIO",
+        "clue": "Veleiro histórico que desbravou mares desconhecidos",
+        "r": 2,
+        "c": 1,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "ESCUDO",
+        "clue": "Arma defensiva usada para proteger guerreiros",
+        "r": 3,
+        "c": 3,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "COROA",
+        "clue": "Símbolo majestoso usado por monarcas e imperadores",
+        "r": 3,
+        "c": 5,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "IMPERIO",
+        "clue": "Grande extensão territorial regida por imperador",
+        "r": 5,
+        "c": 1,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "TRATADO",
+        "clue": "Pacto ou acordo formal de paz entre nações",
+        "r": 7,
+        "c": 3,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "TRONO",
+        "clue": "Cadeira nobre ocupada pelo soberano da nação",
+        "r": 7,
+        "c": 6,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "CASTELO",
+        "clue": "Fortaleza medieval de pedra com muralhas imponentes",
+        "r": 9,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 13 — Carros & Rodovias",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 10,
+    "grid": [
+      "#######P##",
+      "#ESTRADA##",
+      "#######I##",
+      "#######N##",
+      "####G##E##",
+      "###FAROL#P",
+      "#M##S####N",
+      "#O#VOLANTE",
+      "#T##L####U",
+      "CORRIDA###",
+      "#R##N#####",
+      "####A#####"
+    ],
+    "words": [
+      {
+        "word": "PAINEL",
+        "clue": "Quadro com velocímetro e marcadores do carro",
+        "r": 0,
+        "c": 7,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "ESTRADA",
+        "clue": "Rodovia asfaltada que conecta cidades e estados",
+        "r": 1,
+        "c": 1,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "GASOLINA",
+        "clue": "Combustível fóssil tradicional dos automóveis",
+        "r": 4,
+        "c": 4,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "FAROL",
+        "clue": "Lâmpada brilhante que guia a condução noturna",
+        "r": 5,
+        "c": 3,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "PNEU",
+        "clue": "Composto de borracha que garante aderência na pista",
+        "r": 5,
+        "c": 9,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "MOTOR",
+        "clue": "Coração mecânico que gera força e cavalos",
+        "r": 6,
+        "c": 1,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "VOLANTE",
+        "clue": "Direção circular que o condutor manobra",
+        "r": 7,
+        "c": 3,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "CORRIDA",
+        "clue": "Disputa de velocidade na pista do autódromo",
+        "r": 9,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 14 — Literatura & Letras",
+    "difficulty": "Fácil",
+    "rows": 10,
+    "cols": 10,
+    "grid": [
+      "V####F####",
+      "E###PAGINA",
+      "RIMA#B####",
+      "S##U#U####",
+      "O##T#L####",
+      "##ROMANCE#",
+      "###R###O##",
+      "#######N##",
+      "#######T##",
+      "###LIVRO##"
+    ],
+    "words": [
+      {
+        "word": "VERSO",
+        "clue": "Cada uma das linhas que compõem uma poesia",
+        "r": 0,
+        "c": 0,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "FABULA",
+        "clue": "História alegórica com lição moral e animais",
+        "r": 0,
+        "c": 5,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "PAGINA",
+        "clue": "Folha de papel impressa e numerada no livro",
+        "r": 1,
+        "c": 4,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "RIMA",
+        "clue": "Harmonia fonética entre os finais dos versos",
+        "r": 2,
+        "c": 0,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "AUTOR",
+        "clue": "Escritor talentoso que cria a obra e os enredos",
+        "r": 2,
+        "c": 3,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "ROMANCE",
+        "clue": "Longa história de amor, conflitos e aventuras",
+        "r": 5,
+        "c": 2,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "CONTO",
+        "clue": "Narrativa literária breve e de efeito concentrado",
+        "r": 5,
+        "c": 7,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "LIVRO",
+        "clue": "Volume encadernado de páginas cheias de histórias",
+        "r": 9,
+        "c": 3,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 15 — Mares & Oceanos",
+    "difficulty": "Médio",
+    "rows": 11,
+    "cols": 10,
+    "grid": [
+      "###T######",
+      "###U######",
+      "###B######",
+      "###A#CORAL",
+      "#PORTO####",
+      "###A#NAVIO",
+      "###O#C###N",
+      "M####H###D",
+      "ANCORA###A",
+      "R########S",
+      "E#########"
+    ],
+    "words": [
+      {
+        "word": "TUBARAO",
+        "clue": "Predador veloz de barbatanas e dentes afiados",
+        "r": 0,
+        "c": 3,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "CORAL",
+        "clue": "Recife colorido de grande biodiversidade marinha",
+        "r": 3,
+        "c": 5,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "CONCHA",
+        "clue": "Casca calcária bonita que as ondas trazem",
+        "r": 3,
+        "c": 5,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "PORTO",
+        "clue": "Instalação litorânea de embarque e desembarque",
+        "r": 4,
+        "c": 1,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "NAVIO",
+        "clue": "Embarcação de grande porte que viaja os mares",
+        "r": 5,
+        "c": 5,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "ONDAS",
+        "clue": "Oscilações d água adoradas pelos praticantes de surfe",
+        "r": 5,
+        "c": 9,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "MARE",
+        "clue": "Subida e descida periódica das águas marinhas",
+        "r": 7,
+        "c": 0,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "ANCORA",
+        "clue": "Pesada peça de metal que ancora o barco no cais",
+        "r": 8,
+        "c": 0,
+        "dir": "H",
+        "num": 7
+      }
+    ]
+  },
+  {
+    "title": "Edição 16 — Café & Padaria",
+    "difficulty": "Fácil",
+    "rows": 10,
+    "cols": 12,
+    "grid": [
+      "BOLO########",
+      "##E#########",
+      "##I###Q#####",
+      "##T###U####A",
+      "##EXPRESSO#C",
+      "###I##I####U",
+      "###C##J####C",
+      "###A#TORRADA",
+      "###R#######R",
+      "##PADARIA###"
+    ],
+    "words": [
+      {
+        "word": "BOLO",
+        "clue": "Receita doce assada que alegra o café da tarde",
+        "r": 0,
+        "c": 0,
+        "dir": "H",
+        "num": 1
+      },
+      {
+        "word": "LEITE",
+        "clue": "Líquido nutritivo excelente para pingado matinal",
+        "r": 0,
+        "c": 2,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "QUEIJO",
+        "clue": "Iguaria láctea curada ou frescal de dar água na boca",
+        "r": 2,
+        "c": 6,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "ACUCAR",
+        "clue": "Adoçante cristalino que muitos colocam no café",
+        "r": 3,
+        "c": 11,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "EXPRESSO",
+        "clue": "Café curto concentrado tirado com espuma densa",
+        "r": 4,
+        "c": 2,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "XICARA",
+        "clue": "Vasilha com asa usada para tomar café e chá",
+        "r": 4,
+        "c": 3,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "TORRADA",
+        "clue": "Pão douradinho e estaladiço passado na manteiga",
+        "r": 7,
+        "c": 5,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "PADARIA",
+        "clue": "Comércio tradicional com cheiro irresistível de pão",
+        "r": 9,
+        "c": 2,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 17 — Monumentos & Maravilhas",
+    "difficulty": "Médio",
+    "rows": 11,
+    "cols": 10,
+    "grid": [
+      "P#PIRAMIDE",
+      "A#####U###",
+      "L##CRISTO#",
+      "A#####E###",
+      "COLISEU###",
+      "I####S####",
+      "O####T####",
+      "#####A####",
+      "#####TORRE",
+      "#####U####",
+      "##MURALHA#"
+    ],
+    "words": [
+      {
+        "word": "PALACIO",
+        "clue": "Sede nobre onde residem reis ou chefes de Estado",
+        "r": 0,
+        "c": 0,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "PIRAMIDE",
+        "clue": "Tumba colossal erguida pelos faraós no Egito",
+        "r": 0,
+        "c": 2,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "MUSEU",
+        "clue": "Instituição que preserva relíquias e acervos históricos",
+        "r": 0,
+        "c": 6,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "CRISTO",
+        "clue": "O Redentor de braços abertos no Rio de Janeiro",
+        "r": 2,
+        "c": 3,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "COLISEU",
+        "clue": "Grandioso anfiteatro em Roma das lutas romanas",
+        "r": 4,
+        "c": 0,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "ESTATUA",
+        "clue": "Figura esculpida em pedra, mármore ou metal",
+        "r": 4,
+        "c": 5,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "TORRE",
+        "clue": "Monumento de ferro famoso em Paris que marca a skyline",
+        "r": 8,
+        "c": 5,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "MURALHA",
+        "clue": "Gigantesca barreira milenar na China antiga",
+        "r": 10,
+        "c": 2,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 18 — Artes & Pintura",
+    "difficulty": "Médio",
+    "rows": 11,
+    "cols": 12,
+    "grid": [
+      "#########Q##",
+      "#########U#P",
+      "#####MASCARA",
+      "#########D#L",
+      "##ESCULTOR#C",
+      "#P##O####O#O",
+      "FIGURINO####",
+      "#N##E#######",
+      "#C##S#######",
+      "#E##########",
+      "PLATEIA#####"
+    ],
+    "words": [
+      {
+        "word": "QUADRO",
+        "clue": "Pintura em tela exposta em museus e galerias",
+        "r": 0,
+        "c": 9,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "PALCO",
+        "clue": "Tablado onde artistas e atores se apresentam",
+        "r": 1,
+        "c": 11,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "MASCARA",
+        "clue": "Acessório teatral que oculta e transforma a face",
+        "r": 2,
+        "c": 5,
+        "dir": "H",
+        "num": 3
+      },
+      {
+        "word": "ESCULTOR",
+        "clue": "Artista que talha formas belas em pedra ou bronze",
+        "r": 4,
+        "c": 2,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "CORES",
+        "clue": "As matizes vibrantes que dão vida à obra de arte",
+        "r": 4,
+        "c": 4,
+        "dir": "V",
+        "num": 5
+      },
+      {
+        "word": "PINCEL",
+        "clue": "Pequeno instrumento de pelos para espalhar tintas",
+        "r": 5,
+        "c": 1,
+        "dir": "V",
+        "num": 6
+      },
+      {
+        "word": "FIGURINO",
+        "clue": "Vestimentas especiais produzidas para o elenco",
+        "r": 6,
+        "c": 0,
+        "dir": "H",
+        "num": 7
+      },
+      {
+        "word": "PLATEIA",
+        "clue": "Público espectador sentado que aplaude o espetáculo",
+        "r": 10,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  },
+  {
+    "title": "Edição 19 — Games & Cultura Geek",
+    "difficulty": "Médio",
+    "rows": 12,
+    "cols": 9,
+    "grid": [
+      "####PLANO",
+      "####O####",
+      "##CONSOLE",
+      "####T####",
+      "####O#C##",
+      "#MISSAO##",
+      "#A####N##",
+      "#G####T##",
+      "#I####R##",
+      "FASE##O##",
+      "######L##",
+      "###PIXEL#"
+    ],
+    "words": [
+      {
+        "word": "PLANO",
+        "clue": "Estratégia bem pensada para derrotar os oponentes",
+        "r": 0,
+        "c": 4,
+        "dir": "H",
+        "num": 1
+      },
+      {
+        "word": "PONTOS",
+        "clue": "Score acumulado na pontuação máxima do placar",
+        "r": 0,
+        "c": 4,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "CONSOLE",
+        "clue": "Aparelho de jogos ligado na televisão da sala",
+        "r": 2,
+        "c": 2,
+        "dir": "H",
+        "num": 2
+      },
+      {
+        "word": "CONTROLE",
+        "clue": "Acessório com botões e joysticks para jogar",
+        "r": 4,
+        "c": 6,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "MISSAO",
+        "clue": "Objetivo ou quest a cumprir durante a aventura",
+        "r": 5,
+        "c": 1,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "MAGIA",
+        "clue": "Poder místico canalizado por magos nos RPGs",
+        "r": 5,
+        "c": 1,
+        "dir": "V",
+        "num": 4
+      },
+      {
+        "word": "FASE",
+        "clue": "Estágio que você precisa superar para avançar",
+        "r": 9,
+        "c": 0,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "PIXEL",
+        "clue": "O menor ponto de uma imagem na tela do monitor",
+        "r": 11,
+        "c": 3,
+        "dir": "H",
+        "num": 6
+      }
+    ]
+  },
+  {
+    "title": "Edição 20 — Desafio Supremo",
+    "difficulty": "Difícil",
+    "rows": 12,
+    "cols": 12,
+    "grid": [
+      "###C####S#L#",
+      "VITORIA#A#A#",
+      "###R####B#B#",
+      "###A###GENIO",
+      "###G####D#R#",
+      "##DESTINO#I#",
+      "###M#A##R#N#",
+      "#####L##I#T#",
+      "#####E##A#O#",
+      "#####N######",
+      "#####T######",
+      "HORIZONTE###"
+    ],
+    "words": [
+      {
+        "word": "CORAGEM",
+        "clue": "Bravura para encarar os mistérios mais difíceis",
+        "r": 0,
+        "c": 3,
+        "dir": "V",
+        "num": 1
+      },
+      {
+        "word": "SABEDORIA",
+        "clue": "Conhecimento maduro acumulado ao longo da jornada",
+        "r": 0,
+        "c": 8,
+        "dir": "V",
+        "num": 2
+      },
+      {
+        "word": "LABIRINTO",
+        "clue": "Estrutura cheia de caminhos sinuosos e saídas",
+        "r": 0,
+        "c": 10,
+        "dir": "V",
+        "num": 3
+      },
+      {
+        "word": "VITORIA",
+        "clue": "A glória maior de quem completa todos os níveis",
+        "r": 1,
+        "c": 0,
+        "dir": "H",
+        "num": 4
+      },
+      {
+        "word": "GENIO",
+        "clue": "Pessoa dotada de inteligência e talento brilhante",
+        "r": 3,
+        "c": 7,
+        "dir": "H",
+        "num": 5
+      },
+      {
+        "word": "DESTINO",
+        "clue": "O futuro que aguarda as escolhas do viajante",
+        "r": 5,
+        "c": 2,
+        "dir": "H",
+        "num": 6
+      },
+      {
+        "word": "TALENTO",
+        "clue": "Capacidade nata para realizar tarefas com maestria",
+        "r": 5,
+        "c": 5,
+        "dir": "V",
+        "num": 7
+      },
+      {
+        "word": "HORIZONTE",
+        "clue": "A linha distante que separa a terra dos céus",
+        "r": 11,
+        "c": 0,
+        "dir": "H",
+        "num": 8
+      }
+    ]
+  }
+]

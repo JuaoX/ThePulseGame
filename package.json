@@ -1,23 +1,30 @@
 {
   "name": "the-pulse-game",
   "private": true,
-  "version": "10.0.0",
+  "version": "11.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "node tests/audit.mjs",
+    "test": "node --test tests/game.test.cjs",
+    "test:browser": "node tests/browser.cjs",
+    "test:experiences": "node tests/experiences.cjs",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "uisfx": "^0.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright": "^1.62.1",
     "typescript": "^5.5.3",
-    "vite": "^5.4.1"
+    "vite": "^8.3.4"
   }
 }

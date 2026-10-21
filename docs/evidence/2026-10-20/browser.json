@@ -1,0 +1,382 @@
+{
+  "engine": "Chromium headless; viewport and touch emulation; no physical keyboard/device",
+  "errors": [],
+  "measurements": [
+    {
+      "width": 320,
+      "home": {
+        "viewport": 320,
+        "scrollWidth": 320,
+        "overflow": [
+          {
+            "tag": "SPAN",
+            "className": "pg-mini-badge",
+            "text": "⚡ Rápido"
+          },
+          {
+            "tag": "SPAN",
+            "className": "pg-mini-badge",
+            "text": "▲ Infinito"
+          }
+        ],
+        "smallButtons": [
+          {
+            "text": "",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "THE PULSE",
+            "height": 40,
+            "width": 136.640625
+          },
+          {
+            "text": "PulsePlayer",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "PT",
+            "height": 38,
+            "width": 64.015625
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          }
+        ]
+      },
+      "arena": {
+        "viewport": 320,
+        "scrollWidth": 320,
+        "okBottom": 575.578125
+      }
+    },
+    {
+      "width": 375,
+      "home": {
+        "viewport": 375,
+        "scrollWidth": 375,
+        "overflow": [],
+        "smallButtons": [
+          {
+            "text": "",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "THE PULSE",
+            "height": 40,
+            "width": 136.640625
+          },
+          {
+            "text": "PulsePlayer",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "PT",
+            "height": 38,
+            "width": 64.015625
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          }
+        ]
+      },
+      "arena": {
+        "viewport": 375,
+        "scrollWidth": 375,
+        "okBottom": 531.71875
+      }
+    },
+    {
+      "timeoutProbe": {
+        "first": "SÍLABA\nNAT\n11.0s",
+        "second": "SÍLABA\nNAT\n11.0s",
+        "timerFrozen": true
+      }
+    },
+    {
+      "settings": {
+        "dialogCount": 0,
+        "volumeMin": "15"
+      }
+    },
+    {
+      "avatars": [
+        {
+          "src": "https://api.dicebear.com/9.x/adventurer/svg?seed=Felix&backgroundColor=1e293b&radius=20",
+          "loaded": true
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/adventurer/svg?seed=Amaya&backgroundColor=312e81&radius=20",
+          "loaded": true
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/lorelei/svg?seed=Kael&backgroundColor=0f172a&radius=20",
+          "loaded": true
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/lorelei/svg?seed=Luna&backgroundColor=3b0764&radius=20",
+          "loaded": true
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/bottts/svg?seed=VoltX&backgroundColor=083344&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/bottts/svg?seed=Nexus9&backgroundColor=1e1b4b&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/avataaars/svg?seed=LeoPulse&backgroundColor=14532d&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/avataaars/svg?seed=MayaPulse&backgroundColor=4c1d95&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/pixel-art/svg?seed=ArcadeHero&backgroundColor=1e293b&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/pixel-art/svg?seed=CyberNinja&backgroundColor=31102F&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/fun-emoji/svg?seed=Sparky&backgroundColor=1e293b&radius=20",
+          "loaded": false
+        },
+        {
+          "src": "https://api.dicebear.com/9.x/fun-emoji/svg?seed=ChillVibe&backgroundColor=0f292a&radius=20",
+          "loaded": false
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "home": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "overflow": [],
+        "smallButtons": [
+          {
+            "text": "",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "THE PULSE",
+            "height": 40,
+            "width": 149.34375
+          },
+          {
+            "text": "PulsePlayer",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "PT",
+            "height": 38,
+            "width": 64.015625
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          }
+        ]
+      },
+      "arena": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "okBottom": 531.71875
+      }
+    },
+    {
+      "width": 768,
+      "home": {
+        "viewport": 768,
+        "scrollWidth": 768,
+        "overflow": [],
+        "smallButtons": [
+          {
+            "text": "",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "THE PULSE",
+            "height": 40,
+            "width": 149.34375
+          },
+          {
+            "text": "PulsePlayer",
+            "height": 42,
+            "width": 143.375
+          },
+          {
+            "text": "PT",
+            "height": 38,
+            "width": 64.015625
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          }
+        ]
+      },
+      "arena": {
+        "viewport": 768,
+        "scrollWidth": 768,
+        "okBottom": 651.4375
+      }
+    },
+    {
+      "width": 1440,
+      "home": {
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "overflow": [],
+        "smallButtons": [
+          {
+            "text": "",
+            "height": 38,
+            "width": 38
+          },
+          {
+            "text": "THE PULSE",
+            "height": 40,
+            "width": 166.265625
+          },
+          {
+            "text": "Jogar",
+            "height": 40,
+            "width": 73.953125
+          },
+          {
+            "text": "Ligas",
+            "height": 40,
+            "width": 69.78125
+          },
+          {
+            "text": "Avatares",
+            "height": 40,
+            "width": 96.296875
+          },
+          {
+            "text": "Palavras",
+            "height": 40,
+            "width": 94.40625
+          },
+          {
+            "text": "Sílabas",
+            "height": 40,
+            "width": 83.4375
+          },
+          {
+            "text": "PulsePlayer",
+            "height": 42,
+            "width": 143.375
+          },
+          {
+            "text": "PT",
+            "height": 38,
+            "width": 64.015625
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          },
+          {
+            "text": "Jogar ▶",
+            "height": 24,
+            "width": 66.96875
+          }
+        ]
+      },
+      "arena": {
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "okBottom": 657.4375
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\Joao R\\Documents\\PROJETOS\\ThePulseGame\\src\\styles\\global.css",
+    "line": 844,
+    "snippet": "border-left: 4px solid var(--pg-emerald)"
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\Joao R\\Documents\\PROJETOS\\ThePulseGame\\src\\styles\\global.css",
+    "line": 845,
+    "snippet": "border-left: 4px solid var(--pg-gold)"
+  },
+  {
+    "antipattern": "gradient-text",
+    "name": "Gradient text",
+    "description": "Gradient text is decorative rather than meaningful — a common AI tell, especially on headings and metrics. Use solid colors for text.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\Joao R\\Documents\\PROJETOS\\ThePulseGame\\src\\styles\\global.css",
+    "line": 151,
+    "snippet": "background-clip: text + gradient"
+  }
+]

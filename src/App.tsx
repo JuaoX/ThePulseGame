@@ -1,1554 +1,281 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  AnswerHistoryItem,
-  CategoryId,
-  GameModeId,
-  LanguageCode,
-  NavTabId,
-  QuestionItem,
-  SyllableChallenge,
-} from './types/game';
-import { QUESTION_BANK } from './data/questions';
-import { PORTUGUESE_WORD_SET, WORDBOMB_SYLLABLES } from './data/syllables';
-import {
-  AVATAR_STYLE_OPTIONS,
-  buildAvatarUrl,
-  CURATED_AVATARS,
-  I18N_STRINGS,
-  LANGUAGE_OPTIONS,
-  ModeVisualArtwork,
-  PulseBrandLogo,
-} from './data/avatars';
-import {
-  createPRNG,
-  generateProceduralMathQuestion,
-  getBrasiliaDateKey,
-  hashSeed,
-  shuffleQuestionOptions,
-  validateWordSubmission,
-} from './engine/prng';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { CategoryId, GameModeId, PlayerProfile } from './types/game';
+import { PulseBrandLogo } from './data/avatars';
+import { characterById } from './data/characters';
+import { acquireCharacter, equipCharacter, rewardDiscovery } from './engine/collection';
+import { CharacterCollection, CharacterPortrait } from './components/CharacterCollection';
+import { MISSIONS } from './data/missions';
+import { getBrasiliaDateKey, validateWordSubmission } from './engine/prng';
+import { loadLexicon, WordDictionary } from './engine/lexicon';
+import { clearProfileStorage, loadProfile, sanitizeProfile, saveProfile } from './engine/storage';
+import { comboFor, currentSyllable, Session, SessionMode, sessionReducer, totalScore } from './engine/session';
 import { SoundEngine } from './engine/sound';
-import { clearProfileStorage, getPlayerLeague, loadProfile, saveProfile } from './engine/storage';
+import { Dialog } from './components/Dialog';
+import { Icon, IconName } from './components/Icon';
 import { ArenaCanvasFX, ArenaCanvasFXHandle } from './components/ArenaCanvasFX';
+const EchoExperience = lazy(() => import('./components/EchoExperience').then(module => ({ default: module.EchoExperience })));
+const CrosswordExperience = lazy(() => import('./components/CrosswordExperience').then(module => ({ default: module.CrosswordExperience })));
 
-const COMBO_STEPS = [1.0, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0];
-const BASE_POINTS = { 1: 100, 2: 150, 3: 220 } as const;
-
-const VISUAL_MODES: {
-  id: GameModeId;
-  title: string;
-  badges: [string, string];
-  accent: string;
-}[] = [
-  {
-    id: 'wordbomb',
-    title: 'Bomba de Sílabas',
-    badges: ['⚡ Rápido', '♥♥♥ 3 Vidas'],
-    accent: '#22D3EE',
-  },
-  {
-    id: 'daily',
-    title: 'Desafio Diário',
-    badges: ['📅 Hoje', '⏱ 60s'],
-    accent: '#10B981',
-  },
-  {
-    id: 'elevator',
-    title: 'O Elevador',
-    badges: ['▲ Infinito', '♥♥♥ 3 Vidas'],
-    accent: '#F43F5E',
-  },
-  {
-    id: 'classic',
-    title: 'Arena Turbo 60s',
-    badges: ['🔥 Combo 3x', '⏱ 60s'],
-    accent: '#818CF8',
-  },
+type Tab = 'home' | 'progress' | 'avatars';
+const TABS: { id: Tab; title: string; icon: IconName }[] = [
+  { id: 'home', title: 'Explorar', icon: 'play' }, { id: 'progress', title: 'Recordes', icon: 'chart' }, { id: 'avatars', title: 'Coleção', icon: 'user' },
 ];
-
-const CATEGORY_LABELS: Record<CategoryId, string> = {
-  mixed: '⚡ Misto',
-  math: '∑ Matemática',
-  logic: '◈ Lógica',
-  words: 'Aa Palavras',
-  general: '🌐 Gerais',
-};
+const CATEGORIES: Record<CategoryId, string> = { mixed: 'Todas', math: 'Matemática', logic: 'Lógica', words: 'Linguagem', general: 'Conhecimentos' };
+const MODES: { id: GameModeId; title: string; description: string; color: string }[] = [
+  { id: 'wordbomb', title: 'Bomba de palavras', description: 'Digite antes de explodir.', color: '#55d8e8' },
+  { id: 'elevator', title: 'O Elevador', description: 'Acertou? Sobe mais um.', color: '#ffb39e' },
+  { id: 'classic', title: 'Arena Pulse', description: 'Quanto você faz em 60s?', color: '#bca7ff' },
+  { id: 'daily', title: 'Desafio do dia', description: '10 perguntas. Bora fechar?', color: '#9be3b2' },
+];
+const EXPERIENCES = [
+  { id: 'echo' as const, title: 'Ecos', description: 'Seu último toque ainda está aqui.', color: '#f5c568' },
+  { id: 'crossword' as const, title: 'Cruzadas Diretas', description: 'Uma pista abre a próxima.', color: '#9be3b2' },
+  ...MODES,
+];
+function modeTitle(session: Session): string {
+  return session.mode === 'mission' ? MISSIONS.find(m => m.id === session.missionId)?.title || 'Missão'
+    : session.mode === 'review' ? 'Mais uma chance' : MODES.find(m => m.id === session.mode)?.title || 'The Pulse';
+}
+function recordSession(profile: PlayerProfile, session: Session): PlayerProfile {
+  const score = totalScore(session), correct = session.history.filter(h => h.isCorrect).length;
+  const isReplay = session.mode === 'daily' && Boolean(profile.dailyHistory[session.dateKey]);
+  const xp = isReplay ? 0 : correct * 40;
+  const coins = isReplay ? 0 : correct * 2;
+  const mode = session.mode as GameModeId;
+  const missionBest = { ...profile.missionBest };
+  if (session.missionId && session.history.length === session.queue.length) {
+    const transfer = session.history.filter(h => h.transfer && h.isCorrect).length;
+    const previous = missionBest[session.missionId];
+    if (!previous || correct > previous.correct || (correct === previous.correct && transfer > previous.transfer)) missionBest[session.missionId] = { correct, total: session.history.length, transfer };
+  }
+  const shareText = `The Pulse · ${session.dateKey}\n${modeTitle(session)}: ${correct}/${session.history.length} acertos · ${score} pontos\nProgresso pessoal neste dispositivo.`;
+  const dailyHistory = { ...profile.dailyHistory };
+  if (session.mode === 'daily' && !isReplay && session.history.length === session.queue.length) dailyHistory[session.dateKey] = { dateKey: session.dateKey, score, safeScore: session.safeScore, salvagedScore: Math.round(session.riskScore / 2), correctCount: correct, totalCount: session.history.length, peakCombo: session.peakCombo, timeline: session.history.map(h => h.isCorrect ? '✓' : '·').join(''), shareText };
+  let updated = sanitizeProfile({ ...profile, version: 12, careerXP: profile.careerXP + xp, coins: profile.coins + coins, matchesPlayed: profile.matchesPlayed + 1,
+    totalQuestionsAnswered: profile.totalQuestionsAnswered + session.history.length, totalQuestionsCorrect: profile.totalQuestionsCorrect + correct, highestComboEver: Math.max(profile.highestComboEver, session.peakCombo),
+    bestScores: mode in profile.bestScores ? { ...profile.bestScores, [mode]: Math.max(profile.bestScores[mode], score) } : profile.bestScores,
+    bestCategoryScores: { ...profile.bestCategoryScores, [session.category]: Math.max(profile.bestCategoryScores[session.category], score) },
+    recentQuestionIds: [...profile.recentQuestionIds, ...session.history.flatMap(h => h.questionId ? [h.questionId] : [])].slice(-180),
+    reviewHistory: [...profile.reviewHistory, ...session.history].slice(-120), dailyHistory, missionBest });
+  if (correct > 0 && session.mode !== 'review') updated = rewardDiscovery(updated, `round:${session.mode}:${session.dateKey}`, 8);
+  if (session.mode === 'wordbomb' && session.words.length >= 8) updated = rewardDiscovery(updated, 'words:first-eight', 8);
+  return updated;
+}
 
 export default function App() {
-  const [profile, setProfile] = useState(() => loadProfile());
-  const [activeTab, setActiveTab] = useState<NavTabId>('play');
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [profile, setProfile] = useState(loadProfile);
+  const [tab, setTab] = useState<Tab>('home');
+  const [screen, setScreen] = useState<'hub' | 'game' | 'echo' | 'crossword'>('hub');
+  const [session, dispatch] = useReducer(sessionReducer, null);
+  const [modal, setModal] = useState<'settings' | 'profile' | 'leave' | 'help' | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const [storageOk, setStorageOk] = useState(true);
+  const [dictionary, setDictionary] = useState<WordDictionary>();
+  const [lexiconState, setLexiconState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [word, setWord] = useState('');
+  const [query, setQuery] = useState('');
+  const [pendingStart, setPendingStart] = useState<{ mode: SessionMode; missionId?: string; sequence?: string }>();
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const [explanationOpen, setExplanationOpen] = useState(false);
+  const [systemMotion, setSystemMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const fx = useRef<ArenaCanvasFXHandle>(null);
+  const questionHeading = useRef<HTMLHeadingElement>(null);
+  const recorded = useRef('');
+  const restoreModal = useRef(false);
+  const startRequest = useRef(0);
+  const reducedMotion = systemMotion || profile.reducedMotion;
+  const character = characterById(profile.equippedCharacter);
+  const discover = useCallback((key: string, amount: number) => setProfile(previous => rewardDiscovery(previous, key, amount)), []);
+  const active = screen === 'game' && session && session.phase !== 'finished';
+  const mistakes = useMemo(() => [...new Map(profile.reviewHistory.map((item, i) => [item.questionId || `${item.prompt}_${i}`, item])).values()].filter(item => !item.isCorrect), [profile.reviewHistory]);
 
-  const [inMatch, setInMatch] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [matchClock, setMatchClock] = useState(60.0);
-  const [fuseClock, setFuseClock] = useState(10.0);
-  const [fuseTotal, setFuseTotal] = useState(10.0);
-  const [lives, setLives] = useState(3);
-  const [floor, setFloor] = useState(1);
-
-  const [safeScore, setSafeScore] = useState(0);
-  const [riskScore, setRiskScore] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [combo, setCombo] = useState(1.0);
-
-  const [currentQuestion, setCurrentQuestion] = useState<QuestionItem | null>(null);
-  const [currentSyllable, setCurrentSyllable] = useState<SyllableChallenge>(WORDBOMB_SYLLABLES[0]);
-  const [typedWord, setTypedWord] = useState('');
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState<{
-    visible: boolean;
-    tone: 'positive' | 'error';
-    title: string;
-    detail: string;
-  } | null>(null);
-
-  const [postMatchModal, setPostMatchModal] = useState<{
-    finalScore: number;
-    safeScore: number;
-    salvagedScore: number;
-    coinsEarned: number;
-    peakCombo: number;
-    shareText: string;
-  } | null>(null);
-
-  const [wordSearchQuery, setWordSearchQuery] = useState('');
-
-  const langMenuRef = useRef<HTMLDivElement | null>(null);
-  const fxRef = useRef<ArenaCanvasFXHandle | null>(null);
-  const sessionIdRef = useRef(0);
-  const transitionTimerRef = useRef<number | null>(null);
-  const rngRef = useRef<() => number>(Math.random);
-  const usedQuestionIdsRef = useRef<Set<string>>(new Set());
-  const usedSyllablesRef = useRef<Set<string>>(new Set());
-  const usedWordsRef = useRef<Set<string>>(new Set());
-  const historyRef = useRef<AnswerHistoryItem[]>([]);
-  const timelineMarksRef = useRef<string[]>([]);
-
-  const matchRef = useRef({
-    active: false,
-    paused: false,
-    inFeedback: false,
-    mode: 'wordbomb' as GameModeId,
-    category: 'mixed' as CategoryId,
-    dateKey: getBrasiliaDateKey(),
-    matchClock: 60.0,
-    fuseClock: 10.0,
-    fuseTotal: 10.0,
-    lives: 3,
-    floor: 1,
-    safeScore: 0,
-    riskScore: 0,
-    streak: 0,
-    combo: 1.0,
-    peakCombo: 1.0,
-    correctCount: 0,
-    totalCount: 0,
-    currentQuestion: null as QuestionItem | null,
-    currentSyllable: WORDBOMB_SYLLABLES[0],
-  });
-
+  useEffect(() => { setStorageOk(saveProfile(profile)); SoundEngine.volume = profile.sfxVolume / 100; }, [profile]);
   useEffect(() => {
-    SoundEngine.volume = profile.sfxVolume / 100;
-    document.body.classList.toggle('reduced-motion', profile.reducedMotion);
-    saveProfile(profile);
-  }, [profile]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
-        setLangDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const change = () => setSystemMotion(media.matches);
+    media.addEventListener('change', change); return () => media.removeEventListener('change', change);
   }, []);
-
-  const t = I18N_STRINGS[profile.language] || I18N_STRINGS.pt;
-  const activeLangMeta = LANGUAGE_OPTIONS.find(l => l.code === profile.language) || LANGUAGE_OPTIONS[0];
-  const playerAvatarUrl = buildAvatarUrl(profile.avatarStyle, profile.avatarSeed, profile.avatarBg);
-  const leagueInfo = getPlayerLeague(profile.careerXP);
-
-  const clearPendingTransition = () => {
-    if (transitionTimerRef.current !== null) {
-      window.clearTimeout(transitionTimerRef.current);
-      transitionTimerRef.current = null;
-    }
-  };
-
-  const selectNextQuestion = (
-    mode: GameModeId,
-    category: CategoryId,
-    currentStreak: number,
-    serial: number
-  ): QuestionItem => {
-    const allowedCats =
-      mode === 'daily' || category === 'mixed' ? ['math', 'logic', 'words', 'general'] : [category];
-    const targetDiff: 1 | 2 | 3 = currentStreak < 2 ? 1 : currentStreak < 5 ? 2 : 3;
-
-    let pool = QUESTION_BANK.filter(
-      q =>
-        allowedCats.includes(q.category) &&
-        q.difficulty === targetDiff &&
-        !usedQuestionIdsRef.current.has(q.id)
-    );
-
-    if (pool.length === 0) {
-      pool = QUESTION_BANK.filter(
-        q => allowedCats.includes(q.category) && !usedQuestionIdsRef.current.has(q.id)
-      );
-    }
-
-    if (pool.length === 0) {
-      return generateProceduralMathQuestion(rngRef.current, targetDiff, serial);
-    }
-
-    const picked = pool[Math.floor(rngRef.current() * pool.length)];
-    usedQuestionIdsRef.current.add(picked.id);
-    return shuffleQuestionOptions(picked, rngRef.current);
-  };
-
-  const selectNextSyllable = (): SyllableChallenge => {
-    let pool = WORDBOMB_SYLLABLES.filter(s => !usedSyllablesRef.current.has(s.syl));
-    if (pool.length === 0) {
-      usedSyllablesRef.current.clear();
-      pool = WORDBOMB_SYLLABLES;
-    }
-    const picked = pool[Math.floor(rngRef.current() * pool.length)];
-    usedSyllablesRef.current.add(picked.syl);
-    return picked;
-  };
-
-  const loadStepChallenge = (activeSessionId: number) => {
-    if (sessionIdRef.current !== activeSessionId || !matchRef.current.active) return;
-    clearPendingTransition();
-
-    const st = matchRef.current;
-    st.inFeedback = false;
-    setSelectedOption(null);
-    setFeedback(null);
-
-    if (st.mode === 'wordbomb') {
-      const syl = selectNextSyllable();
-      st.currentSyllable = syl;
-      const nextFuse = Math.max(6.0, 11.0 - Math.floor(st.correctCount / 3) * 0.6);
-      st.fuseTotal = nextFuse;
-      st.fuseClock = nextFuse;
-
-      setCurrentSyllable(syl);
-      setFuseTotal(nextFuse);
-      setFuseClock(nextFuse);
-      setTypedWord('');
-    } else {
-      const q = selectNextQuestion(st.mode, st.category, st.streak, st.totalCount + 1);
-      st.currentQuestion = q;
-      const baseTime = q.difficulty === 1 ? 11.0 : q.difficulty === 2 ? 10.0 : 9.0;
-      const elevatorPenalty = st.mode === 'elevator' ? Math.min(3.5, Math.floor((st.floor - 1) / 4) * 0.5) : 0;
-      const nextFuse = Math.max(5.0, baseTime - elevatorPenalty);
-
-      st.fuseTotal = nextFuse;
-      st.fuseClock = nextFuse;
-
-      setCurrentQuestion(q);
-      setFuseTotal(nextFuse);
-      setFuseClock(nextFuse);
-    }
-  };
-
-  const startNewMatch = (modeOverride?: GameModeId, categoryOverride?: CategoryId) => {
-    clearPendingTransition();
-    sessionIdRef.current += 1;
-    const currentSessionId = sessionIdRef.current;
-
-    const mode = modeOverride ?? profile.selectedMode;
-    const category = categoryOverride ?? profile.selectedCategory;
-    const todayKey = getBrasiliaDateKey();
-
-    rngRef.current =
-      mode === 'daily'
-        ? createPRNG(hashSeed(`THE_PULSE_GAME_${todayKey}`))
-        : createPRNG((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0);
-
-    usedQuestionIdsRef.current.clear();
-    usedSyllablesRef.current.clear();
-    usedWordsRef.current.clear();
-    historyRef.current = [];
-    timelineMarksRef.current = [];
-
-    const initialLives = mode === 'wordbomb' || mode === 'elevator' ? 3 : 0;
-
-    matchRef.current = {
-      active: true,
-      paused: false,
-      inFeedback: false,
-      mode,
-      category,
-      dateKey: todayKey,
-      matchClock: 60.0,
-      fuseClock: 10.0,
-      fuseTotal: 10.0,
-      lives: initialLives,
-      floor: 1,
-      safeScore: 0,
-      riskScore: 0,
-      streak: 0,
-      combo: 1.0,
-      peakCombo: 1.0,
-      correctCount: 0,
-      totalCount: 0,
-      currentQuestion: null,
-      currentSyllable: WORDBOMB_SYLLABLES[0],
-    };
-
-    SoundEngine.modeSelect();
-    setProfile(prev => ({ ...prev, selectedMode: mode, selectedCategory: category }));
-    setPostMatchModal(null);
-    setIsPaused(false);
-    setMatchClock(60.0);
-    setLives(initialLives);
-    setFloor(1);
-    setSafeScore(0);
-    setRiskScore(0);
-    setStreak(0);
-    setCombo(1.0);
-    setInMatch(true);
-
-    loadStepChallenge(currentSessionId);
-  };
-
-  const abortMatchToHome = () => {
-    clearPendingTransition();
-    sessionIdRef.current += 1;
-    matchRef.current.active = false;
-    setInMatch(false);
-    setIsPaused(false);
-    setFeedback(null);
-  };
-
-  const concludeMatch = () => {
-    clearPendingTransition();
-    const st = matchRef.current;
-    if (!st.active) return;
-    st.active = false;
-    sessionIdRef.current += 1;
-
-    setInMatch(false);
-    setIsPaused(false);
-    SoundEngine.finish();
-
-    const salvagedScore = Math.round(st.riskScore * 0.5);
-    const finalScore = st.safeScore + salvagedScore;
-    const coinsEarned = Math.max(10, Math.round(finalScore / 20));
-    const timelineStr = timelineMarksRef.current.length > 0 ? timelineMarksRef.current.join('') : '—';
-
-    const shareText = [
-      `⚡ The Pulse Game — ${st.mode.toUpperCase()} (${st.dateKey})`,
-      `🏆 ${finalScore} pts (🛡️ Cofre: ${st.safeScore} | ⚡ Bônus: +${salvagedScore})`,
-      `🔥 Combo Máx: ${st.peakCombo.toFixed(1)}x • 🎯 ${st.correctCount}/${st.totalCount}`,
-      `📊 ${timelineStr}`,
-    ].join('\n');
-
-    setProfile(prev => ({
-      ...prev,
-      coins: prev.coins + coinsEarned,
-      careerXP: prev.careerXP + finalScore,
-      matchesPlayed: prev.matchesPlayed + 1,
-      totalQuestionsAnswered: prev.totalQuestionsAnswered + st.totalCount,
-      totalQuestionsCorrect: prev.totalQuestionsCorrect + st.correctCount,
-      highestComboEver: Math.max(prev.highestComboEver, st.peakCombo),
-      bestScores: {
-        ...prev.bestScores,
-        [st.mode]: Math.max(prev.bestScores[st.mode] || 0, finalScore),
-      },
-    }));
-
-    setPostMatchModal({
-      finalScore,
-      safeScore: st.safeScore,
-      salvagedScore,
-      coinsEarned,
-      peakCombo: st.peakCombo,
-      shareText,
-    });
-  };
-
-  const handleProtectPulse = () => {
-    const st = matchRef.current;
-    if (!st.active || st.paused || st.riskScore <= 0) return;
-
-    const amount = st.riskScore;
-    const hadHighStreak = st.streak >= 4 && st.mode !== 'elevator';
-
-    st.safeScore += amount;
-    st.riskScore = 0;
-    st.streak = 0;
-    st.combo = 1.0;
-    timelineMarksRef.current.push('🛡️');
-
-    if (hadHighStreak) {
-      st.matchClock = Math.min(60.0, st.matchClock + 1.5);
-      setMatchClock(st.matchClock);
-    }
-
-    setSafeScore(st.safeScore);
-    setRiskScore(0);
-    setStreak(0);
-    setCombo(1.0);
-    SoundEngine.bank();
-    fxRef.current?.spawnConfettiShower();
-
-    setFeedback({
-      visible: true,
-      tone: 'positive',
-      title: `🛡️ +${amount} PTS BLINDADOS!${hadHighStreak ? ' (+1,5s EXTRA)' : ''}`,
-      detail: '100% garantidos na partida!',
-    });
-  };
-
-  const handleAnswerOption = (optionIdx: number) => {
-    const st = matchRef.current;
-    if (!st.active || st.paused || st.inFeedback || !st.currentQuestion) return;
-
-    const currentSessionId = sessionIdRef.current;
-    st.inFeedback = true;
-    st.totalCount += 1;
-    setSelectedOption(optionIdx);
-
-    const q = st.currentQuestion;
-    const isCorrect = optionIdx === q.correctIndex;
-
-    if (isCorrect) {
-      st.correctCount += 1;
-      st.streak += 1;
-      st.floor += 1;
-      st.combo = COMBO_STEPS[Math.min(st.streak, COMBO_STEPS.length - 1)];
-      st.peakCombo = Math.max(st.peakCombo, st.combo);
-
-      const speedRatio = Math.max(0, Math.min(1, st.fuseClock / st.fuseTotal));
-      const speedBonus = Math.round(50 * speedRatio);
-      const earned = Math.round((BASE_POINTS[q.difficulty] + speedBonus) * st.combo);
-      st.riskScore += earned;
-      timelineMarksRef.current.push('🟢');
-
-      setStreak(st.streak);
-      setFloor(st.floor);
-      setCombo(st.combo);
-      setRiskScore(st.riskScore);
-      SoundEngine.hit(st.streak);
-      fxRef.current?.spawnShockwave('#22D3EE');
-
-      setFeedback({
-        visible: true,
-        tone: 'positive',
-        title: `✓ +${earned} PTS (${st.combo.toFixed(1)}X)`,
-        detail: q.explanation,
-      });
-
-      transitionTimerRef.current = window.setTimeout(() => {
-        loadStepChallenge(currentSessionId);
-      }, 850);
-    } else {
-      const lost = st.riskScore;
-      st.riskScore = 0;
-      st.streak = 0;
-      st.combo = 1.0;
-      timelineMarksRef.current.push('🔴');
-
-      if (st.mode === 'elevator' || st.mode === 'wordbomb') {
-        st.lives = Math.max(0, st.lives - 1);
-        setLives(st.lives);
-      }
-
-      setRiskScore(0);
-      setStreak(0);
-      setCombo(1.0);
-      SoundEngine.error();
-      fxRef.current?.spawnBurst('#F43F5E', 24);
-
-      setFeedback({
-        visible: true,
-        tone: 'error',
-        title: `✕ SOBRECARGA! ${lost > 0 ? `-${lost} PTS` : ''}`,
-        detail: `Correta: ${q.options[q.correctIndex]} — ${q.explanation}`,
-      });
-
-      if ((st.mode === 'elevator' || st.mode === 'wordbomb') && st.lives <= 0) {
-        transitionTimerRef.current = window.setTimeout(() => {
-          if (sessionIdRef.current === currentSessionId) concludeMatch();
-        }, 1150);
+  useEffect(() => { document.documentElement.classList.toggle('reduced-motion', reducedMotion); }, [reducedMotion]);
+  useEffect(() => {
+    if (screen !== 'game' || session?.phase !== 'answering' || session.relaxed) return;
+    let last = performance.now();
+    const id = window.setInterval(() => { const now = performance.now(); dispatch({ type: 'TICK', elapsed: now - last }); last = now; }, 100);
+    return () => clearInterval(id);
+  }, [screen, session?.id, session?.phase, session?.relaxed]);
+  useEffect(() => {
+    const hide = () => { document.documentElement.classList.toggle('page-hidden', document.hidden); if (document.hidden && screen === 'game') { dispatch({ type: 'PAUSE' }); SoundEngine.stop(); } };
+    document.addEventListener('visibilitychange', hide); window.addEventListener('blur', hide);
+    return () => { document.removeEventListener('visibilitychange', hide); window.removeEventListener('blur', hide); };
+  }, [screen]);
+  useEffect(() => {
+    if (!session || screen !== 'game') return;
+    if (session.phase === 'answering') {
+      if (session.mode === 'wordbomb') {
+        document.getElementById('arena-word')?.focus({ preventScroll: true });
       } else {
-        transitionTimerRef.current = window.setTimeout(() => {
-          loadStepChallenge(currentSessionId);
-        }, 1350);
+        questionHeading.current?.focus({ preventScroll: true });
       }
     }
-  };
-
-  const handleWordBombSubmit = () => {
-    const st = matchRef.current;
-    if (!st.active || st.paused || st.inFeedback || st.mode !== 'wordbomb') return;
-
-    const validation = validateWordSubmission(
-      typedWord,
-      st.currentSyllable.syl,
-      usedWordsRef.current,
-      PORTUGUESE_WORD_SET
-    );
-
-    if (!validation.valid) {
-      SoundEngine.error();
-      fxRef.current?.spawnBurst('#F43F5E', 14);
-      setFeedback({
-        visible: true,
-        tone: 'error',
-        title: `✕ ${validation.reason}`,
-        detail: `Exemplos: ${st.currentSyllable.hint}`,
-      });
-      return;
+    if (session.phase === 'feedback') {
+      const last = session.history[session.history.length - 1];
+      if (last?.isCorrect) { SoundEngine.hit(session.streak); if (character.effect !== 'shadow') fx.current?.spawnShockwave(character.color); } else SoundEngine.error();
     }
-
-    const currentSessionId = sessionIdRef.current;
-    usedWordsRef.current.add(validation.normalized);
-    st.totalCount += 1;
-    st.correctCount += 1;
-    st.streak += 1;
-    st.combo = COMBO_STEPS[Math.min(st.streak, COMBO_STEPS.length - 1)];
-    st.peakCombo = Math.max(st.peakCombo, st.combo);
-
-    const lengthBonus = Math.min(80, validation.normalized.length * 10);
-    const earned = Math.round((110 + lengthBonus) * st.combo);
-    st.riskScore += earned;
-    timelineMarksRef.current.push('🟢');
-
-    setStreak(st.streak);
-    setCombo(st.combo);
-    setRiskScore(st.riskScore);
-    SoundEngine.hit(st.streak);
-    fxRef.current?.spawnShockwave('#22D3EE');
-
-    loadStepChallenge(currentSessionId);
-    setFeedback({
-      visible: true,
-      tone: 'positive',
-      title: `✓ "${validation.normalized}" +${earned} PTS (${st.combo.toFixed(1)}X)`,
-      detail: 'Toque em BLINDAR para salvar os pontos no cofre!',
-    });
-  };
-
+    if (session.phase === 'finished' && recorded.current !== session.id) {
+      recorded.current = session.id;
+      setProfile(previous => recordSession(previous, session));
+      SoundEngine.finish(); if (character.effect !== 'shadow') fx.current?.spawnConfettiShower();
+      questionHeading.current?.focus();
+    }
+  }, [session?.phase, session?.id, session?.index, screen]);
   useEffect(() => {
-    if (!inMatch) return;
-    let lastTime = performance.now();
-    let lastUrgentSecond = -1;
-    let rafId = 0;
-
-    const tick = (now: number) => {
-      const st = matchRef.current;
-      if (!st.active) return;
-
-      const dt = Math.min(0.1, Math.max(0, (now - lastTime) / 1000));
-      lastTime = now;
-
-      if (!st.paused && !st.inFeedback) {
-        if (st.mode !== 'elevator') {
-          st.matchClock = Math.max(0, st.matchClock - dt);
-          setMatchClock(st.matchClock);
-
-          if (st.matchClock <= 10.0 && st.matchClock > 0) {
-            const sec = Math.ceil(st.matchClock);
-            if (sec !== lastUrgentSecond) {
-              lastUrgentSecond = sec;
-              SoundEngine.tickUrgent();
-            }
-          }
-
-          if (st.matchClock <= 0) {
-            concludeMatch();
-            return;
-          }
-        }
-
-        st.fuseClock = Math.max(0, st.fuseClock - dt);
-        setFuseClock(st.fuseClock);
-
-        if (st.fuseClock <= 0) {
-          if (st.mode === 'wordbomb') {
-            const currentSessionId = sessionIdRef.current;
-            st.inFeedback = true;
-            st.totalCount += 1;
-            st.riskScore = 0;
-            st.streak = 0;
-            st.combo = 1.0;
-            st.lives = Math.max(0, st.lives - 1);
-            timelineMarksRef.current.push('🔴');
-
-            setRiskScore(0);
-            setStreak(0);
-            setCombo(1.0);
-            setLives(st.lives);
-            SoundEngine.error();
-            fxRef.current?.spawnBurst('#F43F5E', 26);
-
-            setFeedback({
-              visible: true,
-              tone: 'error',
-              title: '💥 EXPLODIU! -1 VIDA',
-              detail: `Possíveis: ${st.currentSyllable.samples.slice(0, 4).join(', ')}`,
-            });
-
-            if (st.lives <= 0) {
-              transitionTimerRef.current = window.setTimeout(() => {
-                if (sessionIdRef.current === currentSessionId) concludeMatch();
-              }, 1150);
-            } else {
-              transitionTimerRef.current = window.setTimeout(() => {
-                loadStepChallenge(currentSessionId);
-              }, 1250);
-            }
-          } else {
-            handleAnswerOption(-1);
-          }
-          return;
-        }
-      }
-
-      rafId = requestAnimationFrame(tick);
-    };
-
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [inMatch]);
-
+    if (screen !== 'game' || session?.phase !== 'feedback' || modal || explanationOpen || !profile.autoAdvance) return;
+    const correct = session.history[session.history.length - 1]?.isCorrect;
+    const id = window.setTimeout(() => { setWord(''); dispatch({ type: 'NEXT' }); }, correct ? (session.mode === 'wordbomb' ? 500 : 900) : 2200);
+    return () => window.clearTimeout(id);
+  }, [screen, session?.phase, session?.id, session?.index, modal, explanationOpen, profile.autoAdvance]);
+  useEffect(() => { setExplanationOpen(false); }, [session?.id, session?.index]);
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!matchRef.current.active) return;
-
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        matchRef.current.paused = !matchRef.current.paused;
-        setIsPaused(matchRef.current.paused);
-        return;
-      }
-
-      if (matchRef.current.paused) return;
-
-      if (e.key === 'Tab' || (e.code === 'Space' && matchRef.current.mode !== 'wordbomb')) {
-        e.preventDefault();
-        if (matchRef.current.riskScore > 0) {
-          handleProtectPulse();
-        }
-        return;
-      }
-
-      if (matchRef.current.mode !== 'wordbomb') {
-        if (e.key === '1' || e.key.toUpperCase() === 'A') handleAnswerOption(0);
-        else if (e.key === '2' || e.key.toUpperCase() === 'B') handleAnswerOption(1);
-        else if (e.key === '3' || e.key.toUpperCase() === 'C') handleAnswerOption(2);
-        else if (e.key === '4' || e.key.toUpperCase() === 'D') handleAnswerOption(3);
-      }
+    const key = (event: KeyboardEvent) => {
+      if (!active || modal || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || (event.target as HTMLElement)?.isContentEditable) return;
+      if (event.key === 'Escape') { event.preventDefault(); dispatch({ type: session.phase === 'paused' ? 'RESUME' : 'PAUSE' }); }
+      if (session.phase === 'answering' && session.mode !== 'wordbomb' && /^[1-4]$/.test(event.key)) dispatch({ type: 'ANSWER', option: Number(event.key) - 1 });
+      if (event.key.toLowerCase() === 'b' && session.phase === 'answering') dispatch({ type: 'BANK' });
     };
+    window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key);
+  }, [active, session?.phase, session?.mode, modal]);
 
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  });
+  async function ensureDictionary(): Promise<WordDictionary | undefined> {
+    if (dictionary) return dictionary;
+    setLexiconState('loading');
+    try { const value = await loadLexicon(); setDictionary(value); setLexiconState('ready'); return value; }
+    catch { setLexiconState('error'); return undefined; }
+  }
+  async function start(mode: SessionMode, missionId?: string, sequence?: string) {
+    SoundEngine.unlock();
+    const request = ++startRequest.current;
+    if (mode === 'wordbomb') {
+      setPendingStart({ mode, missionId, sequence });
+      const loaded = await ensureDictionary();
+      if (!loaded || request !== startRequest.current) return;
+    }
+    setPendingStart(undefined); setWord(''); setCopied(false); setCopyError(false); setExplanationOpen(false);
+    dispatch({ type: 'START', options: { id: `${Date.now()}_${request}`, mode, category: profile.selectedCategory, seed: (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0, relaxed: false, recent: profile.recentQuestionIds, missionId, forcedSyllable: sequence,
+      review: mistakes.flatMap(item => item.question ? [item.question] : []) } });
+    setScreen('game'); setModal(null); window.scrollTo({ top: 0 }); SoundEngine.modeSelect();
+  }
+  function openModal(value: 'settings' | 'profile' | 'leave' | 'help') {
+    restoreModal.current = Boolean(active && session.phase !== 'paused');
+    if (active) dispatch({ type: 'PAUSE' });
+    setModal(value); setResetConfirm(false);
+  }
+  function closeModal() { setModal(null); if (restoreModal.current) dispatch({ type: 'RESUME' }); restoreModal.current = false; }
+  function goHome(next: Tab = 'home') {
+    startRequest.current++;
+    setPendingStart(undefined); setScreen('hub'); setTab(next); setModal(null); SoundEngine.stop(); window.scrollTo({ top: 0 });
+  }
+  function leave() {
+    if (session?.history.length) setProfile(previous => sanitizeProfile({ ...previous, recentQuestionIds: [...previous.recentQuestionIds, ...session.history.flatMap(h => h.questionId ? [h.questionId] : [])], reviewHistory: [...previous.reviewHistory, ...session.history] }));
+    goHome();
+  }
+  function navigate(next: Tab) {
+    if (active) { openModal('leave'); return; }
+    goHome(next);
+  }
+  const current = session?.queue[session.index];
+  const latest = session?.history[session.history.length - 1];
+  const correctCount = session?.history.filter(h => h.isCorrect).length || 0;
+  const shareText = session ? `The Pulse · ${modeTitle(session)}\n${correctCount}/${session.history.length} acertos · ${totalScore(session)} pontos\nProgresso pessoal neste dispositivo.` : '';
+  const queryResult = useMemo(() => query.trim().length >= 3 && dictionary ? validateWordSubmission(query, '', new Set(), dictionary) : undefined, [query, dictionary]);
 
-  const handlePosterMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-  };
+  const collection = <CharacterCollection profile={profile} onAcquire={id => { setProfile(previous => equipCharacter(acquireCharacter(previous, id), id)); SoundEngine.bank(); }} onEquip={id => { setProfile(previous => equipCharacter(previous, id)); SoundEngine.modeSelect(); }}/>;
+  function openExperience(id: typeof EXPERIENCES[number]['id']) {
+    if (id === 'echo' || id === 'crossword') { startRequest.current++; setPendingStart(undefined); setScreen(id); window.scrollTo({ top: 0 }); SoundEngine.modeSelect(); }
+    else void start(id);
+  }
+  const nextRound = () => { setWord(''); dispatch({ type: 'NEXT' }); };
+  const lastRound = session && (session.mode !== 'wordbomb' && session.index === session.queue.length - 1 || session.mode === 'wordbomb' && session.relaxed && session.index === 11 || !session.relaxed && ['elevator', 'wordbomb'].includes(session.mode) && session.lives === 0);
+  const lookup = <details className="word-lookup" onToggle={event => { if (event.currentTarget.open) void ensureDictionary(); }}><summary>Conferir uma palavra</summary><label htmlFor="word-search">Palavra<input id="word-search" value={query} onChange={e => setQuery(e.target.value)} placeholder="computador" maxLength={40} autoComplete="off" autoCapitalize="none" spellCheck={false}/></label><div className="lookup-result" role="status">{lexiconState === 'loading' ? 'Carregando…' : lexiconState === 'error' ? <button className="secondary" onClick={() => void ensureDictionary()}>Tentar carregar novamente</button> : queryResult ? <strong className={queryResult.valid ? 'positive' : ''}>{queryResult.valid ? `“${dictionary?.spelling(query)}” vale!` : queryResult.reason}</strong> : 'Digite pelo menos três letras.'}</div></details>;
 
-  const fuseRatio = Math.max(0, Math.min(1, fuseClock / fuseTotal));
-  const dialDashOffset = 502 * (1 - fuseRatio);
-  const selectedVisualMeta = VISUAL_MODES.find(m => m.id === profile.selectedMode) || VISUAL_MODES[0];
-
-  return (
-    <div className="pg-shell">
-      {/* =========================================================
-          1. BARRA SUPERIOR (NUNCA QUEBRA LINHA NEM CORTA NO CELULAR)
-         ========================================================= */}
-      <header className="pg-navbar">
-        <div className="pg-nav-left">
-          <button
-            type="button"
-            className="pg-icon-btn"
-            onClick={() => setSettingsOpen(true)}
-            title={t.settingsTitle}
-            aria-label={t.settingsTitle}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <line x1="4" y1="7" x2="20" y2="7" />
-              <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="17" x2="14" y2="17" />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="pg-brand-trigger"
-            onClick={() => {
-              if (inMatch) abortMatchToHome();
-              setActiveTab('play');
-            }}
-          >
-            <PulseBrandLogo size={36} />
-            <span className="pg-brand-text">THE PULSE</span>
-          </button>
-
-          <nav className="pg-nav-links" aria-label="Menu Desktop">
-            {(
-              [
-                ['play', t.navPlay],
-                ['ranked', t.navRanked],
-                ['customize', t.navCustomize],
-                ['lexicon', t.navLexicon],
-                ['syllables', t.navSyllables],
-              ] as [NavTabId, string][]
-            ).map(([tabKey, label]) => (
-              <button
-                key={tabKey}
-                type="button"
-                className={`pg-nav-tab ${activeTab === tabKey && !inMatch ? 'active' : ''}`}
-                onClick={() => {
-                  SoundEngine.hoverTick();
-                  if (inMatch) abortMatchToHome();
-                  setActiveTab(tabKey);
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        <div className="pg-nav-right">
-          <div className="pg-stat-pill" title="Moedas">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#F59E0B">
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            <span>{profile.coins}</span>
-          </div>
-
-          <div className="pg-stat-pill hide-xs" title="XP">
-            <span style={{ color: 'var(--pg-cyan-bright)' }}>⚡</span>
-            <span>{profile.careerXP}</span>
-          </div>
-
-          <button
-            type="button"
-            className="pg-profile-unified-btn"
-            onClick={() => setProfileModalOpen(true)}
-            title={t.profileTitle}
-          >
-            <div className="pg-avatar-circle">
-              <img src={playerAvatarUrl} alt={profile.username} />
-            </div>
-            <span className="pg-profile-name">{profile.username}</span>
-          </button>
-
-          <div className="pg-lang-dropdown-wrap" ref={langMenuRef}>
-            <button
-              type="button"
-              className="pg-lang-btn"
-              onClick={() => setLangDropdownOpen(prev => !prev)}
-              aria-expanded={langDropdownOpen}
-              aria-haspopup="listbox"
-            >
-              <img src={activeLangMeta.flagUrl} alt={activeLangMeta.short} className="pg-flag-img" />
-              <span>{activeLangMeta.short}</span>
-            </button>
-
-            {langDropdownOpen && (
-              <div className="pg-lang-menu" role="listbox">
-                {LANGUAGE_OPTIONS.map(opt => {
-                  const isSelected = profile.language === opt.code;
-                  return (
-                    <button
-                      key={opt.code}
-                      type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      className={`pg-lang-option ${isSelected ? 'selected' : ''}`}
-                      onClick={() => {
-                        SoundEngine.modeSelect();
-                        setProfile(p => ({ ...p, language: opt.code as LanguageCode }));
-                        setLangDropdownOpen(false);
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <img src={opt.flagUrl} alt={opt.name} className="pg-flag-img" />
-                        <span>{opt.name}</span>
-                      </div>
-                      {isSelected && <span style={{ color: 'var(--pg-cyan-bright)' }}>✓</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* =========================================================
-          2. CONTEÚDO CENTRAL MOBILE-FIRST
-         ========================================================= */}
-      <main className="pg-main-container">
-        {inMatch ? (
-          <div className="arena-stage-wrap">
-            <ArenaCanvasFX ref={fxRef} reducedMotion={profile.reducedMotion} />
-
-            <div className="arena-hud-bar">
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 900 }}>
-                {selectedVisualMeta.title}
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {(matchRef.current.mode === 'wordbomb' || matchRef.current.mode === 'elevator') && (
-                  <div style={{ fontSize: '1.25rem', color: 'var(--pg-coral)', fontWeight: 900 }}>
-                    {[0, 1, 2].map(i => (
-                      <span key={i} style={{ opacity: i < lives ? 1 : 0.25, marginRight: '3px' }}>
-                        ♥
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {matchRef.current.mode !== 'elevator' && (
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '1.65rem',
-                      fontWeight: 800,
-                      color: matchClock <= 10 ? 'var(--pg-coral)' : 'var(--pg-text-bright)',
-                    }}
-                  >
-                    {matchClock.toFixed(1)}s
-                  </div>
-                )}
-
-                <button type="button" className="pg-secondary-btn" onClick={abortMatchToHome}>
-                  ✕ Sair
-                </button>
-              </div>
-            </div>
-
-            <div className="arena-vaults-row">
-              <div className="vault-card safe">
-                <div className="vault-title">
-                  <span>🛡️ Cofre</span>
-                </div>
-                <div className="vault-value" style={{ color: 'var(--pg-emerald)' }}>
-                  {safeScore}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="pg-illuminated-cta"
-                style={{ minWidth: 'auto', minHeight: '54px', padding: '0 16px', fontSize: '0.96rem' }}
-                disabled={riskScore <= 0}
-                onClick={handleProtectPulse}
-              >
-                🛡️ Blindar +{riskScore}
-              </button>
-
-              <div className="vault-card risk">
-                <div className="vault-title">
-                  <span>⚡ {combo.toFixed(1)}x</span>
-                </div>
-                <div className="vault-value" style={{ color: 'var(--pg-gold)' }}>
-                  {riskScore}
-                </div>
-              </div>
-            </div>
-
-            <section className="arena-core-box">
-              <div className="bomb-dial">
-                <svg className="bomb-svg" viewBox="0 0 180 180">
-                  <circle cx="90" cy="90" r="80" fill="#07090E" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
-                  <circle
-                    cx="90"
-                    cy="90"
-                    r="80"
-                    fill="none"
-                    stroke={fuseRatio < 0.3 ? '#F43F5E' : '#22D3EE'}
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    strokeDasharray="502"
-                    style={{ strokeDashoffset: dialDashOffset }}
-                  />
-                </svg>
-                <div className="bomb-core-circle">
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--pg-text-muted)' }}>
-                    {matchRef.current.mode === 'wordbomb' ? 'SÍLABA' : `COMBO ${streak}X`}
-                  </span>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '2rem',
-                      fontWeight: 800,
-                      color: 'var(--pg-cyan-bright)',
-                    }}
-                  >
-                    {matchRef.current.mode === 'wordbomb' ? currentSyllable.syl : `${combo.toFixed(1)}x`}
-                  </div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.86rem', color: 'var(--pg-gold)' }}>
-                    {fuseClock.toFixed(1)}s
-                  </span>
-                </div>
-              </div>
-
-              {matchRef.current.mode === 'wordbomb' ? (
-                <>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.38rem', textAlign: 'center' }}>
-                    Palavra com <span style={{ color: 'var(--pg-cyan-bright)' }}>{currentSyllable.syl}</span>
-                  </h2>
-                  <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.9rem', textAlign: 'center' }}>
-                    {currentSyllable.hint}
-                  </p>
-
-                  <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '520px' }}>
-                    <input
-                      type="text"
-                      value={typedWord}
-                      onChange={e => {
-                        SoundEngine.keyClick();
-                        setTypedWord(e.target.value);
-                      }}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleWordBombSubmit();
-                        }
-                      }}
-                      placeholder="DIGITE AQUI..."
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        height: '52px',
-                        backgroundColor: 'var(--pg-bg)',
-                        border: '2px solid var(--pg-indigo-light)',
-                        borderRadius: '13px',
-                        padding: '0 14px',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '1.2rem',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                      }}
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      className="pg-illuminated-cta"
-                      style={{ minWidth: 'auto', minHeight: '52px', padding: '0 22px', fontSize: '1rem', flex: 'none' }}
-                      onClick={handleWordBombSubmit}
-                    >
-                      OK
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', textAlign: 'center' }}>
-                    {currentQuestion?.prompt}
-                  </h2>
-
-                  <div className="options-2col">
-                    {currentQuestion?.options.map((optText, idx) => {
-                      const isAnswered = selectedOption !== null;
-                      const isCorrect = isAnswered && idx === currentQuestion.correctIndex;
-                      const isWrong = isAnswered && selectedOption === idx && idx !== currentQuestion.correctIndex;
-
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          className={`opt-push-btn ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
-                          disabled={isAnswered}
-                          onClick={() => handleAnswerOption(idx)}
-                        >
-                          <span
-                            style={{
-                              width: '30px',
-                              height: '30px',
-                              borderRadius: '8px',
-                              backgroundColor: 'var(--pg-bg)',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontFamily: 'var(--font-mono)',
-                              color: 'var(--pg-cyan-bright)',
-                              flexShrink: 0,
-                            }}
-                          >
-                            {idx + 1}
-                          </span>
-                          <span>{optText}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-              {feedback?.visible && (
-                <div
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: '13px',
-                    backgroundColor:
-                      feedback.tone === 'positive' ? 'rgba(16, 185, 129, 0.16)' : 'rgba(244, 63, 94, 0.16)',
-                    border: `1px solid ${feedback.tone === 'positive' ? '#10B981' : '#F43F5E'}`,
-                  }}
-                >
-                  <div style={{ fontWeight: 800, fontSize: '1rem' }}>{feedback.title}</div>
-                  <div style={{ color: 'var(--pg-text-body)', fontSize: '0.9rem', marginTop: '2px' }}>
-                    {feedback.detail}
-                  </div>
-                </div>
-              )}
-            </section>
-          </div>
-        ) : activeTab === 'play' ? (
-          <>
-            {/* CONSOLE CENTRAL DE AÇÃO IMEDIATA (SEMPRE VISÍVEL ACIMA DA DOBRA NO CELULAR) */}
-            <section className="pg-action-dock">
-              <div className="pg-action-buttons-row">
-                <button
-                  type="button"
-                  className="pg-illuminated-cta"
-                  onClick={() => startNewMatch(profile.selectedMode, profile.selectedCategory)}
-                >
-                  ▶ {t.playBigBtn}: {selectedVisualMeta.title}
-                </button>
-
-                <button
-                  type="button"
-                  className="pg-rank-showcase-btn"
-                  onClick={() => {
-                    SoundEngine.modeSelect();
-                    setActiveTab('ranked');
-                  }}
-                >
-                  <div className="pg-rank-emblem">{leagueInfo.tierCode}</div>
-                  <div style={{ textAlign: 'left', lineHeight: 1.15 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--pg-text-muted)' }}>
-                      LIGA
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.98rem', fontWeight: 900 }}>
-                      {leagueInfo.division}
-                    </div>
-                  </div>
-                </button>
-              </div>
-
-              {profile.selectedMode === 'classic' && (
-                <div className="pg-cat-row">
-                  {(Object.keys(CATEGORY_LABELS) as CategoryId[]).map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      className={`pg-cat-chip ${profile.selectedCategory === cat ? 'active' : ''}`}
-                      onClick={() => {
-                        SoundEngine.hoverTick();
-                        setProfile(p => ({ ...p, selectedCategory: cat }));
-                      }}
-                    >
-                      {CATEGORY_LABELS[cat]}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* 4 PÔSTERES ILUSTRADOS COMPACTOS COM BOTÃO DIRETO "JOGAR ▶" */}
-            <section className="pg-posters-grid" aria-label="Modos de Jogo">
-              {VISUAL_MODES.map(mode => {
-                const isSelected = profile.selectedMode === mode.id;
-                const best = profile.bestScores[mode.id] || 0;
-                return (
-                  <div
-                    key={mode.id}
-                    className={`pg-poster-card ${isSelected ? 'selected' : ''}`}
-                    style={{ '--poster-accent': mode.accent } as React.CSSProperties}
-                    onMouseMove={handlePosterMouseMove}
-                    onClick={() => {
-                      SoundEngine.modeSelect();
-                      setProfile(p => ({ ...p, selectedMode: mode.id }));
-                    }}
-                  >
-                    <div className="pg-poster-art-box">
-                      <ModeVisualArtwork mode={mode.id} />
-                    </div>
-
-                    <div className="pg-poster-title">{mode.title}</div>
-
-                    <div className="pg-poster-pills">
-                      <span className="pg-mini-badge">{mode.badges[0]}</span>
-                      <span className="pg-mini-badge">{mode.badges[1]}</span>
-                    </div>
-
-                    <div className="pg-poster-bottom-row">
-                      <span className="pg-poster-record">★ {best}</span>
-                      <button
-                        type="button"
-                        className="pg-card-quickplay"
-                        onClick={e => {
-                          e.stopPropagation();
-                          startNewMatch(mode.id, profile.selectedCategory);
-                        }}
-                      >
-                        Jogar ▶
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </section>
-          </>
-        ) : activeTab === 'ranked' ? (
-          <section className="pg-action-dock" style={{ maxWidth: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', width: '100%' }}>
-              <img
-                src={playerAvatarUrl}
-                alt={profile.username}
-                style={{ width: '72px', height: '72px', borderRadius: '18px', border: '2px solid var(--pg-indigo-light)' }}
-              />
-              <div style={{ flex: 1, minWidth: '180px' }}>
-                <span className="pg-mini-badge" style={{ color: 'var(--pg-cyan-bright)' }}>
-                  {leagueInfo.division}
-                </span>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', marginTop: '4px' }}>
-                  {profile.username} — {profile.careerXP} XP
-                </h2>
-                <p style={{ color: 'var(--pg-text-muted)', fontSize: '0.92rem' }}>
-                  Próxima divisão em {leagueInfo.nextXp} XP • Combo Máximo: {profile.highestComboEver.toFixed(1)}x
-                </p>
-              </div>
-              <button type="button" className="pg-illuminated-cta" onClick={() => startNewMatch('wordbomb')}>
-                ▶ Jogar Ranqueado
-              </button>
-            </div>
+  return <div className={`pulse-shell affinity-${character.effect} ${screen !== 'hub' ? 'playing' : ''}`} onPointerDownCapture={() => SoundEngine.unlock()} onKeyDownCapture={() => SoundEngine.unlock()} style={{ '--affinity': character.color } as React.CSSProperties}>
+    <a className="skip-link" href="#main">Pular para o conteúdo</a>
+    <header className="topbar">
+      <button className="brand" aria-label="The Pulse, início" onClick={() => active ? openModal('leave') : goHome()}><PulseBrandLogo size={36}/><span>THE PULSE</span></button>
+      <nav className="desktop-nav" aria-label="Navegação principal">{TABS.map(item => <button key={item.id} aria-current={tab === item.id && screen === 'hub' ? 'page' : undefined} onClick={() => navigate(item.id)}>{item.title}</button>)}</nav>
+      <div className="topbar-actions"><button className="icon-button" aria-label={profile.sfxVolume ? 'Silenciar sons' : 'Ativar sons'} aria-pressed={profile.sfxVolume === 0} onClick={() => setProfile(p => ({ ...p, sfxVolume: p.sfxVolume ? 0 : 50 }))}><Icon name="sound"/>{profile.sfxVolume === 0 && <span className="mute-mark" aria-hidden="true">/</span>}</button><button className="icon-button" aria-label="Configurações" onClick={() => openModal('settings')}><Icon name="settings"/></button><button className="profile-button" aria-label="Seu perfil e avatar" onClick={() => openModal('profile')}><CharacterPortrait character={character} animated size="small"/></button></div>
+    </header>
+    {!storageOk && <div className="storage-warning" role="status">Não foi possível salvar seus recordes neste navegador. <button onClick={() => setStorageOk(saveProfile(profile))}>Tentar salvar</button></div>}
+    <main id="main" className={`main ${screen !== 'hub' ? 'game-main' : ''}`}>
+      {screen === 'hub' && <>
+        {tab === 'home' && <>
+          <h1 className="arcade-title">Qual vai ser?</h1>
+          <div className="game-shelf">{EXPERIENCES.map(mode => <button className={`game-tile tile-${mode.id}`} key={mode.id} style={{ '--accent': mode.color } as React.CSSProperties} disabled={lexiconState === 'loading' && mode.id === 'wordbomb'} onClick={() => openExperience(mode.id)} onPointerEnter={event => { if (event.pointerType === 'mouse') SoundEngine.hoverTick(); }} onFocus={() => SoundEngine.hoverTick()} aria-label={`Abrir ${mode.title}`}>
+            <span className="game-preview" aria-hidden="true">{mode.id === 'echo' && <span className="echo-preview"><i>1</i><i>2</i><i>0</i><span>+1</span></span>}{mode.id === 'crossword' && <span className="cross-preview">{['', 'S', '', 'S', 'O', 'L', '', 'L', ''].map((letter, index) => <i key={index} className={!letter ? 'preview-clue' : ''}>{letter || <Icon name="arrow" size={14}/>}</i>)}</span>}
+              {mode.id === 'wordbomb' && <><span className="bomb-fuse"/><span className="letter-bomb">CAR</span><span className="preview-word"><span>car</span>inho</span></>}
+              {mode.id === 'elevator' && <span className="elevator-preview"><span className="floor floor-3">03</span><span className="floor floor-2">02<Icon name="arrow" size={24}/></span><span className="floor floor-1">01</span></span>}
+              {mode.id === 'classic' && <><span className="arena-sixty">60<span>s</span></span><span className="arena-choices"><i/><i/><i/><i/></span></>}
+              {mode.id === 'daily' && <><span className="daily-number">10<span>/10</span></span><span className="daily-dots">{Array.from({ length: 10 }, (_, i) => <i key={i}/>)}</span></>}
+              <span className="tile-play"><Icon name="play" size={21}/></span>
+            </span>
+            <span className="tile-caption"><strong>{mode.title}</strong><span>{mode.description}</span></span>
+          </button>)}</div>
+          {pendingStart && <div className="load-status" role="status">{lexiconState === 'error' ? <><p>As palavras não carregaram. Tente novamente.</p><button className="secondary" onClick={() => void start(pendingStart.mode, pendingStart.missionId, pendingStart.sequence)}>Tentar novamente</button></> : <p>Preparando as palavras…</p>}</div>}
+        </>}
+        {tab === 'progress' && <>
+          <div className="page-heading"><h1>Seus recordes</h1><p>Neste dispositivo.</p></div>
+          <div className="record-list">{MODES.map(mode => <button key={mode.id} onClick={() => void start(mode.id)}><span>{mode.title}</span><strong>{profile.bestScores[mode.id].toLocaleString('pt-BR')} <small>pts</small></strong><Icon name="play" size={18}/></button>)}</div>
+          <p className="personal-stats">{profile.matchesPlayed} partidas · combo máximo {profile.highestComboEver.toFixed(1)}×</p>
+          {Object.values(profile.dailyHistory).length > 0 && <details className="disclosure"><summary>Desafios anteriores</summary><ul className="daily-records">{Object.values(profile.dailyHistory).slice(-7).reverse().map(day => <li key={day.dateKey}><span>{day.dateKey.split('-').reverse().join('/')}</span><strong>{day.correctCount}/{day.totalCount}</strong></li>)}</ul></details>}
+          {mistakes.length > 0 && <details className="disclosure"><summary>Mais uma chance</summary>{mistakes.some(item => item.question) && <button className="secondary" onClick={() => void start('review')}>Rever as que errei</button>}<div className="review-list">{mistakes.slice(-15).reverse().map((item, index) => <details key={`${item.prompt}_${index}`}><summary>{item.prompt}</summary><p><strong>{item.correctAnswer}</strong></p><p>{item.explanation}</p></details>)}</div></details>}
+        </>}
+        {tab === 'avatars' && collection}
+      </>}
+      {(screen === 'echo' || screen === 'crossword') && <><header className="game-header"><h1>{screen === 'echo' ? 'Ecos' : 'Cruzadas Diretas'}</h1><button className="secondary compact" onClick={() => goHome()}>Voltar</button></header><Suspense fallback={<p role="status">Abrindo experiência…</p>}>{screen === 'echo' ? <EchoExperience discoveries={profile.discoveries} onComplete={discover}/> : <CrosswordExperience discoveries={profile.discoveries} onComplete={discover}/>}</Suspense></>}{screen === 'game' && session && <>
+        <ArenaCanvasFX ref={fx} reducedMotion={reducedMotion}/>
+        {session.phase === 'finished' ? <section className="result-screen">
+          <h1 ref={questionHeading} tabIndex={-1}>{correctCount === session.history.length && correctCount > 0 ? 'Gabaritou!' : 'Fim da rodada!'}</h1>
+          <div className="result-score"><strong>{totalScore(session).toLocaleString('pt-BR')}</strong><span>pontos</span></div>
+          <p>{correctCount}/{session.history.length} acertos · combo {session.peakCombo.toFixed(1)}×</p>
+          {session.mode === 'daily' && <p className="meta">Vale nos recordes a primeira partida completa de hoje.</p>}
+          <div className="result-actions"><button className="primary" onClick={() => void start(session.mode, session.missionId)}>Repetir <Icon name="play" size={18}/></button><button className="secondary" onClick={() => goHome()}>Explorar</button><button className="secondary" onClick={async () => { try { await navigator.clipboard.writeText(shareText); setCopied(true); setCopyError(false); } catch { setCopied(false); setCopyError(true); } }}>{copied ? 'Copiado!' : 'Copiar resultado'}</button></div>
+          {copied && <p role="status">Resultado copiado.</p>}
+          {copyError && <div className="copy-recovery" role="status"><label htmlFor="manual-result">Selecione e copie seu resultado</label><textarea id="manual-result" readOnly value={shareText} rows={4} onFocus={event => event.currentTarget.select()}/></div>}
+          <details className="disclosure result-details"><summary>Ver respostas</summary><p className="meta">Cofre: {session.safeScore} + {Math.round(session.riskScore / 2)} recuperados.</p><div className="review-list">{session.history.map((item, index) => <details key={index}><summary><span className={item.isCorrect ? 'positive' : 'attention'}>{item.isCorrect ? 'Acerto' : 'Errou'}</span> {item.prompt}</summary><p>Sua resposta: {item.userAnswer}</p><p><strong>{item.correctAnswer}</strong></p><p>{item.explanation}</p></details>)}</div></details>
+        </section> : <>
+          <header className="game-header"><h1>{modeTitle(session)}</h1><div className="game-controls"><button className="icon-button" aria-label="Como funciona" onClick={() => openModal('help')}>?</button><button className="icon-button" aria-label="Pausar" onClick={() => dispatch({ type: 'PAUSE' })} disabled={session.phase === 'paused'}><Icon name="pause" size={18}/></button><button className="secondary compact" onClick={() => openModal('leave')}>Sair</button></div></header>
+          <div className="scorebar"><div><span>Cofre</span><strong>{session.safeScore}</strong></div><button className="bank-button" onClick={() => { dispatch({ type: 'BANK' }); SoundEngine.bank(); }} disabled={session.riskScore <= 0 || session.phase !== 'answering'}><Icon name="shield" size={18}/>Guardar +{session.riskScore}</button><div><span>Combo</span><strong>{comboFor(session.streak).toFixed(1)}×</strong></div></div>
+          <section className={`question-panel ${session.mode === 'wordbomb' ? 'word-panel' : ''}`} aria-label="Rodada atual" aria-busy={session.phase === 'paused'}>
+            <div className="question-meta"><span>{session.mode === 'wordbomb' ? `Palavra ${session.index + 1}${session.relaxed ? '/12' : ''}` : session.mode === 'elevator' ? `Andar ${session.floor}` : `${session.index + 1}/${session.queue.length}`}</span><span>{!session.relaxed && ['elevator', 'wordbomb'].includes(session.mode) && `${session.lives} vidas · `}{session.relaxed ? 'Sem tempo' : `${Math.ceil(session.fuseMs / 1000)}s`}</span></div>
+            {!session.relaxed && <progress className="fuse-progress" max={session.fuseTotalMs} value={session.fuseMs} aria-label="Tempo restante da rodada"/>}
+            {session.mode === 'wordbomb' ? <>
+              <h2 className="word-instruction" id="word-instruction" aria-live="polite" aria-atomic="true">Uma palavra com<span className="sr-only"> {currentSyllable(session).syl}</span></h2><div className="sequence-display" aria-hidden="true">{currentSyllable(session).syl}</div>
+              <form className="word-form" onSubmit={event => { event.preventDefault(); if (dictionary && session.phase === 'answering') dispatch({ type: 'WORD', raw: word, dictionary }); }}><label className="sr-only" htmlFor="arena-word">Sua palavra</label><div><input id="arena-word" aria-describedby="word-instruction" value={word} onChange={event => setWord(event.target.value)} readOnly={session.phase !== 'answering'} autoComplete="off" autoCapitalize="none" spellCheck={false} enterKeyHint="send" maxLength={32} placeholder="Digite aqui…"/><button className="primary" disabled={session.phase !== 'answering'} type="submit" aria-label="Enviar palavra"><Icon name="arrow" size={22}/></button></div></form>
+            </> : <>{session.mode === 'review' && current?.context && <p>{current.context}</p>}<h2 ref={questionHeading} tabIndex={-1}>{current?.prompt}</h2><div className="answer-options">{current?.options.map((option, index) => { const answered = session.phase === 'feedback' || session.phase === 'paused' && session.resumePhase === 'feedback'; const correct = answered && index === current.correctIndex; const chosen = answered && latest?.userAnswer === option; return <button key={index} className={`answer-option ${correct ? 'is-correct' : chosen ? 'is-wrong' : ''}`} disabled={session.phase !== 'answering'} onClick={() => dispatch({ type: 'ANSWER', option: index })}><span className="answer-letter">{index + 1}</span><span>{option}</span>{correct && <Icon name="check" size={18}/>}</button>; })}</div></>}
+            <div className="round-response" aria-live="polite" aria-atomic="true">{session.notice && session.phase === 'answering' && <p className="word-notice">{session.notice}</p>}{session.phase === 'feedback' && latest && <div className={`answer-feedback ${latest.isCorrect ? 'good' : 'learn'}`}><strong>{latest.isCorrect ? `${session.mode === 'wordbomb' ? latest.correctAnswer : 'Boa!'} +${latest.pointsDelta}` : `Era: ${latest.correctAnswer}`}</strong><div className="feedback-actions">{session.mode !== 'wordbomb' && <button className="text-button" aria-expanded={explanationOpen} onClick={() => setExplanationOpen(!explanationOpen)}>Por quê?</button>}<button className="text-button" onClick={nextRound}>{lastRound ? 'Resultado' : 'Próxima'}<Icon name="arrow" size={16}/></button></div>{explanationOpen && <p>{latest.explanation}</p>}</div>}</div>
+            {!session.relaxed && (session.mode === 'classic' || session.mode === 'wordbomb') && <p className="clock" aria-label="Tempo total restante">{Math.ceil(session.remainingMs / 1000)}s no total</p>}
           </section>
-        ) : activeTab === 'customize' ? (
-          <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', textAlign: 'center' }}>
-              Coleção de Personagens
-            </h2>
-            <div className="avatar-picker-grid">
-              {CURATED_AVATARS.map(preset => {
-                const url = buildAvatarUrl(preset.style, preset.seed, preset.bg);
-                const isCurrent = profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
-                return (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    className={`avatar-choice-card ${isCurrent ? 'selected' : ''}`}
-                    onClick={() => {
-                      SoundEngine.modeSelect();
-                      setProfile(p => ({
-                        ...p,
-                        avatarStyle: preset.style,
-                        avatarSeed: preset.seed,
-                        avatarBg: preset.bg,
-                      }));
-                    }}
-                  >
-                    <img
-                      src={url}
-                      alt={preset.label}
-                      style={{ width: '58px', height: '58px', borderRadius: '14px' }}
-                    />
-                    <strong style={{ fontSize: '0.88rem' }}>{preset.label}</strong>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        ) : activeTab === 'lexicon' ? (
-          <section className="pg-action-dock" style={{ maxWidth: '100%', alignItems: 'stretch' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem' }}>
-              Dicionário do Jogo ({PORTUGUESE_WORD_SET.size} palavras)
-            </h2>
-            <input
-              type="text"
-              value={wordSearchQuery}
-              onChange={e => setWordSearchQuery(e.target.value)}
-              placeholder="Consultar palavra..."
-              style={{
-                height: '50px',
-                backgroundColor: 'var(--pg-bg)',
-                border: '2px solid var(--pg-border-strong)',
-                borderRadius: '12px',
-                padding: '0 16px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '1.1rem',
-                textTransform: 'uppercase',
-              }}
-            />
-            {wordSearchQuery.trim().length >= 2 && (
-              <div style={{ fontWeight: 800, fontSize: '1rem' }}>
-                {PORTUGUESE_WORD_SET.has(
-                  wordSearchQuery
-                    .trim()
-                    .toUpperCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                ) ? (
-                  <span style={{ color: 'var(--pg-emerald)' }}>✓ Palavra aceita na arena!</span>
-                ) : (
-                  <span style={{ color: 'var(--pg-coral)' }}>✕ Palavra não encontrada.</span>
-                )}
-              </div>
-            )}
-          </section>
-        ) : (
-          <div className="pg-posters-grid">
-            {WORDBOMB_SYLLABLES.map(item => (
-              <div
-                key={item.syl}
-                className="pg-poster-card"
-                onClick={() => startNewMatch('wordbomb')}
-              >
-                <div
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '1.85rem',
-                    fontWeight: 900,
-                    color: 'var(--pg-cyan-bright)',
-                  }}
-                >
-                  {item.syl}
-                </div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--pg-text-muted)', textAlign: 'center' }}>
-                  {item.hint}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
+          {session.phase === 'paused' && !modal && <Dialog title="Pausa" onClose={() => dispatch({ type: 'RESUME' })}><button className="primary" onClick={() => dispatch({ type: 'RESUME' })}>Continuar <Icon name="play" size={18}/></button><button className="secondary" onClick={() => openModal('leave')}>Sair</button></Dialog>}
+        </>}
+      </>}
+    </main>
+    {screen === 'hub' && <nav className="bottom-nav" aria-label="Navegação no celular">{TABS.map(item => <button key={item.id} aria-current={tab === item.id ? 'page' : undefined} onClick={() => navigate(item.id)}><Icon name={item.icon}/><span>{item.title}</span></button>)}</nav>}
+    {modal === 'help' && session && <Dialog title="Como funciona" onClose={closeModal}>
+      <p>{session.mode === 'wordbomb' ? 'Digite uma palavra com as letras da tela, em qualquer posição. Não repita palavras.' : session.mode === 'review' ? 'Reveja as respostas anteriores e descubra as alternativas certas.' : session.mode === 'elevator' ? 'Acerte para subir. Você tem três vidas e cada vez menos tempo.' : session.mode === 'daily' ? 'São dez perguntas iguais para todos hoje. A primeira partida completa vale nos seus recordes.' : 'Acerte o máximo de perguntas em 60 segundos.'}</p>
+      <p>Toque em Guardar para proteger os pontos. Errou, perde o que não guardou. No fim, recupera metade.</p>
+      <p className="meta">O relógio para nas pausas. {session.mode !== 'wordbomb' && 'No teclado: 1–4 para responder.'}</p>
+      {session.mode === 'wordbomb' && lookup}
+      <button className="primary" onClick={closeModal}>Continuar</button>
+    </Dialog>}
+    {modal === 'settings' && <Dialog title="Configurações" onClose={closeModal}>
+      <div className="setting-row"><label htmlFor="sfx-volume">Volume <strong>{profile.sfxVolume === 0 ? 'Silenciado' : `${profile.sfxVolume}%`}</strong></label><input id="sfx-volume" type="range" min="0" max="100" value={profile.sfxVolume} onChange={e => setProfile(p => ({ ...p, sfxVolume: Number(e.target.value) }))}/></div>
 
-      {/* =========================================================
-          3. BARRA DE NAVEGAÇÃO INFERIOR NATIVA PARA MOBILE (< 860PX)
-         ========================================================= */}
-      {!inMatch && (
-        <nav className="pg-bottom-nav" aria-label="Navegação Mobile">
-          <button
-            type="button"
-            className={`pg-bnav-item ${activeTab === 'play' ? 'active' : ''}`}
-            onClick={() => {
-              SoundEngine.hoverTick();
-              setActiveTab('play');
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-            <span>{t.navPlay}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`pg-bnav-item ${activeTab === 'ranked' ? 'active' : ''}`}
-            onClick={() => {
-              SoundEngine.hoverTick();
-              setActiveTab('ranked');
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" />
-            </svg>
-            <span>{t.navRanked}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`pg-bnav-item ${activeTab === 'customize' ? 'active' : ''}`}
-            onClick={() => {
-              SoundEngine.hoverTick();
-              setActiveTab('customize');
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <circle cx="12" cy="8" r="5" />
-              <path d="M20 21a8 8 0 1 0-16 0" />
-            </svg>
-            <span>{t.navCustomize}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`pg-bnav-item ${activeTab === 'lexicon' ? 'active' : ''}`}
-            onClick={() => {
-              SoundEngine.hoverTick();
-              setActiveTab('lexicon');
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-            </svg>
-            <span>{t.navLexicon}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`pg-bnav-item ${activeTab === 'syllables' ? 'active' : ''}`}
-            onClick={() => {
-              SoundEngine.hoverTick();
-              setActiveTab('syllables');
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <rect x="3" y="3" width="7" height="7" rx="1" />
-              <rect x="14" y="3" width="7" height="7" rx="1" />
-              <rect x="14" y="14" width="7" height="7" rx="1" />
-              <rect x="3" y="14" width="7" height="7" rx="1" />
-            </svg>
-            <span>{t.navSyllables}</span>
-          </button>
-        </nav>
-      )}
-
-      {/* =========================================================
-          4. MODAL DE CONFIGURAÇÕES
-         ========================================================= */}
-      {settingsOpen && (
-        <div className="pg-modal-backdrop" onClick={() => setSettingsOpen(false)}>
-          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem' }}>{t.settingsTitle}</h2>
-              <button type="button" className="pg-secondary-btn" onClick={() => setSettingsOpen(false)}>
-                ✕ Fechar
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <strong style={{ fontSize: '1rem' }}>Volume dos Efeitos Sonoros</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
-                    Intensidade: {profile.sfxVolume}%
-                  </div>
-                </div>
-                <input
-                  type="range"
-                  min={15}
-                  max={100}
-                  value={profile.sfxVolume}
-                  onChange={e => setProfile(p => ({ ...p, sfxVolume: Number(e.target.value) }))}
-                />
-              </div>
-
-              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <strong style={{ fontSize: '1rem' }}>Partículas e Explosões (60 FPS)</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
-                    Efeitos visuais na Arena
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="pg-secondary-btn"
-                  onClick={() => setProfile(p => ({ ...p, reducedMotion: !p.reducedMotion }))}
-                >
-                  {profile.reducedMotion ? 'Reduzido' : 'Máximo'}
-                </button>
-              </div>
-
-              <div className="vault-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <strong style={{ fontSize: '1rem' }}>Redefinir Progresso</strong>
-                  <div style={{ color: 'var(--pg-text-muted)', fontSize: '0.88rem' }}>
-                    Zera recordes locais
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="pg-secondary-btn"
-                  style={{ color: 'var(--pg-coral)', borderColor: 'var(--pg-coral)' }}
-                  onClick={() => {
-                    setProfile(clearProfileStorage());
-                    setSettingsOpen(false);
-                  }}
-                >
-                  Resetar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================
-          5. MODAL DE PERFIL NATIVO
-         ========================================================= */}
-      {profileModalOpen && (
-        <div className="pg-modal-backdrop" onClick={() => setProfileModalOpen(false)}>
-          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem' }}>{t.profileTitle}</h2>
-              <button
-                type="button"
-                className="pg-illuminated-cta"
-                style={{ minWidth: 'auto', minHeight: '40px', padding: '0 18px', fontSize: '0.92rem', flex: 'none' }}
-                onClick={() => setProfileModalOpen(false)}
-              >
-                ✓ Salvar
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <img
-                src={playerAvatarUrl}
-                alt={profile.username}
-                style={{ width: '68px', height: '68px', borderRadius: '16px', border: '2px solid var(--pg-indigo-light)' }}
-              />
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: '4px', fontSize: '0.92rem' }}>
-                  Nome do Jogador:
-                </label>
-                <input
-                  type="text"
-                  value={profile.username}
-                  maxLength={18}
-                  onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}
-                  style={{
-                    width: '100%',
-                    height: '42px',
-                    backgroundColor: 'var(--pg-bg)',
-                    border: '1px solid var(--pg-border-strong)',
-                    borderRadius: '10px',
-                    padding: '0 12px',
-                    fontWeight: 700,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 700, marginBottom: '8px', fontSize: '0.92rem' }}>
-                Estilo do Personagem:
-              </div>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                {AVATAR_STYLE_OPTIONS.map(st => (
-                  <button
-                    key={st.id}
-                    type="button"
-                    className={`pg-cat-chip ${profile.avatarStyle === st.id ? 'active' : ''}`}
-                    style={{ height: '34px', fontSize: '0.84rem' }}
-                    onClick={() => {
-                      SoundEngine.hoverTick();
-                      setProfile(p => ({ ...p, avatarStyle: st.id }));
-                    }}
-                  >
-                    {st.name}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={profile.avatarSeed}
-                onChange={e => setProfile(p => ({ ...p, avatarSeed: e.target.value }))}
-                placeholder="Digite qualquer palavra para criar um visual único..."
-                style={{
-                  width: '100%',
-                  height: '40px',
-                  backgroundColor: 'var(--pg-bg)',
-                  border: '1px solid var(--pg-border-strong)',
-                  borderRadius: '10px',
-                  padding: '0 12px',
-                }}
-              />
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 700, marginBottom: '8px', fontSize: '0.92rem' }}>
-                Personagens Prontos:
-              </div>
-              <div className="avatar-picker-grid">
-                {CURATED_AVATARS.map(preset => {
-                  const url = buildAvatarUrl(preset.style, preset.seed, preset.bg);
-                  const isSelected =
-                    profile.avatarStyle === preset.style && profile.avatarSeed === preset.seed;
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      className={`avatar-choice-card ${isSelected ? 'selected' : ''}`}
-                      onClick={() => {
-                        SoundEngine.modeSelect();
-                        setProfile(p => ({
-                          ...p,
-                          avatarStyle: preset.style,
-                          avatarSeed: preset.seed,
-                          avatarBg: preset.bg,
-                        }));
-                      }}
-                    >
-                      <img
-                        src={url}
-                        alt={preset.label}
-                        style={{ width: '52px', height: '52px', borderRadius: '12px' }}
-                      />
-                      <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>{preset.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================
-          6. MODAL PÓS-PARTIDA
-         ========================================================= */}
-      {postMatchModal && (
-        <div className="pg-modal-backdrop" onClick={() => setPostMatchModal(null)}>
-          <div className="pg-modal-panel" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-              <div>
-                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--pg-cyan-bright)', fontWeight: 800, fontSize: '0.86rem' }}>
-                  FIM DE PARTIDA • +{postMatchModal.coinsEarned} MOEDAS
-                </span>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem' }}>
-                  {postMatchModal.finalScore} Pontos
-                </h2>
-              </div>
-              <button
-                type="button"
-                className="pg-illuminated-cta"
-                style={{ minWidth: 'auto', minHeight: '44px', padding: '0 20px', fontSize: '0.96rem', flex: 'none' }}
-                onClick={() => {
-                  const m = profile.selectedMode;
-                  setPostMatchModal(null);
-                  startNewMatch(m, profile.selectedCategory);
-                }}
-              >
-                Jogar Novamente
-              </button>
-            </div>
-            <pre
-              style={{
-                backgroundColor: 'var(--pg-bg)',
-                padding: '14px',
-                borderRadius: '12px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.88rem',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {postMatchModal.shareText}
-            </pre>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+      <label className="switch-label"><input type="checkbox" checked={profile.autoAdvance} onChange={e => setProfile(p => ({ ...p, autoAdvance: e.target.checked }))}/>Avançar respostas automaticamente</label>
+      <label className="switch-label"><input type="checkbox" checked={profile.reducedMotion} onChange={e => setProfile(p => ({ ...p, reducedMotion: e.target.checked }))}/>Reduzir efeitos</label>
+      <details className="disclosure"><summary>Tema dos quizzes</summary><fieldset className="category-picker"><legend className="sr-only">Tema dos quizzes</legend>{(Object.keys(CATEGORIES) as CategoryId[]).map(category => <button key={category} className={profile.selectedCategory === category ? 'selected' : ''} aria-pressed={profile.selectedCategory === category} onClick={() => setProfile(p => ({ ...p, selectedCategory: category }))}>{CATEGORIES[category]}</button>)}</fieldset></details>
+      {lookup}
+      <details className="disclosure"><summary>Apagar progresso</summary>{resetConfirm ? <><p>Isso apaga os recordes e respostas salvos neste dispositivo. Não é possível desfazer.</p><button className="danger" onClick={() => { setProfile(clearProfileStorage()); closeModal(); goHome(); }}>Apagar meu progresso</button><button className="secondary" onClick={() => setResetConfirm(false)}>Cancelar</button></> : <button className="secondary" onClick={() => setResetConfirm(true)}>Apagar meus dados…</button>}</details>
+    </Dialog>}
+    {modal === 'profile' && <Dialog title="Seu perfil" onClose={() => { setProfile(p => sanitizeProfile(p)); closeModal(); }}><div className="profile-editor"><label htmlFor="player-name">Seu nome<input id="player-name" value={profile.username} maxLength={18} onChange={e => setProfile(p => ({ ...p, username: e.target.value }))}/></label></div><div className="profile-character"><CharacterPortrait character={character} animated/><span>{character.name}</span></div><button className="primary" onClick={() => { setProfile(p => sanitizeProfile(p)); closeModal(); }}>Pronto</button></Dialog>}
+    {modal === 'leave' && <Dialog title="Sair da partida?" onClose={closeModal}><p>Os pontos desta partida não serão salvos.</p><button className="primary" onClick={closeModal}>Continuar</button><button className="secondary" onClick={leave}>Sair da partida</button></Dialog>}
+  </div>;
 }

@@ -1,0 +1,17 @@
+{
+  "pass": true,
+  "cases": [
+    "12 local presets load with external network blocked",
+    "selection aria-pressed",
+    "selected avatar persists after reload",
+    "custom avatar failure uses local fallback",
+    "credits accessible"
+  ],
+  "errors": [],
+  "externalRequestsBlocked": [
+    "fonts.googleapis.com",
+    "hatscripts.github.io",
+    "api.dicebear.com"
+  ],
+  "browser": "Chromium, 390x844, touch emulation; no physical device"
+}

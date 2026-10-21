@@ -1,0 +1,18 @@
+{
+  "src/App.tsx": "c4abda933f00c5790cab312f4b7fcc69203ef0ed8245c4d2692b21a2ef0d3e7a",
+  "src/engine/session.ts": "ed7cb16595f246ce54174887793afee86224ec184725c296b218c995f70fbb85",
+  "src/engine/crossword.ts": "19c85682e74a4fc0103df53b4815e42f010795881b44123d8fe9cbad5c4eed69",
+  "src/engine/echo.ts": "223f28abf7a07602b65271fe0168a1cb3bf39aada0c9bd54adb1eeed5c03271b",
+  "src/engine/collection.ts": "48ab93f2d8a0a7d874349bbe99c560d993ab959257bcd77c8e1445d25e4102dc",
+  "src/engine/storage.ts": "cc18b6d0fa3bbe7f0f6608b71dfccc2ace11a0da4b212e3ef8f295218590d8a2",
+  "src/engine/sound.ts": "07ecc2b07609a6000f3df677481d7ebfc20bd71d6a69d0c58cd1535cf3ef8260",
+  "src/data/characters.ts": "7f8e7232a4c07882831bd5a9c824942a1011d1c8238112a42cde1591fa49790e",
+  "src/components/CrosswordExperience.tsx": "3b2321b48f6b25642058decbb5fdee747d9b5ea15ea809c105c7f346b808669f",
+  "src/components/EchoExperience.tsx": "23aaa2e8afbd905a18394b717b8488f26972c81be39f063c35954515a28eefce",
+  "src/components/CharacterCollection.tsx": "3d1f54c1b580fd2095cc839cd68d5741ba8e240f5710d8e19c0eb590bfabc3eb",
+  "src/styles/global.css": "ca65e86c8ef584625effeda1fd08daf300a75f70a184633412395bc7bc170b7d",
+  "tests/experiences.cjs": "0a8d503026cc111e1b675ee8590cf2f0aa4620390ccd13ad5e61db944df3a203",
+  "tests/game.test.cjs": "e04baa445042b85669769e4654f41813480473de03ef648efad27542bd347747",
+  "tests/touch.cjs": "a2915407e3e5b76f40b272b7bbcb6a56219b20e61e6eb05dbc0807e9632b8b60",
+  "public/crosswords/upstream.json": "23919020c3faf4dc1391bccaf3ee58c88d46f9be426fe8d6e714510ef53413df"
+}
