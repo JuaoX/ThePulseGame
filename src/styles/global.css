@@ -133,7 +133,7 @@ progress::-moz-progress-bar { background: var(--cyan); }
 .scorebar > div:last-child { text-align: right; }
 .scorebar > div > span { font-size: .75rem; color: var(--muted); }
 .scorebar strong { font-family: 'Outfit', sans-serif; font-size: 1.45rem; line-height: 1.25; }
-.bank-button { background: #253a33; color: var(--green); min-height: 44px; padding: 10px 14px; font-size: .875rem; }
+.bank-button { background: var(--bank-bg, #253a33); color: var(--bank-ink, var(--green)); min-height: 44px; padding: 10px 14px; font-size: .875rem; }
 .question-panel { display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: var(--radius); background: var(--surface); }
 .question-meta { display: flex; justify-content: space-between; gap: 12px; font-size: .8rem; color: var(--muted); }
 .question-panel h2 { font-size: clamp(1.25rem, 3vw, 1.6rem); line-height: 1.3; text-wrap: pretty; }
@@ -141,10 +141,10 @@ progress::-moz-progress-bar { background: var(--cyan); }
 .answer-option { display: flex; align-items: center; text-align: left; gap: 12px; min-height: 54px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); line-height: 1.4; }
 .answer-option > span:nth-child(2) { flex: 1; }
 .answer-letter { display: flex; align-items: center; justify-content: center; width: 25px; height: 25px; flex-shrink: 0; color: var(--subtle); font-size: .8rem; }
-.answer-option:hover:not(:disabled) { background: #1a3241; border-color: #6b96a4; }
+.answer-option:hover:not(:disabled) { background: var(--answer-hover-bg, #1a3241); border-color: var(--answer-hover-border, #6b96a4); }
 .answer-option:disabled { opacity: 1; }
-.answer-option.is-correct { background: #1b3930; border-color: #76b98a; color: #c0f6ce; }
-.answer-option.is-wrong { background: #3e2c28; border-color: #b57c65; color: #ffd4c7; }
+.answer-option.is-correct { background: var(--answer-good-bg, #1b3930); border-color: var(--answer-good-border, #76b98a); color: var(--answer-good-ink, #c0f6ce); }
+.answer-option.is-wrong { background: var(--answer-bad-bg, #3e2c28); border-color: var(--answer-bad-border, #b57c65); color: var(--answer-bad-ink, #ffd4c7); }
 .round-response { min-height: 44px; }
 .answer-feedback { display: flex; align-items: center; flex-wrap: wrap; column-gap: 8px; justify-content: space-between; min-height: 44px; }
 .answer-feedback > strong { flex: 1; font-size: .95rem; }
@@ -564,3 +564,45 @@ html { scrollbar-gutter: stable; }
 @media (hover: hover) and (pointer: fine) {
   [data-theme='light'] .game-tile:not(:disabled):is(:hover,:focus-visible) .tile-play { background: #315f4c; color: #f8f0df; }
 }
+/* Semantic state colors keep text readable when the surface changes theme. */
+:root[data-theme='light'] {
+  --answer-hover-bg: #d1ddce; --answer-hover-border: #6b8165;
+  --answer-good-bg: #c5dcc1; --answer-good-border: #507554; --answer-good-ink: #25492d;
+  --answer-bad-bg: #e9c8b7; --answer-bad-border: #95614d; --answer-bad-ink: #713b29;
+  --bank-bg: #c9dcc4; --bank-ink: #24482f;
+}
+[data-theme='light'] .answer-option.is-correct .answer-letter,
+[data-theme='light'] .answer-option.is-wrong .answer-letter { color: inherit; }
+[data-theme='light'] .answer-feedback.good > strong { color: #285a3f; }
+[data-theme='light'] button:disabled { opacity: 1; }
+[data-theme='light'] .primary:disabled, [data-theme='light'] .bank-button:disabled { background: #d6cfbf; color: #5b554a; border-color: #b9ad98; }
+[data-theme='light'] .secondary:disabled, [data-theme='light'] .icon-button:disabled { color: #625c4e; }
+[data-theme='light'] .category-picker button.selected { background: #c9dcc4; color: #24482f; border-color: #607c5b; }
+[data-theme='light'] .echo-preview > i { background: #e8dcc6; color: #68451b; border-color: #967749; }
+[data-theme='light'] .echo-signal.receives-echo::after { background: #805419; color: #fff2d8; }
+[data-theme='light'] .storage-warning { background: #e2cfa6; color: #5b431d; }
+[data-theme='light'] .storage-warning p, [data-theme='light'] .storage-warning button { color: inherit; }
+[data-theme='light'] .storage-warning button { border-color: #88703c; }
+
+/* A quiet living preview lasts only while a precise pointer stays over it. */
+@media (hover: hover) and (pointer: fine) {
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .game-preview { transform: translateY(-4px); }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .echo-preview > i { --preview-y: 0px; animation: preview-breathe 2.8s ease-in-out infinite alternate; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .echo-preview > i:nth-child(2) { --preview-y: -12px; animation-delay: -600ms; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .echo-preview > i:nth-child(3) { animation-delay: -1200ms; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .cross-preview { animation: preview-cross-sway 3.6s ease-in-out infinite alternate; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .cross-preview > i:not(.preview-clue) { animation: preview-fill 3.2s ease-in-out infinite; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .letter-bomb { animation: preview-bomb-sway 3s ease-in-out infinite alternate; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .floor-2 { animation: preview-floor-travel 3.2s ease-in-out infinite alternate; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .arena-sixty { animation: preview-cross-sway 3.8s ease-in-out infinite alternate; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .arena-choices i,
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .daily-dots i { animation-duration: 2.8s; animation-iteration-count: infinite; }
+  .game-tile:not(:disabled):is(:hover,:focus-visible) .daily-number { animation: preview-breathe 3.4s ease-in-out infinite alternate; }
+}
+@keyframes preview-breathe { from { transform: translateY(var(--preview-y, 0px)); } to { transform: translateY(calc(var(--preview-y, 0px) - 6px)); } }
+@keyframes preview-cross-sway { from { transform: rotate(-2deg) scale(1.025); } to { transform: rotate(2deg) scale(1.045); } }
+@keyframes preview-bomb-sway { from { transform: rotate(-5deg) scale(1.025); } to { transform: rotate(1deg) scale(1.045); } }
+@keyframes preview-floor-travel { from { transform: translate(14px,-3px); } to { transform: translate(18px,-8px); } }
+:root[data-theme='light'] { --subtle: #5f594b; --coral: #95452f; }
+:root:not([data-theme='light']) .primary:disabled { opacity: 1; background: #263642; color: #b6c8d3; }
+:root:not([data-theme='light']) .bank-button:disabled { opacity: 1; background: #253a33; color: #b7d3bf; }

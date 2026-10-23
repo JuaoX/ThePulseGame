@@ -10,7 +10,9 @@
     "test:experiences": "node tests/experiences.cjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test:refinement": "node tests/refinement.cjs"
+    "test:refinement": "node tests/refinement.cjs",
+    "test:contrast": "node tests/theme-contrast.cjs",
+    "test:hover": "node tests/hover-experiences.cjs"
   },
   "engines": {
     "node": ">=22.12.0"

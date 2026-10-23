@@ -5,14 +5,14 @@ colors:
   cyan: "#17695f"
   green: "#356548"
   gold: "#805419"
-  coral: "#a34c35"
+  coral: "#95452f"
   violet: "#bca7ff"
   bg: "#eee7d9"
   surface: "#e3dac9"
   raised: "#d9cdb9"
   text: "#302f27"
   muted: "#625c4e"
-  subtle: "#6e675a"
+  subtle: "#5f594b"
   line: "#b9ad98"
   primary-ink: "#f8f0df"
   cyan-hover: "#235a50"
@@ -53,6 +53,16 @@ colors:
   dark-cross-word: "#c7e9dd"
   dark-cross-active: "#8cd9c4"
   dark-cross-error: "#f0c3b6"
+  answer-hover-bg: "#d1ddce"
+  answer-hover-border: "#6b8165"
+  answer-good-bg: "#c5dcc1"
+  answer-good-border: "#507554"
+  answer-good-ink: "#25492d"
+  answer-bad-bg: "#e9c8b7"
+  answer-bad-border: "#95614d"
+  answer-bad-ink: "#713b29"
+  bank-bg: "#c9dcc4"
+  bank-ink: "#24482f"
 typography:
   display:
     fontFamily: "Outfit, system-ui, sans-serif"
@@ -170,7 +180,7 @@ Outfit dá forma aos títulos e números; Plus Jakarta Sans sustenta os controle
 - Números expressivos, controles de toque e poucas camadas.
 - Feedback breve, explicação opcional e cosméticos sem vantagem nas regras.
 
-Registro baseado em `src/App.tsx`, `src/styles/global.css`, `CharacterCollection.tsx`, `CrosswordExperience.tsx` e `EchoExperience.tsx`. Evidência visual em `.impeccable/review/`: `experiences-home-1440.png`, `experiences-home-390.png`, `experiences-crossword-390.png`, `experiences-crossword-1440.png`, `experiences-crossword-hard-mobile.png`, `experiences-collection-390.png`, `experiences-collection-1440.png` e `experiences-echo-390.png`. O refinamento acrescenta `refinement-*.png` e `refinement-results.json`, com quatro larguras (320, 390, 768 e 1440px), geometria de abas/personagens, pistas flutuantes e preservação das respostas. As capturas `daylight-*.png` e o relatório de `tests/daylight.cjs` registram o tema claro e o fluxo de abertura em quatro larguras. As capturas `fit-orbit-1366.png`, `fit-monuments-1366.png` e `daylight-board-390.png` registram o ajuste de altura e de Órbita. `tests/fit-audio.cjs` cobre o encaixe das 20 edições em 1366×768; `tests/sound-resume.cjs` cobre retomada e descarte de áudio pendente. As capturas `results-corners*` e `results-editions*` registram comparação nas células e marcações na escolha em 390px e 1366px. As capturas `hover-experience-0.png` a `hover-experience-5.png` e `hover-mobile-static.png`, com `tests/hover-experiences.cjs`, registram os gestos e a composição estática no toque. As capturas são de navegador; não confirmam teclado móvel, leitor de tela ou uso em dispositivo físico.
+Registro baseado em `src/App.tsx`, `src/styles/global.css`, `CharacterCollection.tsx`, `CrosswordExperience.tsx` e `EchoExperience.tsx`. Evidência visual em `.impeccable/review/`: `experiences-home-1440.png`, `experiences-home-390.png`, `experiences-crossword-390.png`, `experiences-crossword-1440.png`, `experiences-crossword-hard-mobile.png`, `experiences-collection-390.png`, `experiences-collection-1440.png` e `experiences-echo-390.png`. O refinamento acrescenta `refinement-*.png` e `refinement-results.json`, com quatro larguras (320, 390, 768 e 1440px), geometria de abas/personagens, pistas flutuantes e preservação das respostas. As capturas `daylight-*.png` e o relatório de `tests/daylight.cjs` registram o tema claro e o fluxo de abertura em quatro larguras. As capturas `fit-orbit-1366.png`, `fit-monuments-1366.png` e `daylight-board-390.png` registram o ajuste de altura e de Órbita. `tests/fit-audio.cjs` cobre o encaixe das 20 edições em 1366×768; `tests/sound-resume.cjs` cobre retomada e descarte de áudio pendente. As capturas `results-corners*` e `results-editions*` registram comparação nas células e marcações na escolha em 390px e 1366px. As capturas `hover-experience-0.png` a `hover-experience-5.png` e `hover-mobile-static.png`, com `tests/hover-experiences.cjs`, registram os gestos e a composição estática no toque. A auditoria `tests/theme-contrast.cjs` e `contrast-*.png` cobre 148 estados em 390/1440px nos dois temas: texto pequeno ≥4.5:1 e grande ≥3:1 nos fundos sólidos amostrados. Imagens e controles nativos ficam fora dessa medição. O teste de hover verifica loop durante interação, parada na saída e movimento reduzido. As capturas são de navegador; não confirmam teclado móvel, leitor de tela ou uso em dispositivo físico.
 
 ## Colors
 
@@ -196,7 +206,7 @@ Os valores sem prefixo no frontmatter descrevem o tema claro inicial; `dark-*` p
 - **Prévias:** seis bases tonais para distinguir as experiências.
 - **Papel / tinta das Cruzadas:** células claras com letras escuras; verde suave distingue palavra selecionada e célula ativa. Pistas usam petróleo com texto claro. Após Concluir, células corretas usam verde (#c7e2c3) e incorretas usam vermelho suave nos dois temas. A resposta certa fica central; a letra errada digitada aparece em vermelho escuro (#792e23), no canto inferior direito, em 11px. A comparação também usa `aria-invalid` e rótulo da letra original; não há exclamação.
 
-**The Estado Legível Rule.** Acerto e seleção têm texto, ícone ou semântica de estado junto à cor.
+**The Estado Legível Rule.** Acerto e seleção têm texto, ícone ou semântica de estado junto à cor. Ao mudar o fundo no hover, resultado ou desativação, preservar um par de tinta/fundo legível; no claro, feedback semântico prevalece sobre afinidades cosméticas.
 
 ## Typography
 
@@ -227,7 +237,7 @@ A profundidade vem dos tons, contornos e blocos de prévia. Painéis comuns não
 
 **The Superfície Calma Rule.** A sombra marcada identifica o diálogo ou a pista flutuante; o portal e a rodada usam profundidade tonal.
 
-Em Explorar, mouse preciso com hover ou foco visível eleva a prévia em 3px, com sombra suave (`0 9px 20px #182b2314`); legenda e play deslocam 2px. A entrada da prévia dura 340ms e a legenda, 280ms, com curva `cubic-bezier(.16,1,.3,1)`; o fundo responde em 200ms. Cada experiência ensaia um gesto breve: sinais de Ecos pulsam em sequência, Cruzadas simula preenchimento, Bomba move letras, Elevador desloca andares, Arena responde nas alternativas e Diário nos pontos. Transições internas usam 420ms; preenchimento e respostas usam animações únicas de 520ms e 480ms, sem loop. Toque mantém a composição estática. Movimento reduzido do sistema ou configuração local remove animação e deslocamento, preservando as posições de base do sinal central de Ecos e do andar destacado. No tema claro, play ativo usa verde escuro (#315f4c) e creme (#f8f0df). O canvas de celebração é breve e acionado por eventos.
+Em Explorar, mouse preciso com hover ou foco visível eleva a prévia em 4px, com sombra suave (`0 9px 20px #182b2314`); legenda e play deslocam 2px. A entrada da prévia dura 340ms e a legenda, 280ms, com curva `cubic-bezier(.16,1,.3,1)`; o fundo responde em 200ms. Durante toda a interação, cada experiência mantém um gesto suave: sinais de Ecos pulsam em sequência, Cruzadas simula preenchimento, Bomba move letras, Elevador desloca andares, Arena responde nas alternativas e Diário nos pontos. Transições internas usam 420ms; loops de 2.8–3.8s mantêm respiração de até 6px, balanço, preenchimento e respostas somente enquanto hover ou foco visível estiver ativo. A saída interrompe os loops. Toque mantém a composição estática. Movimento reduzido do sistema ou configuração local remove animação e deslocamento, preservando as posições de base do sinal central de Ecos e do andar destacado. No tema claro, play ativo usa verde escuro (#315f4c) e creme (#f8f0df). O canvas de celebração é breve e acionado por eventos.
 
 Órbita gira em 9s; Aurora, em 12s; Fantasma oscila em 4s, com deslocamento de 5px e opacidade mínima .68. Esses efeitos pertencem somente aos retratos destacados ou equipados; a grade permanece estática. A animação pausa em aba oculta e respeita movimento reduzido. O som de hover/foco é breve, limitado por intervalo de 180ms e condicionado ao desbloqueio de áudio pelo navegador. O volume inicial é 50%, com silêncio persistente; feedback visual continua disponível sem áudio. O primeiro clique comum solicita a retomada do AudioContext; os sinais aguardam o desbloqueio concluído. Silenciar durante essa espera descarta os sinais pendentes.
 
@@ -239,7 +249,7 @@ Prévias e painéis usam cantos de 16px; cartões de personagem, retratos comuns
 
 ### Buttons
 
-Principal verde com texto claro no tema papel, ciano com texto escuro no tema noite; secundário transparente e contornado. Espaçamento de 12px 18px, peso 700 e cantos de 10px. Hover clareia o principal e usa superfície elevada no secundário. Foco visível: contorno da ação do tema de 3px, afastado 4px. Desabilitados usam opacidade .55; alternativas respondidas e sinais de Ecos mantêm opacidade total.
+Principal verde com texto claro no tema papel, ciano com texto escuro no tema noite; secundário transparente e contornado. Espaçamento de 12px 18px, peso 700 e cantos de 10px. Hover clareia o principal e usa superfície elevada no secundário. Foco visível: contorno da ação do tema de 3px, afastado 4px. No claro, desabilitados mantêm opacidade total com pares de tinta/fundo próprios; no escuro, principal e Guardar também usam pares próprios sem redução de opacidade. Alternativas respondidas e sinais de Ecos mantêm opacidade total.
 
 ### Chips
 
@@ -259,7 +269,7 @@ Três destinos: Explorar, Recordes, Coleção. No desktop, o atual usa texto e f
 
 ### Answer options
 
-Botões numerados de largura completa, com contorno e espaçamento de 12px 14px; até 420px, 11px 10px. Acerto ganha verde e check; erro ganha tom quente e resposta textual. O feedback avança automaticamente quando habilitado. “Por quê?” abre a explicação e interrompe esse avanço; “Próxima” permanece disponível. Afinidades podem trocar acabamento e cor do acerto; regras, tempo e pontuação permanecem iguais.
+Botões numerados de largura completa, com contorno e espaçamento de 12px 14px; até 420px, 11px 10px. Acerto ganha verde e check; erro ganha tom quente e resposta textual. O feedback avança automaticamente quando habilitado. “Por quê?” abre a explicação e interrompe esse avanço; “Próxima” permanece disponível. Afinidades podem trocar acabamento; no claro, cores semânticas de resposta e texto de feedback prevalecem sobre os pastéis cosméticos. Hover, acerto, erro e Guardar usam pares de fundo e tinta compatíveis. A letra da alternativa herda a tinta do resultado. Categorias selecionadas e sinais de Ecos também usam pares próprios no claro. Regras, tempo e pontuação permanecem iguais.
 
 ### Ecos
 
