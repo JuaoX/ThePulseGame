@@ -18,7 +18,8 @@ export function CharacterCollection({ profile, onAcquire, onEquip }: { profile: 
     <div className="character-showcase" style={{ '--character-color': selected.color } as React.CSSProperties}>
       <CharacterPortrait character={selected} animated size="large"/>
       <div className="character-description"><h2>{selected.name}</h2><p className="character-affinity">{selected.affinity}</p><p>{selected.description}</p><p className="meta">Mesmas regras, tempo e pontuação para todos.</p>
-        {equipped ? <button className="secondary" disabled><Icon name="check" size={18}/>Em uso</button> : owned ? <button className="primary" onClick={() => { onEquip(selected.id); setNotice(`${selected.name} está com você.`); }}>Usar personagem</button> : <><button className="primary" disabled={profile.fragments < selected.cost} onClick={() => { onAcquire(selected.id); setNotice(`${selected.name} entrou na sua coleção.`); }}>Adquirir e usar <Icon name="fragment" size={18}/>{selected.cost}</button>{profile.fragments < selected.cost && <span className="meta">Faltam {selected.cost - profile.fragments} fragmentos.</span>}</>}
+        {equipped ? <button className="secondary" disabled><Icon name="check" size={18}/>Em uso</button> : owned ? <button className="primary" onClick={() => { onEquip(selected.id); setNotice(`${selected.name} está com você.`); }}>Usar personagem</button> : <><button className="primary" disabled={profile.fragments < selected.cost} onClick={() => { onAcquire(selected.id); setNotice(`${selected.name} entrou na sua coleção.`); }}>Adquirir e usar <Icon name="fragment" size={18}/>{selected.cost}</button></>}
+        <span className="character-cost-status meta">{!owned && profile.fragments < selected.cost ? `Faltam ${selected.cost - profile.fragments} fragmentos.` : ''}</span>
       </div>
     </div>
     <div className="collection-notice" role="status">{notice}</div>

@@ -1,0 +1,22 @@
+{
+  "baseline": "cc94710853bd8893a3b430434f456226d38afce1",
+  "hashes": {
+    "src/App.tsx": "170295527f9bf75869184b7f3b3b53a82dbb5ae011d540a15b7af9a3eff1619b",
+    "src/styles/global.css": "a89ae06bfe550fe347dde583fbeeba1a21c642e1d4153868c4fd383b9ded3983",
+    "src/components/CrosswordExperience.tsx": "80fce8bc1bf6adb5953b0ba1cf3088ffedd84dd4379ad7351c1e1b23cc56f1fa",
+    "src/components/CharacterCollection.tsx": "e10adb53b5b9dd90735b71467bbb93b557d767eca846b06e6505d99232c4e0b2",
+    "tests/refinement.cjs": "bfd71c16b85fdcbc3ab2909a6a10caea9db54aca1237c7e5f0617937dadee96d"
+  },
+  "checks": {
+    "build": "passed",
+    "unit": "19 passed",
+    "browser": "9 groups passed",
+    "experiences": "6 groups passed",
+    "refinement": "4 widths passed",
+    "touch": "8 flows passed"
+  },
+  "review": "ship after documentation truth fix; runtime review kept incumbent design",
+  "publication": "Baseline GitHub/Vercel deployment verified; current refinement is local only",
+  "pending": "Larger existing permitted Portuguese arrow-crossword bank; current 20 editions preserved",
+  "limits": "Chromium emulation, not physical keyboard/screen reader"
+}

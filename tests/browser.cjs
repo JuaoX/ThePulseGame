@@ -33,7 +33,7 @@ const out = '.impeccable/review';
     assert.deepEqual(small, [], `Small controls at ${width}`);
   }
   async function leave(page) {
-    await page.getByRole('button', { name: 'Sair', exact: true }).click();
+    await page.getByRole('button', { name: 'Voltar', exact: true }).click();
     await page.getByRole('button', { name: 'Sair da partida', exact: true }).click();
   }
   async function stored(page) { return page.evaluate(() => JSON.parse(localStorage.getItem('the_pulse_game_v10_profile'))); }
@@ -143,7 +143,7 @@ const out = '.impeccable/review';
       const clock = await page.locator('.clock').innerText();
       await page.waitForTimeout(1200); assert.equal(await page.locator('.clock').innerText(), clock);
       await page.keyboard.press('Escape');
-      await page.getByRole('button', { name: 'Sair', exact: true }).focus(); await page.keyboard.press('Tab');
+      await page.getByRole('button', { name: 'Voltar', exact: true }).focus(); await page.keyboard.press('Tab');
       assert.notEqual(await page.evaluate(() => document.activeElement.textContent), 'Sair');
       results.push('dictionary failure/retry; real timeout auto-advances and timer continues; pause; Tab');
       await ctx.close();

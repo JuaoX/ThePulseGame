@@ -1,67 +1,67 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-21T00:11:27.142Z",
+  "generatedAt": "2026-10-23T00:49:57.598Z",
   "title": "Design System: The Pulse Game",
   "extensions": {
     "colorMeta": {
       "cyan": {
         "role": "primary",
-        "displayName": "Ciano do pulso",
-        "canonical": "#55d8e8",
+        "displayName": "Verde de tinta",
+        "canonical": "#17695f",
         "tonalRamp": [
-          "oklch(15% 0.1150 206.48)",
-          "oklch(26% 0.1150 206.48)",
-          "oklch(38% 0.1150 206.48)",
-          "oklch(49% 0.1150 206.48)",
-          "oklch(61% 0.1150 206.48)",
-          "oklch(72% 0.1150 206.48)",
-          "oklch(84% 0.1150 206.48)",
-          "oklch(95% 0.1150 206.48)"
+          "oklch(15% 0.0767 182.84)",
+          "oklch(26% 0.0767 182.84)",
+          "oklch(38% 0.0767 182.84)",
+          "oklch(49% 0.0767 182.84)",
+          "oklch(61% 0.0767 182.84)",
+          "oklch(72% 0.0767 182.84)",
+          "oklch(84% 0.0767 182.84)",
+          "oklch(95% 0.0767 182.84)"
         ]
       },
       "green": {
         "role": "secondary",
         "displayName": "Verde de acerto",
-        "canonical": "#9be3b2",
+        "canonical": "#356548",
         "tonalRamp": [
-          "oklch(15% 0.0993 154.09)",
-          "oklch(26% 0.0993 154.09)",
-          "oklch(38% 0.0993 154.09)",
-          "oklch(49% 0.0993 154.09)",
-          "oklch(61% 0.0993 154.09)",
-          "oklch(72% 0.0993 154.09)",
-          "oklch(84% 0.0993 154.09)",
-          "oklch(95% 0.0993 154.09)"
+          "oklch(15% 0.0712 155.79)",
+          "oklch(26% 0.0712 155.79)",
+          "oklch(38% 0.0712 155.79)",
+          "oklch(49% 0.0712 155.79)",
+          "oklch(61% 0.0712 155.79)",
+          "oklch(72% 0.0712 155.79)",
+          "oklch(84% 0.0712 155.79)",
+          "oklch(95% 0.0712 155.79)"
         ]
       },
       "gold": {
         "role": "secondary",
         "displayName": "Dourado do pavio, Ecos e fragmentos",
-        "canonical": "#f5c568",
+        "canonical": "#805419",
         "tonalRamp": [
-          "oklch(15% 0.1238 82.26)",
-          "oklch(26% 0.1238 82.26)",
-          "oklch(38% 0.1238 82.26)",
-          "oklch(49% 0.1238 82.26)",
-          "oklch(61% 0.1238 82.26)",
-          "oklch(72% 0.1238 82.26)",
-          "oklch(84% 0.1238 82.26)",
-          "oklch(95% 0.1238 82.26)"
+          "oklch(15% 0.0928 69.49)",
+          "oklch(26% 0.0928 69.49)",
+          "oklch(38% 0.0928 69.49)",
+          "oklch(49% 0.0928 69.49)",
+          "oklch(61% 0.0928 69.49)",
+          "oklch(72% 0.0928 69.49)",
+          "oklch(84% 0.0928 69.49)",
+          "oklch(95% 0.0928 69.49)"
         ]
       },
       "coral": {
         "role": "secondary",
         "displayName": "Coral do elevador",
-        "canonical": "#ffb39e",
+        "canonical": "#a34c35",
         "tonalRamp": [
-          "oklch(15% 0.0941 36.08)",
-          "oklch(26% 0.0941 36.08)",
-          "oklch(38% 0.0941 36.08)",
-          "oklch(49% 0.0941 36.08)",
-          "oklch(61% 0.0941 36.08)",
-          "oklch(72% 0.0941 36.08)",
-          "oklch(84% 0.0941 36.08)",
-          "oklch(95% 0.0941 36.08)"
+          "oklch(15% 0.1211 35.84)",
+          "oklch(26% 0.1211 35.84)",
+          "oklch(38% 0.1211 35.84)",
+          "oklch(49% 0.1211 35.84)",
+          "oklch(61% 0.1211 35.84)",
+          "oklch(72% 0.1211 35.84)",
+          "oklch(84% 0.1211 35.84)",
+          "oklch(95% 0.1211 35.84)"
         ]
       },
       "violet": {
@@ -82,241 +82,241 @@
       "bg": {
         "role": "neutral",
         "displayName": "Fundo",
-        "canonical": "#0b1017",
+        "canonical": "#eee7d9",
         "tonalRamp": [
-          "oklch(15% 0.0167 256.84)",
-          "oklch(26% 0.0167 256.84)",
-          "oklch(38% 0.0167 256.84)",
-          "oklch(49% 0.0167 256.84)",
-          "oklch(61% 0.0167 256.84)",
-          "oklch(72% 0.0167 256.84)",
-          "oklch(84% 0.0167 256.84)",
-          "oklch(95% 0.0167 256.84)"
+          "oklch(15% 0.0201 84.59)",
+          "oklch(26% 0.0201 84.59)",
+          "oklch(38% 0.0201 84.59)",
+          "oklch(49% 0.0201 84.59)",
+          "oklch(61% 0.0201 84.59)",
+          "oklch(72% 0.0201 84.59)",
+          "oklch(84% 0.0201 84.59)",
+          "oklch(95% 0.0201 84.59)"
         ]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Superfície",
-        "canonical": "#141e29",
+        "canonical": "#e3dac9",
         "tonalRamp": [
-          "oklch(15% 0.0259 251.33)",
-          "oklch(26% 0.0259 251.33)",
-          "oklch(38% 0.0259 251.33)",
-          "oklch(49% 0.0259 251.33)",
-          "oklch(61% 0.0259 251.33)",
-          "oklch(72% 0.0259 251.33)",
-          "oklch(84% 0.0259 251.33)",
-          "oklch(95% 0.0259 251.33)"
+          "oklch(15% 0.0249 83.41)",
+          "oklch(26% 0.0249 83.41)",
+          "oklch(38% 0.0249 83.41)",
+          "oklch(49% 0.0249 83.41)",
+          "oklch(61% 0.0249 83.41)",
+          "oklch(72% 0.0249 83.41)",
+          "oklch(84% 0.0249 83.41)",
+          "oklch(95% 0.0249 83.41)"
         ]
       },
       "raised": {
         "role": "neutral",
         "displayName": "Superfície elevada",
-        "canonical": "#1c2a38",
+        "canonical": "#d9cdb9",
         "tonalRamp": [
-          "oklch(15% 0.0323 249.05)",
-          "oklch(26% 0.0323 249.05)",
-          "oklch(38% 0.0323 249.05)",
-          "oklch(49% 0.0323 249.05)",
-          "oklch(61% 0.0323 249.05)",
-          "oklch(72% 0.0323 249.05)",
-          "oklch(84% 0.0323 249.05)",
-          "oklch(95% 0.0323 249.05)"
+          "oklch(15% 0.0302 80.64)",
+          "oklch(26% 0.0302 80.64)",
+          "oklch(38% 0.0302 80.64)",
+          "oklch(49% 0.0302 80.64)",
+          "oklch(61% 0.0302 80.64)",
+          "oklch(72% 0.0302 80.64)",
+          "oklch(84% 0.0302 80.64)",
+          "oklch(95% 0.0302 80.64)"
         ]
       },
       "text": {
         "role": "neutral",
         "displayName": "Texto",
-        "canonical": "#f3f6fa",
+        "canonical": "#302f27",
         "tonalRamp": [
-          "oklch(15% 0.0062 255.47)",
-          "oklch(26% 0.0062 255.47)",
-          "oklch(38% 0.0062 255.47)",
-          "oklch(49% 0.0062 255.47)",
-          "oklch(61% 0.0062 255.47)",
-          "oklch(72% 0.0062 255.47)",
-          "oklch(84% 0.0062 255.47)",
-          "oklch(95% 0.0062 255.47)"
+          "oklch(15% 0.0140 101.32)",
+          "oklch(26% 0.0140 101.32)",
+          "oklch(38% 0.0140 101.32)",
+          "oklch(49% 0.0140 101.32)",
+          "oklch(61% 0.0140 101.32)",
+          "oklch(72% 0.0140 101.32)",
+          "oklch(84% 0.0140 101.32)",
+          "oklch(95% 0.0140 101.32)"
         ]
       },
       "muted": {
         "role": "neutral",
         "displayName": "Texto secundário",
-        "canonical": "#b4c2d1",
+        "canonical": "#625c4e",
         "tonalRamp": [
-          "oklch(15% 0.0262 250.00)",
-          "oklch(26% 0.0262 250.00)",
-          "oklch(38% 0.0262 250.00)",
-          "oklch(49% 0.0262 250.00)",
-          "oklch(61% 0.0262 250.00)",
-          "oklch(72% 0.0262 250.00)",
-          "oklch(84% 0.0262 250.00)",
-          "oklch(95% 0.0262 250.00)"
+          "oklch(15% 0.0231 87.57)",
+          "oklch(26% 0.0231 87.57)",
+          "oklch(38% 0.0231 87.57)",
+          "oklch(49% 0.0231 87.57)",
+          "oklch(61% 0.0231 87.57)",
+          "oklch(72% 0.0231 87.57)",
+          "oklch(84% 0.0231 87.57)",
+          "oklch(95% 0.0231 87.57)"
         ]
       },
       "subtle": {
         "role": "neutral",
         "displayName": "Texto discreto",
-        "canonical": "#8d9fb3",
+        "canonical": "#6e675a",
         "tonalRamp": [
-          "oklch(15% 0.0358 251.10)",
-          "oklch(26% 0.0358 251.10)",
-          "oklch(38% 0.0358 251.10)",
-          "oklch(49% 0.0358 251.10)",
-          "oklch(61% 0.0358 251.10)",
-          "oklch(72% 0.0358 251.10)",
-          "oklch(84% 0.0358 251.10)",
-          "oklch(95% 0.0358 251.10)"
+          "oklch(15% 0.0217 83.02)",
+          "oklch(26% 0.0217 83.02)",
+          "oklch(38% 0.0217 83.02)",
+          "oklch(49% 0.0217 83.02)",
+          "oklch(61% 0.0217 83.02)",
+          "oklch(72% 0.0217 83.02)",
+          "oklch(84% 0.0217 83.02)",
+          "oklch(95% 0.0217 83.02)"
         ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Linha",
-        "canonical": "#2b3b4e",
+        "canonical": "#b9ad98",
         "tonalRamp": [
-          "oklch(15% 0.0395 253.15)",
-          "oklch(26% 0.0395 253.15)",
-          "oklch(38% 0.0395 253.15)",
-          "oklch(49% 0.0395 253.15)",
-          "oklch(61% 0.0395 253.15)",
-          "oklch(72% 0.0395 253.15)",
-          "oklch(84% 0.0395 253.15)",
-          "oklch(95% 0.0395 253.15)"
+          "oklch(15% 0.0323 81.71)",
+          "oklch(26% 0.0323 81.71)",
+          "oklch(38% 0.0323 81.71)",
+          "oklch(49% 0.0323 81.71)",
+          "oklch(61% 0.0323 81.71)",
+          "oklch(72% 0.0323 81.71)",
+          "oklch(84% 0.0323 81.71)",
+          "oklch(95% 0.0323 81.71)"
         ]
       },
       "primary-ink": {
         "role": "primary",
         "displayName": "Tinta da ação",
-        "canonical": "#08252e",
+        "canonical": "#f8f0df",
         "tonalRamp": [
-          "oklch(15% 0.0378 222.08)",
-          "oklch(26% 0.0378 222.08)",
-          "oklch(38% 0.0378 222.08)",
-          "oklch(49% 0.0378 222.08)",
-          "oklch(61% 0.0378 222.08)",
-          "oklch(72% 0.0378 222.08)",
-          "oklch(84% 0.0378 222.08)",
-          "oklch(95% 0.0378 222.08)"
+          "oklch(15% 0.0241 85.79)",
+          "oklch(26% 0.0241 85.79)",
+          "oklch(38% 0.0241 85.79)",
+          "oklch(49% 0.0241 85.79)",
+          "oklch(61% 0.0241 85.79)",
+          "oklch(72% 0.0241 85.79)",
+          "oklch(84% 0.0241 85.79)",
+          "oklch(95% 0.0241 85.79)"
         ]
       },
       "cyan-hover": {
         "role": "primary",
         "displayName": "Ciano de hover",
-        "canonical": "#8ceaf4",
+        "canonical": "#235a50",
         "tonalRamp": [
-          "oklch(15% 0.0904 204.42)",
-          "oklch(26% 0.0904 204.42)",
-          "oklch(38% 0.0904 204.42)",
-          "oklch(49% 0.0904 204.42)",
-          "oklch(61% 0.0904 204.42)",
-          "oklch(72% 0.0904 204.42)",
-          "oklch(84% 0.0904 204.42)",
-          "oklch(95% 0.0904 204.42)"
+          "oklch(15% 0.0604 179.45)",
+          "oklch(26% 0.0604 179.45)",
+          "oklch(38% 0.0604 179.45)",
+          "oklch(49% 0.0604 179.45)",
+          "oklch(61% 0.0604 179.45)",
+          "oklch(72% 0.0604 179.45)",
+          "oklch(84% 0.0604 179.45)",
+          "oklch(95% 0.0604 179.45)"
         ]
       },
       "preview-wordbomb": {
         "role": "neutral",
         "displayName": "Prévia Bomba",
-        "canonical": "#10313a",
+        "canonical": "#c7d9cb",
         "tonalRamp": [
-          "oklch(15% 0.0413 218.71)",
-          "oklch(26% 0.0413 218.71)",
-          "oklch(38% 0.0413 218.71)",
-          "oklch(49% 0.0413 218.71)",
-          "oklch(61% 0.0413 218.71)",
-          "oklch(72% 0.0413 218.71)",
-          "oklch(84% 0.0413 218.71)",
-          "oklch(95% 0.0413 218.71)"
+          "oklch(15% 0.0271 152.32)",
+          "oklch(26% 0.0271 152.32)",
+          "oklch(38% 0.0271 152.32)",
+          "oklch(49% 0.0271 152.32)",
+          "oklch(61% 0.0271 152.32)",
+          "oklch(72% 0.0271 152.32)",
+          "oklch(84% 0.0271 152.32)",
+          "oklch(95% 0.0271 152.32)"
         ]
       },
       "preview-elevator": {
         "role": "neutral",
         "displayName": "Prévia Elevador",
-        "canonical": "#382b2b",
+        "canonical": "#e4c6ae",
         "tonalRamp": [
-          "oklch(15% 0.0193 18.27)",
-          "oklch(26% 0.0193 18.27)",
-          "oklch(38% 0.0193 18.27)",
-          "oklch(49% 0.0193 18.27)",
-          "oklch(61% 0.0193 18.27)",
-          "oklch(72% 0.0193 18.27)",
-          "oklch(84% 0.0193 18.27)",
-          "oklch(95% 0.0193 18.27)"
+          "oklch(15% 0.0471 60.77)",
+          "oklch(26% 0.0471 60.77)",
+          "oklch(38% 0.0471 60.77)",
+          "oklch(49% 0.0471 60.77)",
+          "oklch(61% 0.0471 60.77)",
+          "oklch(72% 0.0471 60.77)",
+          "oklch(84% 0.0471 60.77)",
+          "oklch(95% 0.0471 60.77)"
         ]
       },
       "preview-classic": {
         "role": "neutral",
         "displayName": "Prévia Arena",
-        "canonical": "#28243c",
+        "canonical": "#d4cee1",
         "tonalRamp": [
-          "oklch(15% 0.0439 290.88)",
-          "oklch(26% 0.0439 290.88)",
-          "oklch(38% 0.0439 290.88)",
-          "oklch(49% 0.0439 290.88)",
-          "oklch(61% 0.0439 290.88)",
-          "oklch(72% 0.0439 290.88)",
-          "oklch(84% 0.0439 290.88)",
-          "oklch(95% 0.0439 290.88)"
+          "oklch(15% 0.0267 300.22)",
+          "oklch(26% 0.0267 300.22)",
+          "oklch(38% 0.0267 300.22)",
+          "oklch(49% 0.0267 300.22)",
+          "oklch(61% 0.0267 300.22)",
+          "oklch(72% 0.0267 300.22)",
+          "oklch(84% 0.0267 300.22)",
+          "oklch(95% 0.0267 300.22)"
         ]
       },
       "preview-daily": {
         "role": "neutral",
         "displayName": "Prévia Desafio",
-        "canonical": "#1b322c",
+        "canonical": "#ded3ad",
         "tonalRamp": [
-          "oklch(15% 0.0313 175.57)",
-          "oklch(26% 0.0313 175.57)",
-          "oklch(38% 0.0313 175.57)",
-          "oklch(49% 0.0313 175.57)",
-          "oklch(61% 0.0313 175.57)",
-          "oklch(72% 0.0313 175.57)",
-          "oklch(84% 0.0313 175.57)",
-          "oklch(95% 0.0313 175.57)"
+          "oklch(15% 0.0518 93.79)",
+          "oklch(26% 0.0518 93.79)",
+          "oklch(38% 0.0518 93.79)",
+          "oklch(49% 0.0518 93.79)",
+          "oklch(61% 0.0518 93.79)",
+          "oklch(72% 0.0518 93.79)",
+          "oklch(84% 0.0518 93.79)",
+          "oklch(95% 0.0518 93.79)"
         ]
       },
       "preview-echo": {
         "role": "secondary",
         "displayName": "Prévia de Ecos",
-        "canonical": "#322e21",
+        "canonical": "#d8cbb7",
         "tonalRamp": [
-          "oklch(15% 0.0229 93.00)",
-          "oklch(26% 0.0229 93.00)",
-          "oklch(38% 0.0229 93.00)",
-          "oklch(49% 0.0229 93.00)",
-          "oklch(61% 0.0229 93.00)",
-          "oklch(72% 0.0229 93.00)",
-          "oklch(84% 0.0229 93.00)",
-          "oklch(95% 0.0229 93.00)"
+          "oklch(15% 0.0308 78.76)",
+          "oklch(26% 0.0308 78.76)",
+          "oklch(38% 0.0308 78.76)",
+          "oklch(49% 0.0308 78.76)",
+          "oklch(61% 0.0308 78.76)",
+          "oklch(72% 0.0308 78.76)",
+          "oklch(84% 0.0308 78.76)",
+          "oklch(95% 0.0308 78.76)"
         ]
       },
       "preview-crossword": {
         "role": "secondary",
         "displayName": "Prévia de Cruzadas",
-        "canonical": "#17322f",
+        "canonical": "#c9d6c6",
         "tonalRamp": [
-          "oklch(15% 0.0336 186.24)",
-          "oklch(26% 0.0336 186.24)",
-          "oklch(38% 0.0336 186.24)",
-          "oklch(49% 0.0336 186.24)",
-          "oklch(61% 0.0336 186.24)",
-          "oklch(72% 0.0336 186.24)",
-          "oklch(84% 0.0336 186.24)",
-          "oklch(95% 0.0336 186.24)"
+          "oklch(15% 0.0259 139.83)",
+          "oklch(26% 0.0259 139.83)",
+          "oklch(38% 0.0259 139.83)",
+          "oklch(49% 0.0259 139.83)",
+          "oklch(61% 0.0259 139.83)",
+          "oklch(72% 0.0259 139.83)",
+          "oklch(84% 0.0259 139.83)",
+          "oklch(95% 0.0259 139.83)"
         ]
       },
       "cross-paper": {
         "role": "neutral",
         "displayName": "Papel das Cruzadas",
-        "canonical": "#edf3f0",
+        "canonical": "#f7f0df",
         "tonalRamp": [
-          "oklch(15% 0.0075 164.94)",
-          "oklch(26% 0.0075 164.94)",
-          "oklch(38% 0.0075 164.94)",
-          "oklch(49% 0.0075 164.94)",
-          "oklch(61% 0.0075 164.94)",
-          "oklch(72% 0.0075 164.94)",
-          "oklch(84% 0.0075 164.94)",
-          "oklch(95% 0.0075 164.94)"
+          "oklch(15% 0.0237 88.23)",
+          "oklch(26% 0.0237 88.23)",
+          "oklch(38% 0.0237 88.23)",
+          "oklch(49% 0.0237 88.23)",
+          "oklch(61% 0.0237 88.23)",
+          "oklch(72% 0.0237 88.23)",
+          "oklch(84% 0.0237 88.23)",
+          "oklch(95% 0.0237 88.23)"
         ]
       },
       "cross-ink": {
@@ -337,31 +337,31 @@
       "cross-word": {
         "role": "secondary",
         "displayName": "Palavra selecionada",
-        "canonical": "#c7e9dd",
+        "canonical": "#d8e4cb",
         "tonalRamp": [
-          "oklch(15% 0.0391 172.08)",
-          "oklch(26% 0.0391 172.08)",
-          "oklch(38% 0.0391 172.08)",
-          "oklch(49% 0.0391 172.08)",
-          "oklch(61% 0.0391 172.08)",
-          "oklch(72% 0.0391 172.08)",
-          "oklch(84% 0.0391 172.08)",
-          "oklch(95% 0.0391 172.08)"
+          "oklch(15% 0.0358 128.13)",
+          "oklch(26% 0.0358 128.13)",
+          "oklch(38% 0.0358 128.13)",
+          "oklch(49% 0.0358 128.13)",
+          "oklch(61% 0.0358 128.13)",
+          "oklch(72% 0.0358 128.13)",
+          "oklch(84% 0.0358 128.13)",
+          "oklch(95% 0.0358 128.13)"
         ]
       },
       "cross-active": {
         "role": "secondary",
         "displayName": "Célula ativa",
-        "canonical": "#8cd9c4",
+        "canonical": "#b2cfb6",
         "tonalRamp": [
-          "oklch(15% 0.0822 175.06)",
-          "oklch(26% 0.0822 175.06)",
-          "oklch(38% 0.0822 175.06)",
-          "oklch(49% 0.0822 175.06)",
-          "oklch(61% 0.0822 175.06)",
-          "oklch(72% 0.0822 175.06)",
-          "oklch(84% 0.0822 175.06)",
-          "oklch(95% 0.0822 175.06)"
+          "oklch(15% 0.0465 149.11)",
+          "oklch(26% 0.0465 149.11)",
+          "oklch(38% 0.0465 149.11)",
+          "oklch(49% 0.0465 149.11)",
+          "oklch(61% 0.0465 149.11)",
+          "oklch(72% 0.0465 149.11)",
+          "oklch(84% 0.0465 149.11)",
+          "oklch(95% 0.0465 149.11)"
         ]
       },
       "cross-clue": {
@@ -412,7 +412,352 @@
       "cross-error": {
         "role": "secondary",
         "displayName": "Letra para revisar",
-        "canonical": "#ffdbca",
+        "canonical": "#f0c3b6",
+        "tonalRamp": [
+          "oklch(15% 0.0572 52.01)",
+          "oklch(26% 0.0572 52.01)",
+          "oklch(38% 0.0572 52.01)",
+          "oklch(49% 0.0572 52.01)",
+          "oklch(61% 0.0572 52.01)",
+          "oklch(72% 0.0572 52.01)",
+          "oklch(84% 0.0572 52.01)",
+          "oklch(95% 0.0572 52.01)"
+        ]
+      },
+      "dark-cyan": {
+        "role": "primary",
+        "displayName": "Noite · Ciano do pulso",
+        "canonical": "#55d8e8",
+        "tonalRamp": [
+          "oklch(15% 0.1150 206.48)",
+          "oklch(26% 0.1150 206.48)",
+          "oklch(38% 0.1150 206.48)",
+          "oklch(49% 0.1150 206.48)",
+          "oklch(61% 0.1150 206.48)",
+          "oklch(72% 0.1150 206.48)",
+          "oklch(84% 0.1150 206.48)",
+          "oklch(95% 0.1150 206.48)"
+        ]
+      },
+      "dark-green": {
+        "role": "secondary",
+        "displayName": "Noite · Verde de acerto",
+        "canonical": "#9be3b2",
+        "tonalRamp": [
+          "oklch(15% 0.0993 154.09)",
+          "oklch(26% 0.0993 154.09)",
+          "oklch(38% 0.0993 154.09)",
+          "oklch(49% 0.0993 154.09)",
+          "oklch(61% 0.0993 154.09)",
+          "oklch(72% 0.0993 154.09)",
+          "oklch(84% 0.0993 154.09)",
+          "oklch(95% 0.0993 154.09)"
+        ]
+      },
+      "dark-gold": {
+        "role": "secondary",
+        "displayName": "Noite · Dourado do pavio, Ecos e fragmentos",
+        "canonical": "#f5c568",
+        "tonalRamp": [
+          "oklch(15% 0.1238 82.26)",
+          "oklch(26% 0.1238 82.26)",
+          "oklch(38% 0.1238 82.26)",
+          "oklch(49% 0.1238 82.26)",
+          "oklch(61% 0.1238 82.26)",
+          "oklch(72% 0.1238 82.26)",
+          "oklch(84% 0.1238 82.26)",
+          "oklch(95% 0.1238 82.26)"
+        ]
+      },
+      "dark-coral": {
+        "role": "secondary",
+        "displayName": "Noite · Coral do elevador",
+        "canonical": "#ffb39e",
+        "tonalRamp": [
+          "oklch(15% 0.0941 36.08)",
+          "oklch(26% 0.0941 36.08)",
+          "oklch(38% 0.0941 36.08)",
+          "oklch(49% 0.0941 36.08)",
+          "oklch(61% 0.0941 36.08)",
+          "oklch(72% 0.0941 36.08)",
+          "oklch(84% 0.0941 36.08)",
+          "oklch(95% 0.0941 36.08)"
+        ]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Noite · Fundo",
+        "canonical": "#0b1017",
+        "tonalRamp": [
+          "oklch(15% 0.0167 256.84)",
+          "oklch(26% 0.0167 256.84)",
+          "oklch(38% 0.0167 256.84)",
+          "oklch(49% 0.0167 256.84)",
+          "oklch(61% 0.0167 256.84)",
+          "oklch(72% 0.0167 256.84)",
+          "oklch(84% 0.0167 256.84)",
+          "oklch(95% 0.0167 256.84)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Noite · Superfície",
+        "canonical": "#141e29",
+        "tonalRamp": [
+          "oklch(15% 0.0259 251.33)",
+          "oklch(26% 0.0259 251.33)",
+          "oklch(38% 0.0259 251.33)",
+          "oklch(49% 0.0259 251.33)",
+          "oklch(61% 0.0259 251.33)",
+          "oklch(72% 0.0259 251.33)",
+          "oklch(84% 0.0259 251.33)",
+          "oklch(95% 0.0259 251.33)"
+        ]
+      },
+      "dark-raised": {
+        "role": "neutral",
+        "displayName": "Noite · Superfície elevada",
+        "canonical": "#1c2a38",
+        "tonalRamp": [
+          "oklch(15% 0.0323 249.05)",
+          "oklch(26% 0.0323 249.05)",
+          "oklch(38% 0.0323 249.05)",
+          "oklch(49% 0.0323 249.05)",
+          "oklch(61% 0.0323 249.05)",
+          "oklch(72% 0.0323 249.05)",
+          "oklch(84% 0.0323 249.05)",
+          "oklch(95% 0.0323 249.05)"
+        ]
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Noite · Texto",
+        "canonical": "#f3f6fa",
+        "tonalRamp": [
+          "oklch(15% 0.0062 255.47)",
+          "oklch(26% 0.0062 255.47)",
+          "oklch(38% 0.0062 255.47)",
+          "oklch(49% 0.0062 255.47)",
+          "oklch(61% 0.0062 255.47)",
+          "oklch(72% 0.0062 255.47)",
+          "oklch(84% 0.0062 255.47)",
+          "oklch(95% 0.0062 255.47)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Noite · Texto secundário",
+        "canonical": "#b4c2d1",
+        "tonalRamp": [
+          "oklch(15% 0.0262 250.00)",
+          "oklch(26% 0.0262 250.00)",
+          "oklch(38% 0.0262 250.00)",
+          "oklch(49% 0.0262 250.00)",
+          "oklch(61% 0.0262 250.00)",
+          "oklch(72% 0.0262 250.00)",
+          "oklch(84% 0.0262 250.00)",
+          "oklch(95% 0.0262 250.00)"
+        ]
+      },
+      "dark-subtle": {
+        "role": "neutral",
+        "displayName": "Noite · Texto discreto",
+        "canonical": "#8d9fb3",
+        "tonalRamp": [
+          "oklch(15% 0.0358 251.10)",
+          "oklch(26% 0.0358 251.10)",
+          "oklch(38% 0.0358 251.10)",
+          "oklch(49% 0.0358 251.10)",
+          "oklch(61% 0.0358 251.10)",
+          "oklch(72% 0.0358 251.10)",
+          "oklch(84% 0.0358 251.10)",
+          "oklch(95% 0.0358 251.10)"
+        ]
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "Noite · Linha",
+        "canonical": "#2b3b4e",
+        "tonalRamp": [
+          "oklch(15% 0.0395 253.15)",
+          "oklch(26% 0.0395 253.15)",
+          "oklch(38% 0.0395 253.15)",
+          "oklch(49% 0.0395 253.15)",
+          "oklch(61% 0.0395 253.15)",
+          "oklch(72% 0.0395 253.15)",
+          "oklch(84% 0.0395 253.15)",
+          "oklch(95% 0.0395 253.15)"
+        ]
+      },
+      "dark-primary-ink": {
+        "role": "primary",
+        "displayName": "Noite · Tinta da ação",
+        "canonical": "#08252e",
+        "tonalRamp": [
+          "oklch(15% 0.0378 222.08)",
+          "oklch(26% 0.0378 222.08)",
+          "oklch(38% 0.0378 222.08)",
+          "oklch(49% 0.0378 222.08)",
+          "oklch(61% 0.0378 222.08)",
+          "oklch(72% 0.0378 222.08)",
+          "oklch(84% 0.0378 222.08)",
+          "oklch(95% 0.0378 222.08)"
+        ]
+      },
+      "dark-cyan-hover": {
+        "role": "primary",
+        "displayName": "Noite · Ciano de hover",
+        "canonical": "#8ceaf4",
+        "tonalRamp": [
+          "oklch(15% 0.0904 204.42)",
+          "oklch(26% 0.0904 204.42)",
+          "oklch(38% 0.0904 204.42)",
+          "oklch(49% 0.0904 204.42)",
+          "oklch(61% 0.0904 204.42)",
+          "oklch(72% 0.0904 204.42)",
+          "oklch(84% 0.0904 204.42)",
+          "oklch(95% 0.0904 204.42)"
+        ]
+      },
+      "dark-preview-wordbomb": {
+        "role": "neutral",
+        "displayName": "Noite · Prévia Bomba",
+        "canonical": "#10313a",
+        "tonalRamp": [
+          "oklch(15% 0.0413 218.71)",
+          "oklch(26% 0.0413 218.71)",
+          "oklch(38% 0.0413 218.71)",
+          "oklch(49% 0.0413 218.71)",
+          "oklch(61% 0.0413 218.71)",
+          "oklch(72% 0.0413 218.71)",
+          "oklch(84% 0.0413 218.71)",
+          "oklch(95% 0.0413 218.71)"
+        ]
+      },
+      "dark-preview-elevator": {
+        "role": "neutral",
+        "displayName": "Noite · Prévia Elevador",
+        "canonical": "#382b2b",
+        "tonalRamp": [
+          "oklch(15% 0.0193 18.27)",
+          "oklch(26% 0.0193 18.27)",
+          "oklch(38% 0.0193 18.27)",
+          "oklch(49% 0.0193 18.27)",
+          "oklch(61% 0.0193 18.27)",
+          "oklch(72% 0.0193 18.27)",
+          "oklch(84% 0.0193 18.27)",
+          "oklch(95% 0.0193 18.27)"
+        ]
+      },
+      "dark-preview-classic": {
+        "role": "neutral",
+        "displayName": "Noite · Prévia Arena",
+        "canonical": "#28243c",
+        "tonalRamp": [
+          "oklch(15% 0.0439 290.88)",
+          "oklch(26% 0.0439 290.88)",
+          "oklch(38% 0.0439 290.88)",
+          "oklch(49% 0.0439 290.88)",
+          "oklch(61% 0.0439 290.88)",
+          "oklch(72% 0.0439 290.88)",
+          "oklch(84% 0.0439 290.88)",
+          "oklch(95% 0.0439 290.88)"
+        ]
+      },
+      "dark-preview-daily": {
+        "role": "neutral",
+        "displayName": "Noite · Prévia Desafio",
+        "canonical": "#1b322c",
+        "tonalRamp": [
+          "oklch(15% 0.0313 175.57)",
+          "oklch(26% 0.0313 175.57)",
+          "oklch(38% 0.0313 175.57)",
+          "oklch(49% 0.0313 175.57)",
+          "oklch(61% 0.0313 175.57)",
+          "oklch(72% 0.0313 175.57)",
+          "oklch(84% 0.0313 175.57)",
+          "oklch(95% 0.0313 175.57)"
+        ]
+      },
+      "dark-preview-echo": {
+        "role": "secondary",
+        "displayName": "Noite · Prévia de Ecos",
+        "canonical": "#322e21",
+        "tonalRamp": [
+          "oklch(15% 0.0229 93.00)",
+          "oklch(26% 0.0229 93.00)",
+          "oklch(38% 0.0229 93.00)",
+          "oklch(49% 0.0229 93.00)",
+          "oklch(61% 0.0229 93.00)",
+          "oklch(72% 0.0229 93.00)",
+          "oklch(84% 0.0229 93.00)",
+          "oklch(95% 0.0229 93.00)"
+        ]
+      },
+      "dark-preview-crossword": {
+        "role": "secondary",
+        "displayName": "Noite · Prévia de Cruzadas",
+        "canonical": "#17322f",
+        "tonalRamp": [
+          "oklch(15% 0.0336 186.24)",
+          "oklch(26% 0.0336 186.24)",
+          "oklch(38% 0.0336 186.24)",
+          "oklch(49% 0.0336 186.24)",
+          "oklch(61% 0.0336 186.24)",
+          "oklch(72% 0.0336 186.24)",
+          "oklch(84% 0.0336 186.24)",
+          "oklch(95% 0.0336 186.24)"
+        ]
+      },
+      "dark-cross-paper": {
+        "role": "neutral",
+        "displayName": "Noite · Papel das Cruzadas",
+        "canonical": "#edf3f0",
+        "tonalRamp": [
+          "oklch(15% 0.0075 164.94)",
+          "oklch(26% 0.0075 164.94)",
+          "oklch(38% 0.0075 164.94)",
+          "oklch(49% 0.0075 164.94)",
+          "oklch(61% 0.0075 164.94)",
+          "oklch(72% 0.0075 164.94)",
+          "oklch(84% 0.0075 164.94)",
+          "oklch(95% 0.0075 164.94)"
+        ]
+      },
+      "dark-cross-word": {
+        "role": "secondary",
+        "displayName": "Noite · Palavra selecionada",
+        "canonical": "#c7e9dd",
+        "tonalRamp": [
+          "oklch(15% 0.0391 172.08)",
+          "oklch(26% 0.0391 172.08)",
+          "oklch(38% 0.0391 172.08)",
+          "oklch(49% 0.0391 172.08)",
+          "oklch(61% 0.0391 172.08)",
+          "oklch(72% 0.0391 172.08)",
+          "oklch(84% 0.0391 172.08)",
+          "oklch(95% 0.0391 172.08)"
+        ]
+      },
+      "dark-cross-active": {
+        "role": "secondary",
+        "displayName": "Noite · Célula ativa",
+        "canonical": "#8cd9c4",
+        "tonalRamp": [
+          "oklch(15% 0.0822 175.06)",
+          "oklch(26% 0.0822 175.06)",
+          "oklch(38% 0.0822 175.06)",
+          "oklch(49% 0.0822 175.06)",
+          "oklch(61% 0.0822 175.06)",
+          "oklch(72% 0.0822 175.06)",
+          "oklch(84% 0.0822 175.06)",
+          "oklch(95% 0.0822 175.06)"
+        ]
+      },
+      "dark-cross-error": {
+        "role": "secondary",
+        "displayName": "Noite · Letra para revisar",
+        "canonical": "#f0c3b6",
         "tonalRamp": [
           "oklch(15% 0.0463 46.80)",
           "oklch(26% 0.0463 46.80)",
@@ -456,19 +801,19 @@
         "name": "dialog",
         "value": "0 18px 60px #0008",
         "purpose": "Sombra exclusiva da camada modal."
+      },
+      {
+        "name": "floating-clue",
+        "value": "0 8px 24px #0006",
+        "purpose": "Destacar a pista completa sobre a grade por hover, foco ou toque."
+      },
+      {
+        "name": "preview-hover",
+        "value": "0 9px 20px #182b2314",
+        "purpose": "Elevação temporária das prévias de Explorar com ponteiro preciso ou foco visível."
       }
     ],
     "motion": [
-      {
-        "name": "preview-hover",
-        "value": "background-color 200ms ease-out",
-        "purpose": "Fundo da prévia em dispositivos com hover."
-      },
-      {
-        "name": "elevator-hover",
-        "value": "transform 200ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Andar destacado; removido com movimento reduzido."
-      },
       {
         "name": "character-orbit",
         "value": "character-orbit 9s linear infinite",
@@ -483,6 +828,31 @@
         "name": "character-ghost",
         "value": "character-ghost 4s ease-in-out infinite",
         "purpose": "Fantasma oscila até -5px e opacidade .68 no retrato destacado ou equipado; respeita movimento reduzido e pausa em aba oculta."
+      },
+      {
+        "name": "preview-hover",
+        "value": "transform 340ms cubic-bezier(.16,1,.3,1), box-shadow 340ms cubic-bezier(.16,1,.3,1), background-color 200ms ease-out",
+        "purpose": "Mouse preciso com hover ou foco visível: prévia sobe 3px; toque estático e movimento reduzido sem deslocamento."
+      },
+      {
+        "name": "preview-caption",
+        "value": "transform 280ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Legenda e play avançam 2px no desktop."
+      },
+      {
+        "name": "preview-gesture",
+        "value": "transform 420ms cubic-bezier(.16,1,.3,1), opacity 260ms",
+        "purpose": "Gesto próprio de cada experiência; sem repetição automática."
+      },
+      {
+        "name": "preview-fill",
+        "value": "preview-fill 520ms ease-out both",
+        "purpose": "Preenchimento único da prévia de Cruzadas."
+      },
+      {
+        "name": "preview-answer",
+        "value": "preview-answer 480ms ease-out",
+        "purpose": "Resposta única nas alternativas de Arena e pontos do Diário."
       }
     ],
     "breakpoints": [
@@ -511,7 +881,7 @@
       "refersTo": "button-primary",
       "description": "Ação principal e repetição da experiência.",
       "html": "<button class=\"ds-primary\">Repetir <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border:1px solid transparent;border-radius:10px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:700;line-height:1.35;cursor:pointer;background:var(--cyan,#55d8e8);color:#08252e}.ds-primary:hover:not(:disabled){background:#8ceaf4}.ds-primary:disabled{opacity:.55;cursor:default}.ds-primary:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px;}"
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border:1px solid transparent;border-radius:10px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:700;line-height:1.35;cursor:pointer;background:var(--cyan,#17695f);color:#f8f0df}.ds-primary:hover:not(:disabled){background:#235a50}.ds-primary:disabled{opacity:.55;cursor:default}.ds-primary:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px;}"
     },
     {
       "name": "Botão secundário",
@@ -519,7 +889,7 @@
       "refersTo": "button-secondary",
       "description": "Ação de apoio com contorno.",
       "html": "<button class=\"ds-secondary\">Explorar <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border:1px solid transparent;border-radius:10px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:700;line-height:1.35;cursor:pointer;border-color:var(--line,#2b3b4e);background:transparent;color:var(--text,#f3f6fa)}.ds-secondary:hover:not(:disabled){background:var(--raised,#1c2a38)}.ds-secondary:disabled{opacity:.55;cursor:default}.ds-secondary:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px;}"
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border:1px solid transparent;border-radius:10px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:700;line-height:1.35;cursor:pointer;border-color:var(--line,#b9ad98);background:transparent;color:var(--text,#302f27)}.ds-secondary:hover:not(:disabled){background:var(--raised,#d9cdb9)}.ds-secondary:disabled{opacity:.55;cursor:default}.ds-secondary:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px;}"
     },
     {
       "name": "Campo de consulta",
@@ -527,21 +897,21 @@
       "refersTo": "input",
       "description": "Campo com rótulo persistente e foco visível.",
       "html": "<label class=\"ds-label\" for=\"ds-word\">Palavra</label><input class=\"ds-input\" id=\"ds-word\" placeholder=\"computador\" />",
-      "css": ".ds-label{display:block;margin-bottom:8px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:600;color:var(--text,#f3f6fa)}.ds-input{width:100%;padding:12px 14px;min-height:50px;border:1px solid var(--line,#2b3b4e);border-radius:10px;color:var(--text,#f3f6fa);background:var(--bg,#0b1017);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;caret-color:var(--cyan,#55d8e8)}.ds-input::placeholder{color:var(--subtle,#8d9fb3);opacity:1}.ds-input:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px;}"
+      "css": ".ds-label{display:block;margin-bottom:8px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;font-weight:600;color:var(--text,#302f27)}.ds-input{width:100%;padding:12px 14px;min-height:50px;border:1px solid var(--line,#b9ad98);border-radius:10px;color:var(--text,#302f27);background:var(--bg,#eee7d9);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;caret-color:var(--cyan,#17695f)}.ds-input::placeholder{color:var(--subtle,#6e675a);opacity:1}.ds-input:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px;}"
     },
     {
       "name": "Seletor de tema",
       "kind": "chip",
       "description": "Seletores de tema recolhidos nas configurações.",
       "html": "<div class=\"ds-themes\"><button class=\"ds-theme\" aria-pressed=\"true\">Todas</button><button class=\"ds-theme\" aria-pressed=\"false\">Matemática</button></div>",
-      "css": ".ds-themes{display:flex;flex-wrap:wrap;gap:8px}.ds-theme{min-height:44px;padding:10px 12px;border:1px solid var(--line,#2b3b4e);border-radius:8px;background:transparent;color:var(--text,#f3f6fa);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;cursor:pointer}.ds-theme[aria-pressed=true]{background:#183744;color:#a5f3fa;border-color:#518b98}.ds-theme:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px;}"
+      "css": ".ds-themes{display:flex;flex-wrap:wrap;gap:8px}.ds-theme{min-height:44px;padding:10px 12px;border:1px solid var(--line,#b9ad98);border-radius:8px;background:transparent;color:var(--text,#302f27);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;cursor:pointer}.ds-theme[aria-pressed=true]{background:#183744;color:#a5f3fa;border-color:#518b98}.ds-theme:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px;}"
     },
     {
       "name": "Navegação desktop",
       "kind": "nav",
       "description": "Explorar, Recordes e Coleção; fundo elevado identifica o destino atual no desktop.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Navegação\"><button aria-current=\"page\">Explorar</button><button>Recordes</button><button>Coleção</button></nav>",
-      "css": ".ds-nav{display:flex;gap:8px;flex-wrap:wrap}.ds-nav button{min-height:44px;border:0;background:transparent;padding:8px 14px;color:var(--muted,#b4c2d1);border-radius:8px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;cursor:pointer}.ds-nav button[aria-current]{color:var(--text,#f3f6fa);background:var(--raised,#1c2a38)}.ds-nav button:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px;}"
+      "css": ".ds-nav{display:flex;gap:8px;flex-wrap:wrap}.ds-nav button{min-height:44px;border:0;background:transparent;padding:8px 14px;color:var(--muted,#625c4e);border-radius:8px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;cursor:pointer}.ds-nav button[aria-current]{color:var(--text,#302f27);background:var(--raised,#d9cdb9)}.ds-nav button:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px;}"
     },
     {
       "name": "Painel de rodada",
@@ -549,44 +919,44 @@
       "refersTo": "panel",
       "description": "Superfície para pergunta e alternativas.",
       "html": "<section class=\"ds-panel\"><h2>120 − 24 = ?</h2><p>Escolha uma alternativa.</p></section>",
-      "css": ".ds-panel{display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:16px;background:var(--surface,#141e29);color:var(--text,#f3f6fa)}.ds-panel h2{margin:0;color:var(--text,#f3f6fa);font-family:Outfit,system-ui,sans-serif;font-size:clamp(1.25rem,3vw,1.6rem);font-weight:650;line-height:1.3;letter-spacing:-.02em}.ds-panel p{margin:0;color:var(--muted,#b4c2d1);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;max-width:70ch}@media(max-width:760px){.ds-panel{padding:20px 16px;gap:14px}.ds-panel h2{font-size:1.25rem}}"
+      "css": ".ds-panel{display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:16px;background:var(--surface,#e3dac9);color:var(--text,#302f27)}.ds-panel h2{margin:0;color:var(--text,#302f27);font-family:Outfit,system-ui,sans-serif;font-size:clamp(1.25rem,3vw,1.6rem);font-weight:650;line-height:1.3;letter-spacing:-.02em}.ds-panel p{margin:0;color:var(--muted,#625c4e);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;max-width:70ch}@media(max-width:760px){.ds-panel{padding:20px 16px;gap:14px}.ds-panel h2{font-size:1.25rem}}"
     },
     {
       "name": "Prévia de experiência",
       "kind": "custom",
-      "description": "Botão completo com geometria em CSS, nome e convite curto; integra a grade de seis experiências.",
+      "description": "Prévia com gesto próprio no mouse preciso/foco visível: elevação de 3px, legenda 2px e animação interna breve. Toque estático; movimento reduzido respeitado.",
       "html": "<button class=\"ds-tile\" aria-label=\"Abrir Bomba de palavras\"><span class=\"ds-preview\" aria-hidden=\"true\"><span class=\"ds-fuse\"></span><span class=\"ds-bomb\">CAR</span><span class=\"ds-word\"><span>car</span>inho</span><span class=\"ds-play\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 5 11 7-11 7Z\"/></svg></span></span><span class=\"ds-caption\"><strong>Bomba de palavras</strong><span>Digite antes de explodir.</span></span></button>",
-      "css": ".ds-tile{display:flex;flex-direction:column;text-align:left;padding:0;border:0;border-radius:16px;background:transparent;min-width:0;width:100%;color:var(--text,#f3f6fa);font-family:'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer}.ds-preview{width:100%;height:186px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;position:relative;overflow:hidden;background:#10313a;transition:background-color 200ms ease-out}.ds-bomb{position:relative;display:flex;align-items:center;justify-content:center;width:130px;height:130px;border:3px solid var(--cyan,#55d8e8);border-radius:50%;font:650 2.7rem Outfit,sans-serif;letter-spacing:.04em;color:var(--cyan,#55d8e8);background:var(--bg,#0b1017)}.ds-fuse{position:absolute;top:25px;left:calc(50% + 26px);width:45px;height:33px;border-top:3px solid var(--gold,#f5c568);border-right:3px solid var(--gold,#f5c568);border-radius:0 22px 0 0;transform:rotate(-25deg)}.ds-word{font-family:Outfit,sans-serif;font-size:1.3rem;letter-spacing:.04em;color:#acd7df}.ds-word span{color:var(--cyan,#55d8e8)}.ds-caption{display:flex;flex-direction:column;gap:5px;padding:16px 2px 0}.ds-caption strong{font-family:Outfit,sans-serif;font-size:1.55rem;line-height:1.15;font-weight:600}.ds-caption>span{color:var(--muted,#b4c2d1);font-size:.875rem}.ds-play{position:absolute;bottom:14px;right:14px;height:38px;width:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--cyan,#55d8e8);background:#0b101766}.ds-tile:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px}.ds-tile:active .ds-preview{filter:brightness(1.1)}@media(hover:hover){.ds-tile:hover .ds-preview{background:color-mix(in srgb,var(--cyan,#55d8e8) 22%,var(--bg,#0b1017))}.ds-tile:hover .ds-play{background:var(--cyan,#55d8e8);color:var(--bg,#0b1017)}}@media(max-width:760px){.ds-preview{height:180px}.ds-caption{padding-top:12px}.ds-caption strong{font-size:1.2rem}.ds-caption>span{font-size:.8rem}}@media(max-width:420px){.ds-preview{height:148px;gap:9px}.ds-caption strong{font-size:1.13rem}.ds-caption>span{font-size:.75rem}.ds-bomb{width:86px;height:86px;font-size:1.9rem;border-width:2px}.ds-fuse{top:15px;left:calc(50% + 15px);width:30px;height:24px;border-width:2px}.ds-word{font-size:1rem}.ds-play{bottom:9px;right:9px;width:28px;height:28px}.ds-play svg{width:16px;height:16px}}@media(prefers-reduced-motion:reduce){.ds-preview{transition:none}}"
+      "css": ".ds-tile{display:flex;flex-direction:column;text-align:left;padding:0;border:0;border-radius:16px;background:transparent;min-width:0;width:100%;color:var(--text,#302f27);font-family:'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer}.ds-preview{width:100%;height:186px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;position:relative;overflow:hidden;background:#c7d9cb;transition:background-color 200ms ease-out}.ds-bomb{position:relative;display:flex;align-items:center;justify-content:center;width:130px;height:130px;border:3px solid var(--cyan,#17695f);border-radius:50%;font:650 2.7rem Outfit,sans-serif;letter-spacing:.04em;color:var(--cyan,#17695f);background:var(--bg,#eee7d9)}.ds-fuse{position:absolute;top:25px;left:calc(50% + 26px);width:45px;height:33px;border-top:3px solid var(--gold,#805419);border-right:3px solid var(--gold,#805419);border-radius:0 22px 0 0;transform:rotate(-25deg)}.ds-word{font-family:Outfit,sans-serif;font-size:1.3rem;letter-spacing:.04em;color:#45413c}.ds-word span{color:var(--cyan,#17695f)}.ds-caption{display:flex;flex-direction:column;gap:5px;padding:16px 2px 0}.ds-caption strong{font-family:Outfit,sans-serif;font-size:1.55rem;line-height:1.15;font-weight:600}.ds-caption>span{color:var(--muted,#625c4e);font-size:.875rem}.ds-play{position:absolute;bottom:14px;right:14px;height:38px;width:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--cyan,#17695f);background:#eee7d966}.ds-tile:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px}.ds-tile:active .ds-preview{filter:brightness(1.1)}@media(hover:hover) and (pointer:fine){.ds-tile:hover .ds-preview{background:color-mix(in srgb,var(--cyan,#17695f) 22%,var(--bg,#eee7d9))}.ds-tile:hover .ds-play{background:var(--cyan,#17695f);color:var(--bg,#eee7d9)}}@media(max-width:760px){.ds-preview{height:180px}.ds-caption{padding-top:12px}.ds-caption strong{font-size:1.2rem}.ds-caption>span{font-size:.8rem}}@media(max-width:420px){.ds-preview{height:148px;gap:9px}.ds-caption strong{font-size:1.13rem}.ds-caption>span{font-size:.75rem}.ds-bomb{width:86px;height:86px;font-size:1.9rem;border-width:2px}.ds-fuse{top:15px;left:calc(50% + 15px);width:30px;height:24px;border-width:2px}.ds-word{font-size:1rem}.ds-play{bottom:9px;right:9px;width:28px;height:28px}.ds-play svg{width:16px;height:16px}}@media(prefers-reduced-motion:reduce){.ds-preview{transition:none}}@media(hover:hover) and (pointer:fine){.ds-preview{transition:transform 340ms cubic-bezier(.16,1,.3,1),box-shadow 340ms cubic-bezier(.16,1,.3,1),background-color 200ms ease-out}.ds-caption,.ds-play{transition:transform 280ms cubic-bezier(.16,1,.3,1)}.ds-tile:is(:hover,:focus-visible) .ds-preview{transform:translateY(-3px);box-shadow:0 9px 20px #182b2314}.ds-tile:is(:hover,:focus-visible) .ds-caption,.ds-tile:is(:hover,:focus-visible) .ds-play{transform:translateX(2px)}.ds-tile:is(:hover,:focus-visible) .ds-play{background:#315f4c;color:#f8f0df}.ds-bomb,.ds-word{transition:transform 420ms cubic-bezier(.16,1,.3,1)}.ds-tile:is(:hover,:focus-visible) .ds-bomb{transform:rotate(-4deg) scale(1.035)}.ds-tile:is(:hover,:focus-visible) .ds-word{transform:translateX(5px)}}@media(prefers-reduced-motion:reduce){.ds-tile *{transition:none!important;animation:none!important;transform:none!important}}.reduced-motion .ds-tile *{transition:none!important;animation:none!important;transform:none!important}"
     },
     {
       "name": "Células de Cruzadas Diretas",
       "kind": "custom",
       "refersTo": "crossword-cell",
-      "description": "Células nativas de 46px, pista condensada e leitura completa acima da janela com pan interno. A pista completa não é opcional.",
-      "html": "<section class=\"ds-cross\"><div class=\"ds-cross-active\"><span>Horizontal · 3 letras</span><strong>Nossa estrela-mãe que ilumina e aquece os dias</strong></div><div class=\"ds-cross-viewport\"><div class=\"ds-cross-row\"><button class=\"ds-cross-clue\" aria-label=\"Pista: Nossa estrela-mãe que ilumina e aquece os dias, horizontal\"><span>Nossa estrela-mãe que ilumina e aquece os dias</span><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></button><input class=\"ds-cross-cell ds-cross-selected\" aria-label=\"Letra, linha 1, coluna 2\" value=\"S\" maxlength=\"1\"/><input class=\"ds-cross-cell ds-cross-word\" aria-label=\"Letra, linha 1, coluna 3\" value=\"O\" maxlength=\"1\"/><input class=\"ds-cross-cell ds-cross-word\" aria-label=\"Letra, linha 1, coluna 4\" value=\"L\" maxlength=\"1\"/></div></div></section>",
-      "css": ".ds-cross{display:flex;flex-direction:column;gap:16px;font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;color:var(--text,#f3f6fa)}.ds-cross-active{display:flex;flex-direction:column;gap:8px;min-height:94px;padding:14px 16px;border-radius:10px;background:var(--raised,#1c2a38);position:sticky;top:8px}.ds-cross-active span{font-size:.75rem;color:var(--muted,#b4c2d1)}.ds-cross-active strong{font-size:.95rem;line-height:1.5;font-weight:600}.ds-cross-viewport{max-width:100%;overflow:auto;border-radius:10px;background:var(--bg,#0b1017);padding:2px}.ds-cross-row{display:grid;grid-template-columns:repeat(4,46px);gap:1px;width:max-content;padding:2px}.ds-cross-cell{width:46px;min-height:46px;height:46px;padding:0;border:0;border-radius:0;background:#edf3f0;color:#172d2a;text-align:center;font:500 1.3rem Outfit,system-ui,sans-serif}.ds-cross-word{background:#c7e9dd}.ds-cross-selected{background:#8cd9c4}.ds-cross-cell:focus{outline:3px solid #155c52;outline-offset:-3px}.ds-cross-clue{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:1px;width:46px;height:46px;min-height:46px;padding:3px;border:0;border-radius:0;overflow:hidden;background:#1c4850;color:#e8f4f0;cursor:pointer}.ds-cross-clue span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;width:100%;font-size:8px;line-height:1.15;text-align:center}.ds-cross-clue:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px}@media(max-width:500px){.ds-cross-active{padding:12px}.ds-cross-active strong{font-size:.9rem}}"
+      "description": "Concluir compara na própria célula: resposta certa central, acertos verdes, erros vermelhos e letra original pequena no canto. Próxima retorna à seleção; edições submetidas mantêm Concluída.",
+      "html": "<section class=\"ds-cross\"><div class=\"ds-cross-viewport\"><div class=\"ds-cross-row\"><button class=\"ds-cross-clue\" aria-label=\"Pista: Nossa estrela-mãe que ilumina e aquece os dias, horizontal\"><span>Nossa estrela-mãe que ilumina e aquece os dias</span><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></button><input class=\"ds-cross-cell ds-cross-selected\" aria-label=\"Letra, linha 1, coluna 2\" value=\"S\" maxlength=\"1\"/><input class=\"ds-cross-cell ds-cross-word\" aria-label=\"Letra, linha 1, coluna 3\" value=\"O\" maxlength=\"1\"/><span class=\"ds-cross-comparison\"><input class=\"ds-cross-cell ds-cross-incorrect\" aria-label=\"Letra, linha 1, coluna 4\" aria-invalid=\"true\" value=\"L\" readonly/><small class=\"ds-cross-original\" aria-label=\"Você digitou X\">X</small></span></div></div><div class=\"ds-cross-tooltip\" role=\"tooltip\">Nossa estrela-mãe que ilumina e aquece os dias</div></section>",
+      "css": ".ds-cross{display:flex;flex-direction:column;gap:16px;font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;color:var(--text,#302f27)}.ds-cross-viewport{max-width:100%;overflow:auto;border-radius:10px;background:var(--bg,#eee7d9);padding:2px}.ds-cross-row{display:grid;grid-template-columns:repeat(4,46px);gap:1px;width:max-content;padding:2px}.ds-cross-cell{width:46px;min-height:46px;height:46px;padding:0;border:0;border-radius:0;background:#f7f0df;color:#172d2a;text-align:center;font:500 1.3rem Outfit,system-ui,sans-serif}.ds-cross-word{background:#d8e4cb}.ds-cross-selected{background:#b2cfb6}.ds-cross-cell:focus{outline:3px solid #155c52;outline-offset:-3px}.ds-cross-clue{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:1px;width:46px;height:46px;min-height:46px;padding:3px;border:0;border-radius:0;overflow:hidden;background:#1c4850;color:#e8f4f0;cursor:pointer}.ds-cross-clue span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;width:100%;font-size:8px;line-height:1.15;text-align:center}.ds-cross-clue:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px}.ds-cross-tooltip{width:min(320px,calc(100vw - 24px));padding:16px;background:var(--raised,#d9cdb9);color:var(--text,#302f27);font-size:1rem;line-height:1.5;border-radius:10px;box-shadow:0 8px 24px #0006;pointer-events:none}.ds-cross-clue:hover{filter:brightness(1.1)}.ds-cross-row{grid-template-columns:repeat(4,64px)}.ds-cross-cell,.ds-cross-clue{width:64px;height:64px;min-height:64px}.ds-cross-clue span{font-size:11px}@media(max-width:1100px){.ds-cross-row{grid-template-columns:repeat(4,54px)}.ds-cross-cell,.ds-cross-clue{width:54px;height:54px;min-height:54px}.ds-cross-clue span{font-size:9px}}@media(max-width:760px){.ds-cross-row{grid-template-columns:repeat(4,46px)}.ds-cross-cell,.ds-cross-clue{width:46px;height:46px;min-height:46px}}.ds-cross-tooltip{background:#3e4e40;color:#faf2e0}.ds-cross-row{grid-template-columns:repeat(4,var(--ds-cell-size,46px))}.ds-cross-cell,.ds-cross-clue{width:var(--ds-cell-size,46px);height:var(--ds-cell-size,46px);min-height:var(--ds-cell-size,46px)}.ds-cross-cell{font-size:clamp(16px,calc(var(--ds-cell-size,46px) * .4),25px)}.ds-cross-clue span{font-size:clamp(8px,calc(var(--ds-cell-size,46px) * .17),11px)}.ds-cross-comparison{position:relative;width:var(--ds-cell-size,46px);height:var(--ds-cell-size,46px)}.ds-cross-incorrect{background:#f0c3b6}.ds-cross-correct{background:#c7e2c3}.ds-cross-original{position:absolute;bottom:2px;right:4px;font-size:11px;font-weight:700;line-height:1;color:#792e23;pointer-events:none}"
     },
     {
       "name": "Sinais de Ecos",
       "kind": "custom",
       "description": "Três controles com valor, barras e molde; texto e verde mantêm o alinhamento legível.",
       "html": "<div class=\"ds-signals\"><button class=\"ds-signal \" aria-label=\"Sinal A: 0, molde 1\"><span class=\"ds-echo-letter\">A</span><strong>0</strong><span class=\"ds-bars\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span>molde 1</span></button><button class=\"ds-signal \" aria-label=\"Sinal B: 0, molde 2\"><span class=\"ds-echo-letter\">B</span><strong>0</strong><span class=\"ds-bars\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span>molde 2</span></button><button class=\"ds-signal ds-aligned\" aria-label=\"Sinal C: 0, molde 0\"><span class=\"ds-echo-letter\">C</span><strong>0</strong><span class=\"ds-bars\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span>molde 0</span></button></div>",
-      "css": ".ds-signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:12px 0}.ds-signal{display:flex;flex-direction:column;align-items:center;gap:18px;padding:22px 12px;background:var(--surface,#141e29);border:1px solid var(--line,#2b3b4e);border-radius:14px;color:var(--text,#f3f6fa);font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;cursor:pointer}.ds-signal>strong{font:600 clamp(2.5rem,8vw,4rem)/1 Outfit,system-ui,sans-serif;color:var(--gold,#f5c568)}.ds-echo-letter{color:var(--muted,#b4c2d1);font-size:.875rem}.ds-signal>span:last-child{font-size:.8rem;color:var(--muted,#b4c2d1)}.ds-signal.ds-aligned{border-color:#547961}.ds-signal.ds-aligned>strong{color:var(--green,#9be3b2)}.ds-bars{display:flex;gap:5px}.ds-bars i{width:12px;height:28px;border-radius:3px;background:var(--line,#2b3b4e)}.ds-signal:disabled{opacity:1;cursor:default}.ds-signal:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px}@media(max-width:500px){.ds-signals{gap:10px}.ds-signal{padding:20px 8px;gap:14px}.ds-signal>span:last-child{font-size:.75rem}.ds-bars{gap:4px}.ds-bars i{width:9px;height:24px}}"
+      "css": ".ds-signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:12px 0}.ds-signal{display:flex;flex-direction:column;align-items:center;gap:18px;padding:22px 12px;background:var(--surface,#e3dac9);border:1px solid var(--line,#b9ad98);border-radius:14px;color:var(--text,#302f27);font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;cursor:pointer}.ds-signal>strong{font:600 clamp(2.5rem,8vw,4rem)/1 Outfit,system-ui,sans-serif;color:var(--gold,#805419)}.ds-echo-letter{color:var(--muted,#625c4e);font-size:.875rem}.ds-signal>span:last-child{font-size:.8rem;color:var(--muted,#625c4e)}.ds-signal.ds-aligned{border-color:#547961}.ds-signal.ds-aligned>strong{color:var(--green,#356548)}.ds-bars{display:flex;gap:5px}.ds-bars i{width:12px;height:28px;border-radius:3px;background:var(--line,#b9ad98)}.ds-signal:disabled{opacity:1;cursor:default}.ds-signal:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px}@media(max-width:500px){.ds-signals{gap:10px}.ds-signal{padding:20px 8px;gap:14px}.ds-signal>span:last-child{font-size:.75rem}.ds-bars{gap:4px}.ds-bars i{width:9px;height:24px}}"
     },
     {
       "name": "Cartão de personagem",
       "kind": "card",
-      "description": "Retrato estático na grade, contorno ciano de seleção e posse em texto. Efeitos ficam no retrato destacado ou equipado.",
+      "description": "Retrato estático na grade, nome com duas linhas reservadas e espaço de efeito. Destaque compacto lado a lado no celular.",
       "html": "<button class=\"ds-character-card ds-selected\" aria-pressed=\"true\" aria-label=\"Ver Kael\"><span class=\"ds-character-portrait\"><svg class=\"ds-character-art\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 980 980\" fill=\"none\" shape-rendering=\"auto\"><metadata xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\"><rdf:RDF><rdf:Description><dc:title>Lorelei</dc:title><dc:creator>Lisa Wischofsky</dc:creator><dc:source xsi:type=\"dcterms:URI\">https://www.figma.com/community/file/1198749693280469639</dc:source><dcterms:license xsi:type=\"dcterms:URI\">https://creativecommons.org/publicdomain/zero/1.0/</dcterms:license><dc:rights>Remix of „Lorelei” (https://www.figma.com/community/file/1198749693280469639) by „Lisa Wischofsky”, licensed under „CC0 1.0” (https://creativecommons.org/publicdomain/zero/1.0/)</dc:rights></rdf:Description></rdf:RDF></metadata><mask id=\"viewboxMask\"><rect width=\"980\" height=\"980\" rx=\"196\" ry=\"196\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#0f172a\" width=\"980\" height=\"980\" x=\"0\" y=\"0\" /><g transform=\"translate(10 -60)\"><path d=\"M580 141c9 1 19 4 27 9 7 5 15 9 21 15l19 15c6 6 10 14 13 21s5 14 4 22c-1 5-3 9-6 13-6 9-11 18-19 26 14 8 28 17 39 29 14 18 24 39 26 62 1 11 0 23-3 34-2 6-10 8-15 4-4-2-5-6-7-10s-5-7-6-11c-8-15-17-30-24-46l-7-14-24-1-12-1-8-5-11-8c-1 4-2 8-5 11-1 3-4 3-7 2l-13-3-45-5c-28-1-57 2-86 6l-24 4-9-2-17-5c1 7 3 15 3 23-1 5 0 10-3 14-7 14-15 27-21 42-7 17-13 35-17 53 0 2-1 4-3 5l-12 2c5 9 5 19 5 29-1 12-2 26-9 37 7 9 10 21 10 33 1 18 0 37-7 54-2 5-5 10-10 12-1 1-4 2-4-1-2-5-2-11-3-16l-16-6-28-10-10-4c-3-2-5-6-7-9-10-20-17-41-21-63a296 296 0 0 1 17-150c-14 1-29 1-41-5-9-5-16-13-21-21-4-8-7-16-9-25v-21c2-13 7-26 12-39l13-24c3-5 6-11 10-15 7-9 17-16 26-22 14-9 28-17 43-23 13-6 28-9 42-6 10 2 19 6 27 9 9 4 17 10 23 17 7 7 11 17 9 27l-7 22c11-2 23-3 35-2h19l51-1c-1-9 1-19 3-28 3-10 9-19 17-25 23-18 54-26 83-25Z\" fill=\"#000000\"/><path d=\"M486 236c57-2 115 18 159 56a209 209 0 0 1 73 190c-1 4-1 8-4 12l-1-3v-33a215 215 0 0 0-172-206 235 235 0 0 0-270 153c-12 37-14 78-6 116 6-2 12-2 17-2 2 1 5 1 6 3s0 3-1 4l-12 4c-14 3-27 8-37 18a63 63 0 0 0-22 45c0 12 3 24 8 35 8 13 19 24 33 31 18 10 41 13 62 7 2-1 4-2 6-1s3 4 4 6l15 30a215 215 0 0 0 72 63c28 15 59 21 90 26 3 1 8 1 10 4 1 2 0 3-2 4l-11 1a231 231 0 0 1-147-62c5 18 8 36 8 54 0 12-2 23-6 34-5 10-11 18-19 26a196 196 0 0 1-60 43c-1-1 1-2 2-3l17-14c13-12 25-23 35-38a93 93 0 0 0 17-65l-4-39-2-10-12-17c-5-10-11-20-13-31a93 93 0 0 1-96-31 81 81 0 0 1-19-51c0-12 3-23 8-34 9-16 23-29 40-36-8-31-8-62-3-93 8-40 26-77 51-108 45-54 115-87 186-88Z\" fill=\"#000\"/><path d=\"M541 252a214 214 0 0 1 172 206v33c-1 5-2 10-1 15-2 2-3 3-3 5-3 18-1 37 1 55 4 29 6 59 2 88-3 28-13 56-30 79-16 21-38 34-62 43-15 6-30 9-45 13-11 2-22 4-32 8 1 2 4 1 6 2 12 1 24-1 36-2-5 8-8 17-9 26-2 10 2 19 9 26 6 7 15 11 24 14 5 2 11 3 17 3 7 9 13 18 14 30 2 12-1 24-8 34-9 14-22 23-37 30-18 9-38 15-57 18a352 352 0 0 1-192-23c-18-10-38-23-48-42-4-7-8-16-6-24 18-10 33-23 47-38 8-8 14-16 19-26 4-11 6-22 6-34 0-18-3-36-8-54a235 235 0 0 0 147 62l11-1c2-1 3-2 2-4-2-3-7-3-10-4-31-5-62-11-90-26-18-10-36-22-50-37-8-8-16-17-22-26l-15-30c-1-2-2-5-4-6s-4 0-6 1a82 82 0 0 1-95-38c-5-11-8-23-8-35 1-17 9-34 22-45 10-10 23-15 37-18l12-4c1-1 2-2 1-4s-4-2-6-3c-5 0-11 0-17 2-8-38-6-79 6-116a236 236 0 0 1 270-153Z\" fill=\"#ffffff\"/><path d=\"m712 506 3 3 1 13 3 45c3 20 5 40 5 60 0 16-1 32-5 47-6 28-20 56-40 76a174 174 0 0 1-88 46c-1 9-4 16-4 25-1 6 2 10 5 15 8 8 18 14 28 19l18 9c-3 3-8 1-12 2-6 0-12-1-17-3-9-3-18-7-24-14-7-7-11-16-9-26 1-9 4-18 9-26-12 1-24 3-36 2-2-1-5 0-6-2 10-4 21-6 32-8 15-4 30-7 45-13 24-9 46-22 62-43 17-23 27-51 30-79 4-29 2-59-2-88-2-18-4-37-1-55 0-2 1-3 3-5ZM262 566c6 0 12 1 15 6 2 3 2 7 1 10-3 8-9 14-11 22-1 4 0 7 3 9 7 5 16 7 24 10l-2 2h-11c-6-1-12-2-17-5-5-4-9-11-7-18 2-9 9-15 12-23-7-4-14-2-20-8 3-4 8-6 13-5Z\" fill=\"#000\"/><path d=\"M684 485c6 2 11 7 13 13s1 13-2 18c-4 8-12 14-20 18-11 7-24 10-37 8-6 0-12-2-17-6-3-3-6-7-5-12v-3c-1-6 2-13 6-17 8-11 21-18 34-20 9-2 19-2 28 1ZM490 495c7 3 14 7 20 12l5 6c2 1 5 2 6 5 6 7 5 18-2 24-5 5-12 8-19 9-17 4-34 3-50 0-11-3-22-7-32-13-6-4-11-8-13-14-2-5-2-11 1-15 3-6 10-10 16-13 22-8 46-10 68-1Z\" fill=\"#000000\"/><path d=\"M669 490c5 0 11 1 15 4 3 2 5 5 6 9 0 6-4 11-8 15-7 8-18 12-29 15 3-8 3-17 0-25-2-5-4-9-9-12 8-4 16-6 25-6ZM459 499c13 0 27 4 39 9 6 3 11 6 15 11l-1 12c-1 5-6 7-10 8-18 6-36 4-54 0 3-5 5-10 6-16 0-8-3-17-10-22l15-2Z\" fill=\"#fff\"/><path d=\"M479 386c16 1 33 7 46 17 3 3 7 5 8 9 1 2-1 5-3 4-8-1-15-5-23-7-7-3-15-5-23-5-7-1-15 0-22 1-15 2-30 9-43 16l-21 9-1-1c1-4 3-9 6-12 6-10 17-16 27-21 15-7 32-11 49-10ZM673 390c5 2 11 5 15 10 4 4 5 9 4 15l-23-7c-7-2-13-1-20-2-7 0-15 1-21 5l-13 8h-3c-1-3 0-6 2-8 5-9 13-15 22-18 12-4 24-6 37-3Z\" fill=\"#000000\"/><path d=\"M597 505h1l3 15 3 26 8 13 6 12c2 5 2 10 5 14 3 5 5 10 5 16 0 9-6 17-14 20l-19 8c-5 3-9 5-15 5-5 0-11 0-13-5-2-2 0-4 2-5l12-3 16-5 13-5c6-2 9-8 7-14l-5-8-7-17-7-19c-4-8-6-17-5-26 0-7 1-15 4-22Z\" fill=\"#000000\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M661 646c3 3 6 8 7 12 3 5 4 11 3 17l-4-5-1-2-10-15-1-1v-1c-1-2-2-3-1-5 2-2 4-1 7 0Zm-30 25a40 40 0 0 1 29 13c3 4 7 7 8 10 2 4 2 8-2 10-5 4-13 5-20 5a5207 5207 0 0 1-42 1l-28 3-18 1-10 2-19 1c1-3 2-4 5-5l5-6 4-3c7-7 17-12 26-17l2-1c10-5 21-9 31-11 10-3 19-4 29-3Zm-6 29c-1-7 1-14 4-20-11-1-22 0-32 3l-1 11-1 7 30-1Zm11-19 1 1 4 1c6 2 11 7 15 12l3 3c-6 2-12 2-19 2h-10c4-6 6-12 6-19Zm-48 20c-1-5 0-10 1-15a254 254 0 0 0-43 21c10-3 21-4 31-5l11-1Z\" fill=\"#000000\"/><path d=\"M508 220a271 271 0 0 1 97 24c14 7 29 14 42 23 8 5 16 11 22 18l22 25c-9 4-18 3-27 2-17-2-34-4-51-3l-8-1-7-5-12-8c0 4-1 7-3 11-2 2-4 3-7 3-4-1-7-3-11-3a470 470 0 0 0-155 3h-11l-18-6c1 9 4 18 3 26-1 4-1 8-3 11-7 14-15 27-21 42-7 17-13 35-17 53 0 2-1 4-3 5l-12 2c5 9 6 20 5 30-1 12-3 26-9 36 7 9 10 21 10 33 1 19 0 37-7 55-2 4-5 9-10 11-1 1-4 1-4-1-2-4-2-9-3-13-2-15-9-29-20-40-8-7-17-14-26-19-6-2-11-4-16-8l-6-8c-12-32-16-67-12-101a285 285 0 0 1 37-113c10-16 22-30 35-43 10-9 20-17 31-23l14-5 32-11 19-2h43c23 0 44-2 67 0Z\" fill=\"#000000\"/></g><g transform=\"translate(10 -60)\"></g></g></svg></span><strong>Kael</strong><span>Na coleção</span></button>",
-      "css": ".ds-character-card{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:24px 12px 18px;background:var(--surface,#141e29);color:var(--text,#f3f6fa);border:2px solid transparent;border-radius:14px;font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;cursor:pointer}.ds-character-card.ds-selected{border-color:var(--cyan,#55d8e8)}.ds-character-portrait{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;flex-shrink:0}.ds-character-art{width:100%;height:100%;border-radius:14px;background:var(--surface,#141e29)}.ds-character-card>strong{font-family:Outfit,system-ui,sans-serif;font-size:1.1rem}.ds-character-card>span:not(.ds-character-portrait){font-size:.75rem;color:var(--muted,#b4c2d1)}.ds-character-card:focus-visible{outline:3px solid var(--cyan,#55d8e8);outline-offset:4px}@media(max-width:760px){.ds-character-card{padding:18px 8px}}@media(max-width:500px){.ds-character-portrait{width:64px;height:64px}.ds-character-card>strong{font-size:.9rem}.ds-character-card>span:not(.ds-character-portrait){font-size:.7rem}}@media(max-width:420px){.ds-character-card{padding:14px 4px;gap:10px}.ds-character-portrait{width:54px;height:54px}.ds-character-card>strong{font-size:.85rem;line-height:1.25}}"
+      "css": ".ds-character-card{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:24px 12px 18px;background:var(--surface,#e3dac9);color:var(--text,#302f27);border:2px solid transparent;border-radius:14px;font-family:\"Plus Jakarta Sans\",system-ui,sans-serif;cursor:pointer}.ds-character-card.ds-selected{border-color:var(--cyan,#17695f)}.ds-character-portrait{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;flex-shrink:0}.ds-character-art{width:100%;height:100%;border-radius:14px;background:var(--surface,#e3dac9)}.ds-character-card>strong{font-family:Outfit,system-ui,sans-serif;font-size:1.1rem}.ds-character-card>span:not(.ds-character-portrait){font-size:.75rem;color:var(--muted,#625c4e)}.ds-character-card:focus-visible{outline:3px solid var(--cyan,#17695f);outline-offset:4px}@media(max-width:760px){.ds-character-card{padding:18px 8px}}@media(max-width:500px){.ds-character-portrait{width:64px;height:64px}.ds-character-card>strong{font-size:.9rem}.ds-character-card>span:not(.ds-character-portrait){font-size:.7rem}}@media(max-width:420px){.ds-character-card{padding:14px 4px;gap:10px}.ds-character-portrait{width:54px;height:54px}.ds-character-card>strong{font-size:.85rem;line-height:1.25}}.ds-character-card{position:relative;min-height:210px;padding-bottom:36px}.ds-character-card>strong{min-height:2.3em;display:flex;align-items:center;justify-content:center}@media(max-width:500px){.ds-character-card{min-height:180px;padding-bottom:30px}}"
     }
   ],
   "narrative": {
     "northStar": "O pulso de The Pulse",
-    "overview": "The Pulse apresenta seis experiências em uma grade ilustrada, com entrada direta por toque. A identidade mantém fundo azul quase preto, ciano, símbolo de pulso, personagens e cofre de pontos. A linguagem de navegação usa Explorar, abrir e continuar. Não há apresentação comercial, missões na entrada ou tutorial obrigatório.\n\nOutfit dá forma aos títulos e números; Plus Jakarta Sans sustenta os controles e as poucas linhas de apoio. Sinais, pistas com setas, bomba, andares, cronômetro e pontos representam as experiências. Ajuda, consulta de palavras e preferências ficam em diálogos ou detalhes recolhidos. A coleção amplia os personagens existentes com afinidades visuais e efeitos cosméticos.",
+    "overview": "The Pulse apresenta seis experiências em uma grade ilustrada, com entrada direta por toque. A primeira visita usa Claro · Papel e tinta: fundo areia, superfícies quentes, tinta escura e verde. Escuro · Noite preserva marinho e ciano como opção nas configurações, persistida neste navegador. Símbolo de pulso, personagens e cofre de pontos permanecem. A linguagem de navegação usa Explorar, abrir e continuar. Não há apresentação comercial, missões na entrada ou tutorial obrigatório.\n\nOutfit dá forma aos títulos e números; Plus Jakarta Sans sustenta os controles e as poucas linhas de apoio. Sinais, pistas com setas, bomba, andares, cronômetro e pontos representam as experiências. Ajuda, consulta de palavras e preferências ficam em diálogos ou detalhes recolhidos. A coleção amplia os personagens existentes com afinidades visuais e efeitos cosméticos.",
     "keyCharacteristics": [
       "Seis prévias geométricas, com nome curto e uma linha de convite.",
-      "Fundo escuro, iluminação estática discreta e acentos próprios por experiência.",
+      "Papel quente e tinta no padrão inicial; noite marinho/ciano opcional, com acentos por experiência.",
       "Números expressivos, controles de toque e poucas camadas.",
       "Feedback breve, explicação opcional e cosméticos sem vantagem nas regras."
     ],
@@ -598,16 +968,16 @@
       },
       {
         "name": "The Superfície Calma Rule",
-        "body": "A sombra marcada identifica a camada modal; o portal e a rodada usam profundidade tonal.",
+        "body": "A sombra marcada identifica o diálogo ou a pista flutuante; o portal e a rodada usam profundidade tonal.",
         "section": "elevation"
       }
     ],
     "dos": [
       "Do preservar as seis prévias, os nomes curtos e a entrada direta nas experiências.",
       "Do manter Outfit nos títulos e números, com Plus Jakarta Sans nos controles.",
-      "Do manter ciano para ação principal e foco.",
+      "Do manter verde no tema papel e ciano no tema noite para ação principal e foco.",
       "Do manter explicações opcionais e respeitar movimento reduzido e silêncio persistente.",
-      "Do preservar células de 46px, pan interno e pista completa fora da grade nas Cruzadas.",
+      "Do ajustar células quadradas à altura disponível, preservando 32–64px no desktop, 44–46px no celular, pan interno e pista completa fora da grade nas Cruzadas.",
       "Do manter afinidades e efeitos estritamente cosméticos."
     ],
     "donts": [
@@ -615,7 +985,7 @@
       "Don't adicionar créditos técnicos visíveis à interface.",
       "Don't adicionar sombras aos painéis comuns.",
       "Don't promover os glifos atuais de ajuda, fechar e silêncio a padrão de ícones.",
-      "Don't usar as pistas condensadas de 8px como escala de instrução ou remover a leitura ampliada.",
+      "Don't usar as pistas condensadas como escala de instrução ou remover a leitura ampliada.",
       "Don't bloquear a saída por Tab da grade ou depender de áudio para comunicar estado.\r"
     ]
   }

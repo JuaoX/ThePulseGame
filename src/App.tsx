@@ -63,6 +63,8 @@ function recordSession(profile: PlayerProfile, session: Session): PlayerProfile 
 }
 
 export default function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => { try { return localStorage.getItem('pulse_theme') === 'dark' ? 'dark' : 'light'; } catch { return 'light'; } });
+  useEffect(() => { document.documentElement.dataset.theme = theme; document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#eee7d9' : '#0b1017'); try { localStorage.setItem('pulse_theme', theme); } catch {} }, [theme]);
   const [profile, setProfile] = useState(loadProfile);
   const [tab, setTab] = useState<Tab>('home');
   const [screen, setScreen] = useState<'hub' | 'game' | 'echo' | 'crossword'>('hub');
@@ -197,7 +199,7 @@ export default function App() {
   const lastRound = session && (session.mode !== 'wordbomb' && session.index === session.queue.length - 1 || session.mode === 'wordbomb' && session.relaxed && session.index === 11 || !session.relaxed && ['elevator', 'wordbomb'].includes(session.mode) && session.lives === 0);
   const lookup = <details className="word-lookup" onToggle={event => { if (event.currentTarget.open) void ensureDictionary(); }}><summary>Conferir uma palavra</summary><label htmlFor="word-search">Palavra<input id="word-search" value={query} onChange={e => setQuery(e.target.value)} placeholder="computador" maxLength={40} autoComplete="off" autoCapitalize="none" spellCheck={false}/></label><div className="lookup-result" role="status">{lexiconState === 'loading' ? 'Carregando…' : lexiconState === 'error' ? <button className="secondary" onClick={() => void ensureDictionary()}>Tentar carregar novamente</button> : queryResult ? <strong className={queryResult.valid ? 'positive' : ''}>{queryResult.valid ? `“${dictionary?.spelling(query)}” vale!` : queryResult.reason}</strong> : 'Digite pelo menos três letras.'}</div></details>;
 
-  return <div className={`pulse-shell affinity-${character.effect} ${screen !== 'hub' ? 'playing' : ''}`} onPointerDownCapture={() => SoundEngine.unlock()} onKeyDownCapture={() => SoundEngine.unlock()} style={{ '--affinity': character.color } as React.CSSProperties}>
+  return <div className={`pulse-shell affinity-${character.effect} ${screen !== 'hub' ? 'playing' : ''}`} onPointerDownCapture={() => SoundEngine.unlock()} onPointerUpCapture={() => SoundEngine.unlock()} onClickCapture={() => SoundEngine.unlock()} onKeyDownCapture={() => SoundEngine.unlock()} style={{ '--affinity': character.color } as React.CSSProperties}>
     <a className="skip-link" href="#main">Pular para o conteúdo</a>
     <header className="topbar">
       <button className="brand" aria-label="The Pulse, início" onClick={() => active ? openModal('leave') : goHome()}><PulseBrandLogo size={36}/><span>THE PULSE</span></button>
@@ -205,7 +207,7 @@ export default function App() {
       <div className="topbar-actions"><button className="icon-button" aria-label={profile.sfxVolume ? 'Silenciar sons' : 'Ativar sons'} aria-pressed={profile.sfxVolume === 0} onClick={() => setProfile(p => ({ ...p, sfxVolume: p.sfxVolume ? 0 : 50 }))}><Icon name="sound"/>{profile.sfxVolume === 0 && <span className="mute-mark" aria-hidden="true">/</span>}</button><button className="icon-button" aria-label="Configurações" onClick={() => openModal('settings')}><Icon name="settings"/></button><button className="profile-button" aria-label="Seu perfil e avatar" onClick={() => openModal('profile')}><CharacterPortrait character={character} animated size="small"/></button></div>
     </header>
     {!storageOk && <div className="storage-warning" role="status">Não foi possível salvar seus recordes neste navegador. <button onClick={() => setStorageOk(saveProfile(profile))}>Tentar salvar</button></div>}
-    <main id="main" className={`main ${screen !== 'hub' ? 'game-main' : ''}`}>
+    <main id="main" className={`main ${screen !== 'hub' ? 'game-main' : ''} ${screen === 'crossword' ? 'crossword-main' : ''}`}>
       {screen === 'hub' && <>
         {tab === 'home' && <>
           <h1 className="arcade-title">Qual vai ser?</h1>
@@ -230,7 +232,7 @@ export default function App() {
         </>}
         {tab === 'avatars' && collection}
       </>}
-      {(screen === 'echo' || screen === 'crossword') && <><header className="game-header"><h1>{screen === 'echo' ? 'Ecos' : 'Cruzadas Diretas'}</h1><button className="secondary compact" onClick={() => goHome()}>Voltar</button></header><Suspense fallback={<p role="status">Abrindo experiência…</p>}>{screen === 'echo' ? <EchoExperience discoveries={profile.discoveries} onComplete={discover}/> : <CrosswordExperience discoveries={profile.discoveries} onComplete={discover}/>}</Suspense></>}{screen === 'game' && session && <>
+      {(screen === 'echo' || screen === 'crossword') && <><header className="game-header experience-header"><button className="secondary compact" onClick={() => goHome()}>Voltar</button><h1>{screen === 'echo' ? 'Ecos' : 'Cruzadas Diretas'}</h1></header><Suspense fallback={<p role="status">Abrindo experiência…</p>}>{screen === 'echo' ? <EchoExperience discoveries={profile.discoveries} onComplete={discover}/> : <CrosswordExperience discoveries={profile.discoveries} onComplete={discover}/>}</Suspense></>}{screen === 'game' && session && <>
         <ArenaCanvasFX ref={fx} reducedMotion={reducedMotion}/>
         {session.phase === 'finished' ? <section className="result-screen">
           <h1 ref={questionHeading} tabIndex={-1}>{correctCount === session.history.length && correctCount > 0 ? 'Gabaritou!' : 'Fim da rodada!'}</h1>
@@ -242,7 +244,7 @@ export default function App() {
           {copyError && <div className="copy-recovery" role="status"><label htmlFor="manual-result">Selecione e copie seu resultado</label><textarea id="manual-result" readOnly value={shareText} rows={4} onFocus={event => event.currentTarget.select()}/></div>}
           <details className="disclosure result-details"><summary>Ver respostas</summary><p className="meta">Cofre: {session.safeScore} + {Math.round(session.riskScore / 2)} recuperados.</p><div className="review-list">{session.history.map((item, index) => <details key={index}><summary><span className={item.isCorrect ? 'positive' : 'attention'}>{item.isCorrect ? 'Acerto' : 'Errou'}</span> {item.prompt}</summary><p>Sua resposta: {item.userAnswer}</p><p><strong>{item.correctAnswer}</strong></p><p>{item.explanation}</p></details>)}</div></details>
         </section> : <>
-          <header className="game-header"><h1>{modeTitle(session)}</h1><div className="game-controls"><button className="icon-button" aria-label="Como funciona" onClick={() => openModal('help')}>?</button><button className="icon-button" aria-label="Pausar" onClick={() => dispatch({ type: 'PAUSE' })} disabled={session.phase === 'paused'}><Icon name="pause" size={18}/></button><button className="secondary compact" onClick={() => openModal('leave')}>Sair</button></div></header>
+          <header className="game-header"><button className="secondary compact" onClick={() => openModal('leave')}>Voltar</button><h1>{modeTitle(session)}</h1><div className="game-controls"><button className="icon-button" aria-label="Como funciona" onClick={() => openModal('help')}>?</button><button className="icon-button" aria-label="Pausar" onClick={() => dispatch({ type: 'PAUSE' })} disabled={session.phase === 'paused'}><Icon name="pause" size={18}/></button></div></header>
           <div className="scorebar"><div><span>Cofre</span><strong>{session.safeScore}</strong></div><button className="bank-button" onClick={() => { dispatch({ type: 'BANK' }); SoundEngine.bank(); }} disabled={session.riskScore <= 0 || session.phase !== 'answering'}><Icon name="shield" size={18}/>Guardar +{session.riskScore}</button><div><span>Combo</span><strong>{comboFor(session.streak).toFixed(1)}×</strong></div></div>
           <section className={`question-panel ${session.mode === 'wordbomb' ? 'word-panel' : ''}`} aria-label="Rodada atual" aria-busy={session.phase === 'paused'}>
             <div className="question-meta"><span>{session.mode === 'wordbomb' ? `Palavra ${session.index + 1}${session.relaxed ? '/12' : ''}` : session.mode === 'elevator' ? `Andar ${session.floor}` : `${session.index + 1}/${session.queue.length}`}</span><span>{!session.relaxed && ['elevator', 'wordbomb'].includes(session.mode) && `${session.lives} vidas · `}{session.relaxed ? 'Sem tempo' : `${Math.ceil(session.fuseMs / 1000)}s`}</span></div>
@@ -267,6 +269,7 @@ export default function App() {
       <button className="primary" onClick={closeModal}>Continuar</button>
     </Dialog>}
     {modal === 'settings' && <Dialog title="Configurações" onClose={closeModal}>
+      <div className="setting-row"><label htmlFor="appearance">Aparência</label><select id="appearance" value={theme} onChange={event => setTheme(event.target.value as 'light' | 'dark')}><option value="light">Claro · Papel e tinta</option><option value="dark">Escuro · Noite</option></select></div>
       <div className="setting-row"><label htmlFor="sfx-volume">Volume <strong>{profile.sfxVolume === 0 ? 'Silenciado' : `${profile.sfxVolume}%`}</strong></label><input id="sfx-volume" type="range" min="0" max="100" value={profile.sfxVolume} onChange={e => setProfile(p => ({ ...p, sfxVolume: Number(e.target.value) }))}/></div>
 
       <label className="switch-label"><input type="checkbox" checked={profile.autoAdvance} onChange={e => setProfile(p => ({ ...p, autoAdvance: e.target.checked }))}/>Avançar respostas automaticamente</label>

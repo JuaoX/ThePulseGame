@@ -28,7 +28,7 @@ O build estático fica em `dist/`. Publique todos os arquivos dessa pasta. `sync
 
 Ecos tem oito sinais com consequências adiadas: o toque soma no sinal escolhido e deixa um eco para o próximo. Há desfazer e recomeçar, sem necessidade de cronômetro ou moedas para resolver.
 
-Cruzadas Diretas importa 20 edições existentes em português, com 160 respostas e três níveis. Grades, respostas e pistas vêm do acervo registrado em `public/crosswords/source.json`; não são geradas em tempo de execução. Pistas foram inseridas nas casas anteriores às palavras e numa margem de borda. Fácil oferece iniciais, médio permite conferir letras, e difícil permite conferir a edição somente depois de preenchida.
+Cruzadas Diretas importa 20 edições existentes em português, com 160 respostas e três níveis. Grades, respostas e pistas vêm do acervo registrado em `public/crosswords/source.json`; não são geradas em tempo de execução. Pistas foram inseridas nas casas anteriores às palavras e numa margem de borda. Fácil oferece iniciais; os três níveis revelam as respostas apenas ao clicar em Concluir, mantendo o preenchimento original para voltar à edição.
 
 Toque numa pista ou letra e digite. Setas movem pela grade; espaço troca direção num cruzamento; Tab/Enter passam à próxima palavra, com saída pelos controles ao terminar a lista. Backspace apaga e recua. Colagem de respostas e acentos são normalizados. As casas têm 46px, com rolagem interna e pista ampliada; o preenchimento é salvo localmente. Limpar exige confirmação.
 
@@ -49,3 +49,9 @@ Suítes de navegador usam Chrome/Edge instalado ou Chromium do Playwright. `PULS
 Sem multiplayer ou ranking online. A coleção é local e não é uma economia protegida por servidor. Redefinir progresso apaga também o preenchimento das cruzadas.
 
 Atribuições ficam em `public/THIRD-PARTY-NOTICES.txt`, `public/avatars/NOTICE.md`, `public/fonts/NOTICE.md`, `public/lexicon/` e `public/crosswords/LICENSE.txt`; não são exibidas na interface. O corpus de grafias continua separado das pistas de cruzadas. `scripts/sync-crosswords.mjs` importa o commit fixo do acervo; não gera novas grades.
+
+### Refinamento das cruzadas
+
+Voltar fica à esquerda em todas as experiências. As pistas ampliam por mouse/foco ou toque. Concluir revela respostas e comparação nas células; Próxima retorna ao seletor com a edição seguinte escolhida. Limpar pede confirmação. Controles ficam antes da grade, com rolagem interna para preservar as células de 46px. A coleção reserva espaço para nomes, avisos e aquisição; a troca de aba mantém a largura.
+
+Validação adicional: `npm run test:refinement` (use PULSE_BASE_URL para outra porta). O banco importado permanece com 20 edições de oito respostas: edições mais densas ainda dependem de fonte adequada com permissão de uso.

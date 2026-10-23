@@ -77,7 +77,7 @@ export function saveProfile(profile: PlayerProfile): boolean {
   catch { return false; }
 }
 export function clearProfileStorage(): PlayerProfile {
-  try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('pulse_crosswords_v1'); } catch { /* The UI reports unavailable persistence on its next save. */ }
+  try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('pulse_crosswords_v1'); localStorage.removeItem('pulse_crosswords_finished_v1'); } catch { /* The UI reports unavailable persistence on its next save. */ }
   return createDefaultProfile();
 }
 export function getPlayerLeague(xp: number): { division: string; tierCode: string; nextXp: number; progressPct: number } {

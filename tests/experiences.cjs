@@ -21,13 +21,20 @@ const url = process.env.PULSE_BASE_URL || 'http://127.0.0.1:5180/';
       input.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }));
     }, answer);
   }
+  async function choose(page, puzzle) {
+    await page.getByRole('button', { name: 'Voltar', exact: true }).click();
+    await page.getByRole('button', { name: 'Abrir Cruzadas Diretas', exact: true }).click();
+    await page.getByRole('button', { name: puzzle.title, exact: true }).click();
+    await page.getByRole('button', { name: 'Abrir cruzada', exact: true }).click();
+  }
   async function solve(page, puzzle) {
     for (const entry of puzzle.entries) {
       const button = page.getByRole('button', { name: `Pista: ${entry.clue}, ${entry.direction === 'H' ? 'horizontal' : 'vertical'}`, exact: true });
       if (await button.count()) await button.click();
-      else { await page.getByText('Todas as pistas', { exact: true }).click(); await page.locator('.cross-clue-list button').nth(puzzle.entries.indexOf(entry)).click(); }
+      else { await page.locator(`[id="cross-${entry.cells[0]}"]`).focus(); }
       await paste(page, entry.cells[0], entry.answer);
     }
+    await page.getByRole('button', { name: 'Concluir', exact: true }).click();
     await page.getByText('Cruzada completa!', { exact: false }).waitFor();
   }
   try {
@@ -63,7 +70,8 @@ const url = process.env.PULSE_BASE_URL || 'http://127.0.0.1:5180/';
       assert.equal((await profile(page)).equippedCharacter, 'leo');
       assert.equal(await page.locator('.profile-button img').getAttribute('src'), '/avatars/ava_leo.svg');
       await page.getByRole('button', { name: 'Abrir Cruzadas Diretas', exact: true }).click();
-      await page.getByLabel('Nível', { exact: true }).waitFor();
+      await page.getByRole('button', { name: 'Abrir cruzada', exact: true }).click();
+      await page.locator('.cross-grid').waitFor();
       await capture(page, `experiences-crossword-${width}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `Crossword overflow at ${width}`);
       const first = bank[0].entries[0];
@@ -88,31 +96,33 @@ const url = process.env.PULSE_BASE_URL || 'http://127.0.0.1:5180/';
         assert.notEqual(await page.locator('#cross-clue-text').innerText(), before);
         const correct = bank[0].solution[intersection];
         await input.fill(correct === 'Z' ? 'X' : 'Z');
-        await page.getByRole('button', { name: 'Conferir letras', exact: true }).click();
+        await page.getByRole('button', { name: 'Concluir', exact: true }).click();
         assert.ok(await page.locator('.cross-cell.incorrect').count() > 0);
+        await page.getByRole('button', { name: 'Limpar', exact: true }).click();
+        await page.getByRole('button', { name: 'Apagar preenchimento', exact: true }).click();
         await input.focus(); await input.press('Backspace'); assert.equal(await input.inputValue(), '');
         await input.press('Tab'); assert.ok((await page.evaluate(() => document.activeElement.id)).startsWith('cross-'));
         await solve(page, bank[0]);
         await page.waitForFunction(() => JSON.parse(localStorage.getItem('the_pulse_game_v10_profile')).fragments === 10);
         await page.getByRole('button', { name: 'Voltar', exact: true }).click();
         await page.getByRole('button', { name: 'Abrir Cruzadas Diretas', exact: true }).click();
+      await page.getByRole('button', { name: 'Abrir cruzada', exact: true }).click();
+        await solve(page, bank[0]);
         await page.getByText('Cruzada completa!', { exact: false }).waitFor();
         assert.equal((await profile(page)).fragments, 10);
-        await page.getByLabel('Nível', { exact: true }).selectOption('Médio');
-        await page.getByLabel('Edição', { exact: true }).selectOption('cross-3');
+        await choose(page, bank[2]);
         await solve(page, bank[2]);
         await page.waitForFunction(() => JSON.parse(localStorage.getItem('the_pulse_game_v10_profile')).fragments === 22);
-        await page.getByLabel('Nível', { exact: true }).selectOption('Difícil');
-        await page.getByLabel('Edição', { exact: true }).selectOption('cross-6');
-        assert.equal(await page.getByRole('button', { name: 'Conferir edição', exact: true }).isDisabled(), true);
+        await choose(page, bank[5]);
+        assert.equal(await page.getByRole('button', { name: 'Concluir', exact: true }).isDisabled(), false);
         const hardLast = bank[5].entries[bank[5].entries.length - 1];
         await page.getByRole('button', { name: `Pista: ${hardLast.clue}, ${hardLast.direction === 'H' ? 'horizontal' : 'vertical'}`, exact: true }).click();
         await page.keyboard.press('Tab');
-        assert.equal(await page.evaluate(() => document.activeElement.id), 'cross-clear', 'Hard incomplete final word traps Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'cross-check', 'Hard incomplete final word traps Tab');
         const hardFirst = bank[5].entries[0];
         await page.getByRole('button', { name: `Pista: ${hardFirst.clue}, ${hardFirst.direction === 'H' ? 'horizontal' : 'vertical'}`, exact: true }).click();
         await page.keyboard.press('Shift+Tab');
-        assert.equal(await page.evaluate(() => document.activeElement.id), 'cross-level', 'First word traps reverse Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'cross-check', 'First word traps reverse Tab');
         await capture(page, 'experiences-crossword-hard-mobile');
         await solve(page, bank[5]);
         await page.waitForFunction(() => JSON.parse(localStorage.getItem('the_pulse_game_v10_profile')).fragments === 38);
@@ -123,6 +133,7 @@ const url = process.env.PULSE_BASE_URL || 'http://127.0.0.1:5180/';
       } else {
         await page.getByRole('button', { name: 'Voltar', exact: true }).click();
         await page.getByRole('button', { name: 'Abrir Cruzadas Diretas', exact: true }).click();
+      await page.getByRole('button', { name: 'Abrir cruzada', exact: true }).click();
         await firstInput.waitFor(); assert.equal(await firstInput.inputValue(), first.answer[0]);
       }
       cases.push(`home, echo solution, purchase, reduced motion and crossword keyboard: ${width}`);

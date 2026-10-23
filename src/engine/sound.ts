@@ -4,6 +4,7 @@ class PulseSound {
   private player: UISFXPlayer | undefined;
   private level = 0.5;
   private lastHover = 0;
+  private request = 0;
   private getPlayer(): UISFXPlayer {
     return this.player ||= createUISFX({ pack: 'soft', volume: this.level, maxVoices: 4, cooldownMs: 100 });
   }
@@ -11,7 +12,7 @@ class PulseSound {
     this.level = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
     this.player?.setVolume(this.level);
     this.player?.setEnabled(this.level > 0);
-    if (this.level === 0) this.player?.stopAll();
+    if (this.level === 0) { this.request++; this.player?.stopAll(); }
   }
   get volume(): number { return this.level; }
   unlock(): void {
@@ -20,7 +21,11 @@ class PulseSound {
   }
   private play(cue: CueName): void {
     if (this.level <= 0) return;
-    try { this.getPlayer().play(cue); } catch { /* Visible feedback remains available. */ }
+    try {
+      const player = this.getPlayer(), request = ++this.request;
+      player.setEnabled(true);
+      void player.unlock().then(ready => { if (ready && this.level > 0 && request === this.request) player.play(cue); }).catch(() => {});
+    } catch { /* Visible feedback remains available. */ }
   }
   hoverTick(): void {
     const now = performance.now();

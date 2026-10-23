@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "cases": [
+    "Stable tabs, all character selections, clue expansion, manual reveal, preserved answers, reachable actions at 320",
+    "Stable tabs, all character selections, clue expansion, manual reveal, preserved answers, reachable actions at 390",
+    "Stable tabs, all character selections, clue expansion, manual reveal, preserved answers, reachable actions at 768",
+    "Stable tabs, all character selections, clue expansion, manual reveal, preserved answers, reachable actions at 1440"
+  ],
+  "limit": "Browser emulation; no physical mobile keyboard or screen reader"
+}
