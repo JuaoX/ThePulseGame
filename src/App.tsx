@@ -217,7 +217,6 @@ export default function App() {
               {mode.id === 'elevator' && <span className="elevator-preview"><span className="floor floor-3">03</span><span className="floor floor-2">02<Icon name="arrow" size={24}/></span><span className="floor floor-1">01</span></span>}
               {mode.id === 'classic' && <><span className="arena-sixty">60<span>s</span></span><span className="arena-choices"><i/><i/><i/><i/></span></>}
               {mode.id === 'daily' && <><span className="daily-number">10<span>/10</span></span><span className="daily-dots">{Array.from({ length: 10 }, (_, i) => <i key={i}/>)}</span></>}
-              <span className="tile-play"><Icon name="play" size={21}/></span>
             </span>
             <span className="tile-caption"><strong>{mode.title}</strong><span>{mode.description}</span></span>
           </button>)}</div>
